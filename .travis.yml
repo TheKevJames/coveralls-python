@@ -6,6 +6,6 @@ python:
 install:
   - 'pip install coverage'
 script:
-  - 'coverage run --source=coveralls python setup.py test'
+  - 'coverage run --source=coveralls setup.py test'
   - 'coverage report -m'
 
