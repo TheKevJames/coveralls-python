@@ -39,6 +39,7 @@ class Configration(unittest.TestCase):
     def tearDown(self):
         os.remove('.coveralls.mock')
 
+    @patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
         expect(cover.config['service_name']).to.equal('jenkins')
