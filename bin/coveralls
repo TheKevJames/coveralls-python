@@ -9,6 +9,7 @@ Usage:
 Global options:
     -h --help       Display this help
     -v --verbose    Print extra info, True for debug command
+    --source-debug  Include source_files in debug
 """
 import logging
 import pprint
@@ -31,8 +32,11 @@ if __name__ == '__main__':
     if options['--verbose']:
         log.debug('Submitting this (sources excluded for brevity):')
         data = coverallz.create_data().copy()
-        data.pop('source_files')
-        log.debug(pprint.pformat(data))
+        if options['--source-debug']:
+            log.debug(data)
+        else:
+            data.pop('source_files')
+            log.debug(pprint.pformat(data))
     if not options['debug']:
         log.info("Submitting coverage to coveralls.io...")
         result = coverallz.wear()
