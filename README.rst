@@ -26,15 +26,16 @@ Second, install this package::
 
     $ pip install coveralls
 
-.. note::
+If you're using `Travis CI`_, no further configuration is required.
 
-    If you're using `Travis CI`_, no further configuration is required.
+Configuration
+~~~~~~~~~~~~~
 
-If you're not using Travis, you have to provide ``repo_token`` option in ``.coveralls.yml`` in the root of your repo.
-This is your own secret token, which is available at the bottom of your repository's page on Coveralls.
+If you're not using Travis, you have to provide at least a ``repo_token`` option in ``.coveralls.yml``
+at the root of your repo. This is your own secret token, which is available at the bottom of your repository's page on Coveralls.
 Make sure it stays **secret**, do not put it in your public repo.
 
-Example if .coveralls.yml::
+Example of .coveralls.yml::
 
     # .coveralls.yml
     repo_token: TjkDuVpGjuQcRhNW8dots9c8SSnv7ReM5
