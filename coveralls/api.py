@@ -1,11 +1,17 @@
 # coding: utf-8
 import json
+import logging
 import os
 import tempfile
 import coverage
 import requests
 import yaml
+from sh import git
+
 from .reporter import CoverallReporter
+
+
+log = logging.getLogger(__name__)
 
 
 class Coveralls(object):
@@ -13,7 +19,7 @@ class Coveralls(object):
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
     default_client = 'coveralls-python'  # coveralls-ruby ?
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """ Coveralls!
 
         * repo_token
@@ -28,18 +34,27 @@ class Coveralls(object):
         * [service_job_id]
           A unique identifier of the job on the service specified by service_name.
         """
-        self.config = {}
-        file_config = yaml.load(open(self.config_filename))
-        self.config['repo_token'] = file_config.get('repo_token', None)
-
-        if not self.config['repo_token']:
-            raise Exception('You have to provide repo_token in %s' % self.config_filename)
+        self.config = kwargs
+        file_config = self.load_config()
+        self.config['repo_token'] = self.config['repo_token'] or file_config.get('repo_token')
 
         if os.environ.get('TRAVIS'):
-            self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
+            is_travis = True
+            self.config['service_name'] = file_config.get('service_name') or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
         else:
-            self.config['service_name'] = file_config.get('service_name', None) or self.default_client
+            is_travis = False
+            self.config['service_name'] = file_config.get('service_name') or self.default_client
+
+        if not self.config['repo_token'] and not is_travis:
+            raise Exception('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
+
+    def load_config(self):
+        try:
+            return yaml.load(open(self.config_filename))
+        except IOError:
+            log.warning('Missing %s file. Using only env variables.', self.config_filename)
+            return {}
 
     def wear(self):
         """ run! """
@@ -89,5 +104,41 @@ class Coveralls(object):
         return reporter.report()
 
     def git_info(self):
-        # TODO: implement optional git info
-        return {}
+        """ A hash of Git data that can be used to display more information to users.
+
+            Example:
+            "git": {
+                "head": {
+                    "id": "5e837ce92220be64821128a70f6093f836dd2c05",
+                    "author_name": "Wil Gieseler",
+                    "author_email": "wil@example.com",
+                    "committer_name": "Wil Gieseler",
+                    "committer_email": "wil@example.com",
+                    "message": "depend on simplecov >= 0.7"
+                },
+                "branch": "master",
+                "remotes": [{
+                    "name": "origin",
+                    "url": "https://github.com/lemurheavy/coveralls-ruby.git"
+                }]
+            }
+        """
+        git_info = {
+            'head': {
+                'id': gitlog('%H'),
+                'author_name': gitlog('%aN'),
+                'author_email': gitlog('%ae'),
+                'committer_name': gitlog('%cN'),
+                'committer_email': gitlog('%ce'),
+                'message': gitlog('%s'),
+            },
+            'branch': git('rev-parse', '--abbrev-ref', 'HEAD').strip(),
+            # #origin	git@github.com:coagulant/coveralls-python.git (fetch)
+            'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
+                         for line in git.remote('-v') if '(fetch)' in line]
+        }
+        return git_info
+
+
+def gitlog(format):
+    return str(git('--no-pager', 'log', "-1", pretty="format:%s" % format))
