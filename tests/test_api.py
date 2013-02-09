@@ -25,7 +25,9 @@ class SimpleTest(unittest.TestCase):
 
         git_info = cover.git_info()
         commit_id = git_info['head'].pop('id')
-        expect(commit_id).should.match(r'[a-f0-9]{40}', re.I)
+        self.assertEqual(re.match(r'[a-f0-9]{40}', commit_id))
+        # expect(commit_id).should.match(r'[a-f0-9]{40}', re.I | re.U) sure 1.1.7 is broken for py2.6
+
         expect(git_info).should.be.equal({
             'head': {
                 'committer_email': 'me@here.com',

@@ -10,7 +10,7 @@ setup(
     author_email='baryhsev@gmail.com',
     description='Show coverage stats online via coveralls.io',
     scripts=['bin/coveralls'],
-    requires=['docopt', 'coverage', 'requests', 'sh'],
-    tests_require=['nose', 'sure'],
+    install_requires=['PyYAML', 'docopt', 'coverage', 'requests'],
+    tests_require=['nose', 'sure', 'sh'],
     test_suite="nose.collector",
 )
