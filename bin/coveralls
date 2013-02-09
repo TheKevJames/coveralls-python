@@ -28,12 +28,13 @@ if __name__ == '__main__':
     log.setLevel(level)
 
     coverallz = Coveralls()
-    if options['debug']:
+    if options['--verbose']:
         log.debug('Submitting this (sources excluded for brevity):')
-        data = coverallz.create_data()
+        data = coverallz.create_data().copy()
         data.pop('source_files')
         log.debug(pprint.pformat(data))
-    else:
+    if not options['debug']:
+        log.info("Submitting coverage to coveralls.io...")
         result = coverallz.wear()
         log.info("Coverage submitted!")
         log.info(result['message'])

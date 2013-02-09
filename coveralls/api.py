@@ -34,6 +34,7 @@ class Coveralls(object):
         * [service_job_id]
           A unique identifier of the job on the service specified by service_name.
         """
+        self._data = None
         self.config = kwargs
         file_config = self.load_config()
         repo_token = self.config.get('repo_token') or file_config.get('repo_token')
@@ -88,10 +89,11 @@ class Coveralls(object):
                 ]
             }
         """
-        data = {'source_files': self.get_coverage()}
-        data.update(self.git_info())
-        data.update(self.config)
-        return data
+        if not self._data:
+            self._data = {'source_files': self.get_coverage()}
+            self._data.update(self.git_info())
+            self._data.update(self.config)
+        return self._data
 
     def write_file(self, data):
         fd, name = tempfile.mkstemp()

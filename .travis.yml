@@ -9,5 +9,6 @@ script:
   - coverage run --source=coveralls setup.py test
   - coverage report -m
   - python setup.py develop
-  - bin/coveralls
+after_script:
+  - bin/coveralls --verbose
 
