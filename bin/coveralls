@@ -39,3 +39,4 @@ if __name__ == '__main__':
         log.info("Coverage submitted!")
         log.info(result['message'])
         log.info(result['url'])
+        log.debug(result)

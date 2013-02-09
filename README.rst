@@ -4,6 +4,9 @@ Coveralls for python
 .. image:: https://travis-ci.org/coagulant/coveralls-python.png?branch=master
     :target: https://travis-ci.org/coagulant/coveralls-python
 
+.. image:: https://coveralls.io/repos/coagulant/coveralls-python/badge.png?branch=master
+    :target: https://coveralls.io/r/coagulant/coveralls-python
+
 `Coveralls.io`_ is service to publish your coverage stats online with a lot of `nice features`_.
 This package provides seamless integration with ``coverage.py`` in your python projects.
 For ruby projects, there is an `official gem`_.
