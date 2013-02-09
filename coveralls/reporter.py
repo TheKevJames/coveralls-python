@@ -33,7 +33,7 @@ class CoverallReporter(Reporter):
     def parse_file(self, cu, analysis):
         """ Generate data for single file """
         filename = cu.file_locator.relative_filename(cu.filename)
-        coverage_lines = [self.get_hits(i, analysis) for i in xrange(1, len(analysis.parser.lines) + 1)]
+        coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(analysis.parser.lines) + 1)]
         self.source_files.append({
             'name': filename,
             'source': cu.source_file().read(),

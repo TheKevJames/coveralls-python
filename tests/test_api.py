@@ -1,20 +1,21 @@
 # coding: utf-8
+import os
 import re
 import shutil
 import tempfile
 import unittest
 import sh
+from mock import patch
 from sure import expect
 
 from coveralls import Coveralls
 
 
-class SimpleTest(unittest.TestCase):
+class GitBasedTest(unittest.TestCase):
 
-    def test_git(self):
-        cover = Coveralls(repo_token='xxx')
-        dir = tempfile.mkdtemp()
-        sh.cd(dir)
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        sh.cd(self.dir)
         sh.git.init()
         sh.git('config', 'user.name', '"Guido"')
         sh.git('config', 'user.email', '"me@here.com"')
@@ -23,6 +24,43 @@ class SimpleTest(unittest.TestCase):
         sh.git.commit('-m', 'first commit')
         sh.git('remote', 'add', 'origin', 'https://github.com/username/Hello-World.git')
 
+    def tearDown(self):
+        shutil.rmtree(self.dir)
+
+
+@patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+class Configration(unittest.TestCase):
+
+    def setUp(self):
+        with open('.coveralls.mock', 'w+') as fp:
+            fp.write('repo_token: xxx\n')
+            fp.write('service_name: jenkins\n')
+
+    def tearDown(self):
+        os.remove('.coveralls.mock')
+
+    def test_local_with_config(self):
+        cover = Coveralls()
+        expect(cover.config['service_name']).to.equal('jenkins')
+        expect(cover.config['repo_token']).to.equal('xxx')
+        expect(cover.config).should_not.have.key('service_job_id')
+
+
+@patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+class NoConfig(unittest.TestCase):
+
+    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'})
+    def test_travis_no_config(self):
+        cover = Coveralls()
+        expect(cover.config['service_name']).to.equal('travis-ci')
+        expect(cover.config['service_job_id']).to.equal('777')
+        expect(cover.config).should_not.have.key('repo_token')
+
+
+class Git(GitBasedTest):
+
+    def test_git(self):
+        cover = Coveralls(repo_token='xxx')
         git_info = cover.git_info()
         commit_id = git_info['git']['head'].pop('id')
         self.assertTrue(re.match(r'^[a-f0-9]{40}$', commit_id))
@@ -42,4 +80,3 @@ class SimpleTest(unittest.TestCase):
             }],
             'branch': u'master'}})
 
-        shutil.rmtree(dir)

@@ -36,7 +36,9 @@ class Coveralls(object):
         """
         self.config = kwargs
         file_config = self.load_config()
-        self.config['repo_token'] = self.config.get('repo_token') or file_config.get('repo_token')
+        repo_token = self.config.get('repo_token') or file_config.get('repo_token')
+        if repo_token:
+            self.config['repo_token'] = self.config.get('repo_token') or file_config.get('repo_token')
 
         if os.environ.get('TRAVIS'):
             is_travis = True
@@ -46,13 +48,15 @@ class Coveralls(object):
             is_travis = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
 
-        if not self.config['repo_token'] and not is_travis:
+        if not self.config.get('repo_token') and not is_travis:
             raise Exception('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
 
     def load_config(self):
         try:
             return yaml.load(open(os.path.join(os.getcwd(), self.config_filename)))
-        except IOError:
+        except yaml.YAMLError as e:
+            log.warning('Malformed yaml in %s. Error: %s', self.config_filename, str(e))
+        except (OSError, IOError):
             log.warning('Missing %s file. Using only env variables.', self.config_filename)
             return {}
 

@@ -11,6 +11,6 @@ setup(
     description='Show coverage stats online via coveralls.io',
     scripts=['bin/coveralls'],
     install_requires=['PyYAML', 'docopt', 'coverage', 'requests', 'sh'],
-    tests_require=['nose', 'sure'],
+    tests_require=['nose', 'sure', 'mock'],
     test_suite="nose.collector",
 )
