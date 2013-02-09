@@ -36,7 +36,7 @@ class Coveralls(object):
         """
         self.config = kwargs
         file_config = self.load_config()
-        self.config['repo_token'] = self.config['repo_token'] or file_config.get('repo_token')
+        self.config['repo_token'] = self.config.get('repo_token') or file_config.get('repo_token')
 
         if os.environ.get('TRAVIS'):
             is_travis = True
@@ -51,7 +51,7 @@ class Coveralls(object):
 
     def load_config(self):
         try:
-            return yaml.load(open(self.config_filename))
+            return yaml.load(open(os.path.join(os.getcwd(), self.config_filename)))
         except IOError:
             log.warning('Missing %s file. Using only env variables.', self.config_filename)
             return {}
@@ -123,7 +123,7 @@ class Coveralls(object):
                 }]
             }
         """
-        git_info = {
+        git_info = {'git':{
             'head': {
                 'id': gitlog('%H'),
                 'author_name': gitlog('%aN'),
@@ -136,7 +136,7 @@ class Coveralls(object):
             # #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                          for line in git.remote('-v') if '(fetch)' in line]
-        }
+        }}
         return git_info
 
 
