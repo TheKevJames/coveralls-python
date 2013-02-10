@@ -129,7 +129,8 @@ class Coveralls(object):
                 }]
             }
         """
-        git_info = {'git':{
+
+        git_info = {'git': {
             'head': {
                 'id': gitlog('%H'),
                 'author_name': gitlog('%aN'),
@@ -138,10 +139,10 @@ class Coveralls(object):
                 'committer_email': gitlog('%ce'),
                 'message': gitlog('%s'),
             },
-            'branch': git('rev-parse', '--abbrev-ref', 'HEAD').strip(),
-            # #origin	git@github.com:coagulant/coveralls-python.git (fetch)
+            'branch': os.environ.get('TRAVIS_BRANCH', git('rev-parse', '--abbrev-ref', 'HEAD').strip()),
+            #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                         for line in git.remote('-v') if '(fetch)' in line]
+                        for line in git.remote('-v') if '(fetch)' in line]
         }}
         return git_info
 
