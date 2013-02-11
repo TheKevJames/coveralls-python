@@ -3,3 +3,4 @@ docopt
 coverage
 requests
 sh
+nose
