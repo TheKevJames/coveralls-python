@@ -2,7 +2,6 @@
 import json
 import logging
 import os
-import tempfile
 import coverage
 import requests
 import yaml
@@ -64,14 +63,13 @@ class Coveralls(object):
     def wear(self, dry_run=False):
         """ run! """
         data = self.create_data()
-        json_file, name = self.write_file(data)
+        json_data = json.dumps(data)
+        log.debug(json_data)
         if not dry_run:
-            response = requests.post(self.api_endpoint, files={'json_file': json_file})
+            response = requests.post(self.api_endpoint, files={'json_file': json_data})
             result = response.json()
         else:
-            log.debug(json_file.read())
             result = {}
-        os.remove(name)
         return result
 
     def create_data(self):
@@ -99,13 +97,6 @@ class Coveralls(object):
             self._data.update(self.git_info())
             self._data.update(self.config)
         return self._data
-
-    def write_file(self, data):
-        fd, name = tempfile.mkstemp()
-        json_file = open(name, 'w+')
-        json.dump(data, json_file)
-        json_file.close()
-        return open(name, 'rb'), name
 
     def get_coverage(self):
         workman = coverage.coverage()
