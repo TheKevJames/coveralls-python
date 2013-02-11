@@ -10,5 +10,5 @@ script:
   - coverage report -m
   - python setup.py develop
 after_script:
-  - bin/coveralls --verbose --source-debug
+  - bin/coveralls --verbose
 

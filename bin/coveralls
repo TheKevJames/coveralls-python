@@ -3,21 +3,18 @@
 
 Usage:
     coveralls [options]
-    coveralls report [options]
     coveralls debug  [options]
 
 Global options:
     -h --help       Display this help
     -v --verbose    Print extra info, True for debug command
-    --source-debug  Include source_files in debug
 """
 import logging
-import pprint
 from docopt import docopt
 from coveralls import Coveralls
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('coveralls')
 
 
 if __name__ == '__main__':
@@ -29,14 +26,6 @@ if __name__ == '__main__':
     log.setLevel(level)
 
     coverallz = Coveralls()
-    if options['--verbose']:
-        log.debug('Submitting this (sources excluded for brevity):')
-        data = coverallz.create_data().copy()
-        if options['--source-debug']:
-            log.debug(data)
-        else:
-            data.pop('source_files')
-            log.debug(pprint.pformat(data))
     if not options['debug']:
         log.info("Submitting coverage to coveralls.io...")
         result = coverallz.wear()
@@ -44,3 +33,6 @@ if __name__ == '__main__':
         log.info(result['message'])
         log.info(result['url'])
         log.debug(result)
+    else:
+        log.info("Testing coveralls-python...")
+        coverallz.wear(dry_run=True)

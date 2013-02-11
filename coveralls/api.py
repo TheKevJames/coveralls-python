@@ -11,7 +11,7 @@ from sh import git
 from .reporter import CoverallReporter
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('coveralls')
 
 
 class Coveralls(object):
@@ -61,13 +61,18 @@ class Coveralls(object):
             log.warning('Missing %s file. Using only env variables.', self.config_filename)
             return {}
 
-    def wear(self):
+    def wear(self, dry_run=False):
         """ run! """
         data = self.create_data()
         json_file, name = self.write_file(data)
-        response = requests.post(self.api_endpoint, files={'json_file': json_file})
+        if not dry_run:
+            response = requests.post(self.api_endpoint, files={'json_file': json_file})
+            result = response.json()
+        else:
+            log.debug(json_file.read())
+            result = {}
         os.remove(name)
-        return response.json()
+        return result
 
     def create_data(self):
         """ Generate object for api.
