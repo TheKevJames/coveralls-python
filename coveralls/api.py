@@ -16,7 +16,7 @@ log = logging.getLogger('coveralls')
 class Coveralls(object):
     config_filename = '.coveralls.yml'
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
-    default_client = 'coveralls-python'  # coveralls-ruby ?
+    default_client = 'coveralls-python'
 
     def __init__(self, **kwargs):
         """ Coveralls!

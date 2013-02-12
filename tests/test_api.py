@@ -81,3 +81,11 @@ class Git(GitBasedTest):
             }],
             'branch': u'master'}})
 
+
+class ReporterTest(unittest.TestCase):
+
+    def test_reporter(self):
+        os.chdir('/Users/prophet/projects/coveralls-python/example')
+        sh.coverage('run', 'runtests.py')
+        cover = Coveralls(repo_token='xxx')
+        expect(cover.get_coverage()).should.be.equal([{'source': '# coding: utf-8\n\n\ndef hello():\n    print \'world\'\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print \'this is not tested\'', 'name': 'project.py', 'coverage': [None, None, None, 1, 0, None, None, 1, None, None, None, 1, 0]}, {'source': '# coding: utf-8\nfrom project import hello\n\n\ndef test_hello():\n    hello()', 'name': 'runtests.py', 'coverage': [None, 1, None, None, 1, 0]}])
