@@ -1,6 +1,5 @@
 # coding: utf-8
 from project import hello
 
-
-def test_hello():
+if __name__ == '__main__':
     hello()

@@ -2,7 +2,7 @@
 
 
 def hello():
-    print 'world'
+    print('world')
 
 
 class Foo(object):
@@ -10,4 +10,4 @@ class Foo(object):
 
 
 def baz():
-    print 'this is not tested'
+    print('this is not tested')
