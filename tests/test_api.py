@@ -1,5 +1,6 @@
 # coding: utf-8
 import os
+from os.path import join, dirname
 import re
 import shutil
 import tempfile
@@ -57,6 +58,11 @@ class NoConfig(unittest.TestCase):
         expect(cover.config['service_job_id']).to.equal('777')
         expect(cover.config).should_not.have.key('repo_token')
 
+    @patch.dict(os.environ, {}, clear=True)
+    def test_misconfigured(self):
+        Coveralls.when.called_with().should.throw(Exception,
+            'You have to provide either repo_token in .coveralls.mock, or launch via Travis')
+
 
 class Git(GitBasedTest):
 
@@ -85,7 +91,25 @@ class Git(GitBasedTest):
 class ReporterTest(unittest.TestCase):
 
     def test_reporter(self):
-        os.chdir('/Users/prophet/projects/coveralls-python/example')
+        os.chdir(join(dirname(dirname(__file__)), 'example'))
         sh.coverage('run', 'runtests.py')
         cover = Coveralls(repo_token='xxx')
         expect(cover.get_coverage()).should.be.equal([{'source': '# coding: utf-8\n\n\ndef hello():\n    print \'world\'\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print \'this is not tested\'', 'name': 'project.py', 'coverage': [None, None, None, 1, 0, None, None, 1, None, None, None, 1, 0]}, {'source': '# coding: utf-8\nfrom project import hello\n\n\ndef test_hello():\n    hello()', 'name': 'runtests.py', 'coverage': [None, 1, None, None, 1, 0]}])
+
+
+@patch('coveralls.api.requests')
+class WearTest(unittest.TestCase):
+
+    def setup_mock(self, mock_requests):
+        self.expected_json = {u'url': u'https://coveralls.io/jobs/5869', u'message': u'Job #7.1 - 44.58% Covered'}
+        mock_requests.post.return_value.json.return_value = self.expected_json
+
+    def test_wet_run(self, mock_requests):
+        self.setup_mock(mock_requests)
+        result = Coveralls(repo_token='xxx').wear(dry_run=False)
+        expect(result).should.be.equal(self.expected_json)
+
+    def test_dry_run(self, mock_requests):
+        self.setup_mock(mock_requests)
+        result = Coveralls(repo_token='xxx').wear(dry_run=True)
+        expect(result).should.be.equal({})

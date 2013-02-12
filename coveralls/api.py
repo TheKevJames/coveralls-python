@@ -54,8 +54,6 @@ class Coveralls(object):
     def load_config(self):
         try:
             return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
-        except yaml.YAMLError as e:
-            log.warning('Malformed yaml in %s. Error: %s', self.config_filename, str(e))
         except (OSError, IOError):
             log.warning('Missing %s file. Using only env variables.', self.config_filename)
             return {}
