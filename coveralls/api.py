@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+import re
 import coverage
 import requests
 import yaml
@@ -38,12 +39,14 @@ class Coveralls(object):
         file_config = self.load_config()
         repo_token = self.config.get('repo_token') or file_config.get('repo_token')
         if repo_token:
-            self.config['repo_token'] = self.config.get('repo_token') or file_config.get('repo_token')
+            self.config['repo_token'] = repo_token
 
         if os.environ.get('TRAVIS'):
             is_travis = True
             self.config['service_name'] = file_config.get('service_name') or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
+            if os.environ.get('COVERALLS_REPO_TOKEN', None):
+                self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
         else:
             is_travis = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
@@ -61,13 +64,14 @@ class Coveralls(object):
     def wear(self, dry_run=False):
         """ run! """
         data = self.create_data()
-        json_data = json.dumps(data)
-        log.debug(json_data)
+        json_string = json.dumps(data)
         if not dry_run:
-            response = requests.post(self.api_endpoint, files={'json_file': json_data})
+            response = requests.post(self.api_endpoint, files={'json_file': json_string})
             result = response.json()
         else:
             result = {}
+        json_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
+        log.debug(json_string)
         return result
 
     def create_data(self):

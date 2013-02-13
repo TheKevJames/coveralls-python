@@ -10,6 +10,7 @@ from mock import patch
 from sure import expect
 
 from coveralls import Coveralls
+from coveralls.api import log
 
 
 class GitBasedTest(unittest.TestCase):
@@ -56,7 +57,15 @@ class NoConfig(unittest.TestCase):
         cover = Coveralls()
         expect(cover.config['service_name']).to.equal('travis-ci')
         expect(cover.config['service_job_id']).to.equal('777')
+
         expect(cover.config).should_not.have.key('repo_token')
+
+    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777', 'COVERALLS_REPO_TOKEN': 'yyy'})
+    def test_repo_token_from_env(self):
+        cover = Coveralls()
+        expect(cover.config['service_name']).to.equal('travis-ci')
+        expect(cover.config['service_job_id']).to.equal('777')
+        expect(cover.config['repo_token']).to.equal('yyy')
 
     @patch.dict(os.environ, {}, clear=True)
     def test_misconfigured(self):
@@ -118,3 +127,9 @@ class WearTest(unittest.TestCase):
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear(dry_run=True)
         expect(result).should.be.equal({})
+
+    @patch.object(log, 'debug')
+    def test_repo_token_in_not_compromised_verbose(self, mock_logger, mock_requests):
+        self.setup_mock(mock_requests)
+        result = Coveralls(repo_token='xxx').wear(dry_run=True)
+        expect(mock_logger.call_args[0][0]).should_not.contain('xxx')
