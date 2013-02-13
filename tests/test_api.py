@@ -52,7 +52,7 @@ class Configration(unittest.TestCase):
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfig(unittest.TestCase):
 
-    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'})
+    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'}, clear=True)
     def test_travis_no_config(self):
         cover = Coveralls()
         expect(cover.config['service_name']).to.equal('travis-ci')
@@ -60,7 +60,7 @@ class NoConfig(unittest.TestCase):
 
         expect(cover.config).should_not.have.key('repo_token')
 
-    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777', 'COVERALLS_REPO_TOKEN': 'yyy'})
+    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777', 'COVERALLS_REPO_TOKEN': 'yyy'}, clear=True)
     def test_repo_token_from_env(self):
         cover = Coveralls()
         expect(cover.config['service_name']).to.equal('travis-ci')

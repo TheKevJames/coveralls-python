@@ -11,6 +11,3 @@ script:
   - python setup.py develop
 after_script:
   - bin/coveralls --verbose
-env:
-  global:
-    - secure: "ix2ZuaRaHhkXm5a394ddEd6r0ZoR+ubqRr/fBuUWAGbVp1m4rfNi9WZT2ZMv\nPMD27M4INulqvhhWaTnDC9ozDyPmBSQMkqDmgcXt1gt26z3KV1CZ38GhtoX3\nKl91zZxXme3JvmiZSmBTK4fIlxP69ZOcdI6QNkbPPBlnfuRJQWM="
