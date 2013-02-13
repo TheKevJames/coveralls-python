@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='coveralls',
-    version='0.1',
+    version='0.1.1',
     packages=['tests', 'coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
