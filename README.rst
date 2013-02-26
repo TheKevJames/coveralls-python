@@ -47,10 +47,14 @@ Usage
 -----
 ::
 
-    $ coverage run your_test_suite_runner.py
+    $ coverage run your_test_suite_runner.py --source=yourpackagename
     $ coveralls
 
 This will publish your coverage results on coveralls.io for everyone to see (unless you're using pro account).
+Note, that example command will gather coverage for specified package.
+If you wish to customise what's included in your reports, consult `coverage docs`_.
+
+.. _coverage docs: http://nedbatchelder.com/code/coverage/
 
 How it works
 ------------
