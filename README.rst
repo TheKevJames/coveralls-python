@@ -47,7 +47,7 @@ Usage
 -----
 ::
 
-    $ coverage run your_test_suite_runner.py --source=yourpackagename
+    $ coverage run --source=yourpackagename your_test_suite_runner.py
     $ coveralls
 
 This will publish your coverage results on coveralls.io for everyone to see (unless you're using pro account).
