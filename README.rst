@@ -18,20 +18,53 @@ Works with python 2.6-2.7 and 3.3
 .. _nice features: https://coveralls.io/info/features
 .. _official gem: https://coveralls.io/docs/ruby
 
-Installation
-------------
-First, log in via Github and `add your repo`_ on Coveralls website.
+Usage (Travis CI)
+-----------------
 
-Second, install this package::
+This library will publish your coverage results on coveralls.io for everyone to see (unless you're using pro account).
+This package can possibly work with different CI environments, but it's only tested to work with `Travis CI`_ atm.
 
-    $ pip install coveralls
+1. First, log in via Github and `add your repo`_ on Coveralls website.
+2. Add ``pip install coveralls`` to ``install`` section of ``.travis.yml``
+3. Make sure you run your tests with coverage during the build in ``script`` part. Example::
 
-If you're using `Travis CI`_, no further configuration is required.
+    script:
+        coverage run --source=coveralls setup.py -q nosetests
 
-Configuration
-~~~~~~~~~~~~~
+   It depends on how you run your tests. Here is another example::
 
-If you're not using Travis, you have to provide at least a ``repo_token`` option in ``.coveralls.yml``
+    # --source specifies what packages to cover, you will WANT to use that option
+    script:
+        coverage run --source=moscowdjango,meetup manage.py test
+
+   Note, that example command will gather coverage for specified package.
+   If you wish to customise what's included in your reports, consult `coverage docs`_.
+
+.. _coverage docs: http://nedbatchelder.com/code/coverage/
+
+4. Execute run ``coveralls`` in ``after_success`` section::
+
+    after_success:
+        coveralls
+
+Full example of .travis.yml::
+
+    language: python
+    python:
+      - 2.7
+      - 3.3
+    install:
+      - pip install -r requirements.txt --use-mirrors
+      - pip install coveralls --use-mirrors
+    script:
+      - coverage run --source=moscowdjango,meetup manage.py test
+    after_success:
+      - coveralls
+
+Usage (another CI)
+~~~~~~~~~~~~~~~~~~
+
+If you're NOT using Travis, you have to provide at least a ``repo_token`` option in ``.coveralls.yml``
 at the root of your repo. This is your own secret token, which is available at the bottom of your repository's page on Coveralls.
 Make sure it stays **secret**, do not put it in your public repo.
 
@@ -43,18 +76,6 @@ Example of .coveralls.yml::
 .. _add your repo: https://coveralls.io/repos/new
 .. _Travis CI: http://travis-ci.org
 
-Usage
------
-::
-
-    $ coverage run --source=yourpackagename your_test_suite_runner.py
-    $ coveralls
-
-This will publish your coverage results on coveralls.io for everyone to see (unless you're using pro account).
-Note, that example command will gather coverage for specified package.
-If you wish to customise what's included in your reports, consult `coverage docs`_.
-
-.. _coverage docs: http://nedbatchelder.com/code/coverage/
 
 How it works
 ------------
