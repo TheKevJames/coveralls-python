@@ -102,6 +102,7 @@ class Coveralls(object):
 
     def get_coverage(self):
         workman = coverage.coverage()
+        workman.config.ignore_errors = True
         workman.load()
         workman._harvest_data()
         reporter = CoverallReporter(workman, workman.config)
