@@ -68,7 +68,6 @@ class Coveralls(object):
         # Force unicode of source files
         clean_sourcefiles = []
         for source_file in data['source_files']:
-            print source_file['name']
             clean_sourcefiles.append(
                 {
                     'name': source_file['name'],
