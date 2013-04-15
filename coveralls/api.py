@@ -64,6 +64,21 @@ class Coveralls(object):
     def wear(self, dry_run=False):
         """ run! """
         data = self.create_data()
+        
+        # Force unicode of source files
+        clean_sourcefiles = []
+        for source_file in data['source_files']:
+            print source_file['name']
+            clean_sourcefiles.append(
+                {
+                    'name': source_file['name'],
+                    'source': unicode(source_file['source'], errors='ignore'),
+                    'coverage': source_file['coverage']
+                }
+            )
+
+        data['source_files'] = clean_sourcefiles
+
         json_string = json.dumps(data)
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
