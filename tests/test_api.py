@@ -133,3 +133,10 @@ class WearTest(unittest.TestCase):
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear(dry_run=True)
         expect(mock_logger.call_args[0][0]).should_not.contain('xxx')
+
+    def test_coveralls_unavailable(self, mock_requests):
+        mock_requests.post.return_value.json.side_effect = ValueError
+        mock_requests.post.return_value.status_code = 500
+        mock_requests.post.return_value.text = '<html>Http 1./1 500</html>'
+        result = Coveralls(repo_token='xxx').wear(dry_run=False)
+        expect(result).should.be.equal({'error': 'Failure to submit data. Response [500]: <html>Http 1./1 500</html>'})

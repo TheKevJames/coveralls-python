@@ -67,7 +67,12 @@ class Coveralls(object):
         json_string = json.dumps(data)
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
-            result = response.json()
+            try:
+                result = response.json()
+            except ValueError:
+                result = {'error': 'Failure to submit data. Response [%(status)s]: %(text)s' % {
+                    'status': response.status_code,
+                    'text': response.text}}
         else:
             result = {}
         json_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
