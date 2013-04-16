@@ -1,8 +1,23 @@
+from setuptools.command.test import test as TestCommand
 from setuptools import setup
+import sys
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
+
 
 setup(
     name='coveralls',
-    version='0.1.1',
+    version='0.2.0',
     packages=['tests', 'coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
@@ -11,10 +26,10 @@ setup(
     description='Show coverage stats online via coveralls.io',
     scripts=['bin/coveralls'],
     install_requires=['PyYAML', 'docopt', 'coverage', 'requests>=1.0.0', 'sh'],
-    tests_require=['nose', 'sure', 'mock'],
-    test_suite="nose.collector",
+    tests_require=['mock', 'pytest'],
+    cmdclass = {'test': PyTest},
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 3 - Beta',
         'Topic :: Software Development :: Testing',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',

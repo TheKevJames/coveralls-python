@@ -4,5 +4,5 @@ coverage
 requests
 sh
 nose
-sure
+pytest
 mock
