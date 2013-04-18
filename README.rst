@@ -86,6 +86,43 @@ so please make sure you're not ruining your own security! For private projects t
 .. _json API: https://coveralls.io/docs/api_reference
 .. _Coveralls Pro: https://coveralls.io/docs/pro
 
+
+Tips for coverage.rc config
+---------------------------
+
+This section is a list of most common options for coverage.py, which collects all the data.
+Coveralls feeds from this data, so it's good to know how to to configure it.
+
+To limit the `report with only your packages`_, specify their names (or directores)::
+
+  [run]
+  source = coveralls,your_otherpackage
+
+To exclude parts of your source from coverage, for example migrations folders::
+
+  [run]
+  omit = */migrations/*
+
+Some lines are never executed in your tests, but that can be ok. 
+To mark those lines use inline comments right in your source code::
+
+  if debug:   # pragma: no cover
+    msg = "blah blah"
+    log_message(msg, a)
+
+Sometimes it can be tedious to mark them in code, so you can `specify whole lines to .coveragerc`_::
+
+  [report]
+  exclude_lines =
+      pragma: no cover
+      def __repr__
+      raise AssertionError
+      raise NotImplementedError
+      if __name__ == .__main__.:
+
+.. _report with only your packages: http://nedbatchelder.com/code/coverage/source.html#source
+.. _specify whole lines to .coveragerc: http://nedbatchelder.com/code/coverage/excluding.html
+
 Tests
 -----
 ::
