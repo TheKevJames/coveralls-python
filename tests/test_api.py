@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import unicode_literals
 import os
 from os.path import join, dirname
 import re
@@ -92,10 +93,10 @@ class Git(GitBasedTest):
                 'committer_name': 'Guido',
             },
             'remotes': [{
-                'url': u'https://github.com/username/Hello-World.git',
-                'name': u'origin'
+                'url': 'https://github.com/username/Hello-World.git',
+                'name': 'origin'
             }],
-            'branch': u'master'
+            'branch': 'master'
         }}
 
 
@@ -117,7 +118,7 @@ class ReporterTest(unittest.TestCase):
 class WearTest(unittest.TestCase):
 
     def setup_mock(self, mock_requests):
-        self.expected_json = {u'url': u'https://coveralls.io/jobs/5869', u'message': u'Job #7.1 - 44.58% Covered'}
+        self.expected_json = {'url': 'https://coveralls.io/jobs/5869', 'message': 'Job #7.1 - 44.58% Covered'}
         mock_requests.post.return_value.json.return_value = self.expected_json
 
     def test_wet_run(self, mock_requests):

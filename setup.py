@@ -29,7 +29,7 @@ setup(
     tests_require=['mock', 'pytest'],
     cmdclass = {'test': PyTest},
     classifiers=[
-        'Development Status :: 3 - Beta',
+        'Development Status :: 4 - Beta',
         'Topic :: Software Development :: Testing',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',

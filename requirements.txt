@@ -3,6 +3,5 @@ docopt
 coverage
 requests
 sh
-nose
 pytest
 mock

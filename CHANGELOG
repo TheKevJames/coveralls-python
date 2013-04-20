@@ -1,6 +1,6 @@
 0.2dev (?)
 ----------
-* Switched from sure & nose to pytest (to support pypy)
+* Python 3.2 and PyPy support
 
 0.1.1 (2013-02-13)
 -----------------
