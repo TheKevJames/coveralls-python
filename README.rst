@@ -29,7 +29,7 @@ This package can possibly work with different CI environments, but it's only tes
 3. Make sure you run your tests with coverage during the build in ``script`` part. Example::
 
     script:
-        coverage run --source=coveralls setup.py -q nosetests
+        coverage run --source=coveralls setup.py test
 
    It depends on how you run your tests. Here is another example::
 
