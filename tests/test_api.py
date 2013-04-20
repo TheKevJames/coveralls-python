@@ -6,6 +6,7 @@ import re
 import shutil
 import tempfile
 import unittest
+import coverage
 
 import sh
 from mock import patch
@@ -141,5 +142,12 @@ class WearTest(unittest.TestCase):
         mock_requests.post.return_value.json.side_effect = ValueError
         mock_requests.post.return_value.status_code = 500
         mock_requests.post.return_value.text = '<html>Http 1./1 500</html>'
-        result = Coveralls(repo_token='xxx').wear(dry_run=False)
+        result = Coveralls(repo_token='xxx').wear()
         assert result == {'error': 'Failure to submit data. Response [500]: <html>Http 1./1 500</html>'}
+
+    @patch('coveralls.reporter.CoverallReporter.report_files')
+    def test_no_coverage(self, report_files, mock_requests):
+        report_files.side_effect = coverage.CoverageException('No data to report')
+        self.setup_mock(mock_requests)
+        result = Coveralls(repo_token='xxx').wear()
+        assert result == {'error': 'Failure to gather coverage: No data to report'}
