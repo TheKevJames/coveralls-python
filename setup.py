@@ -25,7 +25,7 @@ setup(
     author_email='baryhsev@gmail.com',
     description='Show coverage stats online via coveralls.io',
     scripts=['bin/coveralls'],
-    install_requires=['PyYAML', 'docopt', 'coverage', 'requests>=1.0.0', 'sh'],
+    install_requires=['PyYAML>=3.10', 'docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0', 'sh>=1.08'],
     tests_require=['mock', 'pytest'],
     cmdclass = {'test': PyTest},
     classifiers=[
