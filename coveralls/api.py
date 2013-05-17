@@ -67,7 +67,28 @@ class Coveralls(object):
             data = self.create_data()
         except coverage.CoverageException as e:
             return {'error': 'Failure to gather coverage: %s' % str(e)}
-        json_string = json.dumps(data)
+
+        try:
+            json_string = json.dumps(data)
+        except UnicodeDecodeError, e:
+            log.error("ERROR: While preparing JSON received exception: %s"
+                      % e)
+            # Let's try to help user figure out what is at fault
+            at_fault_files = []
+            for k in data['source_files']:
+                for i, f in enumerate(data['source_files']):
+                    try:
+                        json_string = json.dumps(f)
+                    except:
+                        if not f['name'] in at_fault_files:
+                            at_fault_files.append(f['name'])
+            if len(at_fault_files):
+                log.error("HINT: Following files cannot be decoded properly "
+                          "into unicode. Check their content: %s"
+                          % (', '.join(at_fault_files)))
+            # re-raise
+            raise
+
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
             try:
