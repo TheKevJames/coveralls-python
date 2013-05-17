@@ -18,7 +18,7 @@ This package provides seamless integration with ``coverage.py`` in your python p
 For ruby projects, there is an `official gem`_.
 Only projects hosted on Github are supported.
 
-Works with python 2.6-2.7 and 3.3
+Works with python 2.6+, 3.2+ and pypy 1.9.
 
 .. _Coveralls.io: http://coveralls.io
 .. _nice features: https://coveralls.io/info/features
@@ -34,17 +34,12 @@ This package can possibly work with different CI environments, but it's only tes
 2. Add ``pip install coveralls`` to ``install`` section of ``.travis.yml``
 3. Make sure you run your tests with coverage during the build in ``script`` part. Example::
 
+    # --source specifies what packages to cover, you probably want to use that option
     script:
-        coverage run --source=coveralls setup.py test
-
-   It depends on how you run your tests. Here is another example::
-
-    # --source specifies what packages to cover, you will WANT to use that option
-    script:
-        coverage run --source=moscowdjango,meetup manage.py test
+        coverage run --source=yourpackagename setup.py test
 
    Note, that example command will gather coverage for specified package.
-   If you wish to customise what's included in your reports, consult `coverage docs`_.
+   If you wish to customize what's included in your reports, consult `coverage docs`_.
 
 .. _coverage docs: http://nedbatchelder.com/code/coverage/
 
