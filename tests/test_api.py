@@ -85,6 +85,7 @@ class Git(GitBasedTest):
         commit_id = git_info['git']['head'].pop('id')
 
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
+        print(git_info)
         assert git_info == {'git': {
             'head': {
                 'committer_email': 'me@here.com',
