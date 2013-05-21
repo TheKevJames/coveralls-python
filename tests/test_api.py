@@ -119,13 +119,13 @@ class ReporterTest(unittest.TestCase):
             'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1]}]
 
     def test_missing_file(self):
-        sh.echo('print "Python rocks!"', _out="extra.py")
+        sh.echo('print("Python rocks!")', _out="extra.py")
         sh.coverage('run', 'extra.py')
         sh.rm('-f', 'extra.py')
         assert self.cover.get_coverage() == []
 
     def test_not_python(self):
-        sh.echo('print "Python rocks!"', _out="extra.py")
+        sh.echo('print("Python rocks!")', _out="extra.py")
         sh.coverage('run', 'extra.py')
         sh.echo("<h1>This isn't python!</h1>", _out="extra.py")
         assert self.cover.get_coverage() == []
