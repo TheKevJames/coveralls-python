@@ -1,5 +1,10 @@
 # coding: utf-8
+import logging
+from coverage.misc import NoSource, NotPython
 from coverage.report import Reporter
+
+
+log = logging.getLogger('coveralls')
 
 
 class CoverallReporter(Reporter):
@@ -12,7 +17,20 @@ class CoverallReporter(Reporter):
         `outfile` is a file object to write the json to.
         """
         self.source_files = []
-        self.report_files(self.parse_file, morfs)
+        self.find_code_units(morfs)
+
+        for cu in self.code_units:
+            try:
+                self.parse_file(cu, self.coverage._analyze(cu))
+            except NoSource:
+                if not self.config.ignore_errors:
+                    log.warn('No source for %s', cu.name)
+            except NotPython:
+                # Only report errors for .py files, and only if we didn't
+                # explicitly suppress those errors.
+                if cu.should_be_python() and not self.config.ignore_errors:
+                    log.warn('Source file is not python %s', cu.name)
+
         return self.source_files
 
     def get_hits(self, line_num, analysis):

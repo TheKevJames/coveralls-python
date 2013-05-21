@@ -103,16 +103,32 @@ class Git(GitBasedTest):
 
 class ReporterTest(unittest.TestCase):
 
-    def test_reporter(self):
+    def setUp(self):
         os.chdir(join(dirname(dirname(__file__)), 'example'))
+        sh.rm('-f', '.coverage')
+        sh.rm('-f', 'extra.py')
+        self.cover = Coveralls(repo_token='xxx')
+
+    def test_reporter(self):
         sh.coverage('run', 'runtests.py')
-        cover = Coveralls(repo_token='xxx')
-        assert cover.get_coverage() == [{
+        assert self.cover.get_coverage() == [{
             'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')',
             'name': 'project.py',
             'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0]}, {
             'source': "# coding: utf-8\nfrom project import hello\n\nif __name__ == '__main__':\n    hello()",
             'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1]}]
+
+    def test_missing_file(self):
+        sh.echo('print "Python rocks!"', _out="extra.py")
+        sh.coverage('run', 'extra.py')
+        sh.rm('-f', 'extra.py')
+        assert self.cover.get_coverage() == []
+
+    def test_not_python(self):
+        sh.echo('print "Python rocks!"', _out="extra.py")
+        sh.coverage('run', 'extra.py')
+        sh.echo("<h1>This isn't python!</h1>", _out="extra.py")
+        assert self.cover.get_coverage() == []
 
 
 @patch('coveralls.api.requests')
@@ -143,11 +159,11 @@ class WearTest(unittest.TestCase):
         mock_requests.post.return_value.status_code = 500
         mock_requests.post.return_value.text = '<html>Http 1./1 500</html>'
         result = Coveralls(repo_token='xxx').wear()
-        assert result == {'error': 'Failure to submit data. Response [500]: <html>Http 1./1 500</html>'}
+        assert result == {'message': 'Failure to submit data. Response [500]: <html>Http 1./1 500</html>'}
 
-    @patch('coveralls.reporter.CoverallReporter.report_files')
+    @patch('coveralls.reporter.CoverallReporter.report')
     def test_no_coverage(self, report_files, mock_requests):
         report_files.side_effect = coverage.CoverageException('No data to report')
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear()
-        assert result == {'error': 'Failure to gather coverage: No data to report'}
+        assert result == {'message': 'Failure to gather coverage: No data to report'}
