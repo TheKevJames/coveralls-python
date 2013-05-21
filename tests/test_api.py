@@ -79,13 +79,13 @@ class NoConfig(unittest.TestCase):
 
 class Git(GitBasedTest):
 
+    @patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
     def test_git(self):
         cover = Coveralls(repo_token='xxx')
         git_info = cover.git_info()
         commit_id = git_info['git']['head'].pop('id')
 
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
-        print(git_info)
         assert git_info == {'git': {
             'head': {
                 'committer_email': 'me@here.com',
@@ -100,7 +100,6 @@ class Git(GitBasedTest):
             }],
             'branch': 'master'
         }}
-
 
 class ReporterTest(unittest.TestCase):
 
