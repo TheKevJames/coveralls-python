@@ -32,8 +32,8 @@ from coveralls import Coveralls
 log = logging.getLogger('coveralls')
 
 
-if __name__ == '__main__':
-    options = docopt(__doc__)
+def main(argv=None):
+    options = docopt(__doc__, argv=argv)
     if options['debug']:
         options['--verbose'] = True
     level = logging.DEBUG if options['--verbose'] else logging.INFO
