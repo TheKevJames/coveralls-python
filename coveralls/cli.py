@@ -32,7 +32,7 @@ from coveralls import Coveralls
 log = logging.getLogger('coveralls')
 
 
-if __name__ == '__main__':
+def main():
     options = docopt(__doc__)
     if options['debug']:
         options['--verbose'] = True

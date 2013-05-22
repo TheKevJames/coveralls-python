@@ -18,13 +18,17 @@ class PyTest(TestCommand):
 setup(
     name='coveralls',
     version='0.2dev',
-    packages=['tests', 'coveralls'],
+    packages=['coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
     author='Ilya Baryshev',
     author_email='baryhsev@gmail.com',
     description='Show coverage stats online via coveralls.io',
-    scripts=['bin/coveralls'],
+    entry_points={
+        'console_scripts': [
+            'coveralls = coveralls.cli:main',
+        ],
+    },
     install_requires=['PyYAML>=3.10', 'docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0', 'sh>=1.08'],
     tests_require=['mock', 'pytest'],
     cmdclass={'test': PyTest},
