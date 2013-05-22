@@ -66,14 +66,14 @@ class Coveralls(object):
         try:
             data = self.create_data()
         except coverage.CoverageException as e:
-            return {'error': 'Failure to gather coverage: %s' % str(e)}
+            return {'message': 'Failure to gather coverage: %s' % str(e)}
         json_string = json.dumps(data)
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
             try:
                 result = response.json()
             except ValueError:
-                result = {'error': 'Failure to submit data. Response [%(status)s]: %(text)s' % {
+                result = {'message': 'Failure to submit data. Response [%(status)s]: %(text)s' % {
                     'status': response.status_code,
                     'text': response.text}}
         else:
