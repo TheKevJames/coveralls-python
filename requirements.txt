@@ -1,7 +1,0 @@
-PyYAML
-docopt
-coverage
-requests
-sh
-pytest
-mock

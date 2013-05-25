@@ -1,6 +1,6 @@
+import sys
 from setuptools.command.test import test as TestCommand
 from setuptools import setup
-import sys
 
 
 class PyTest(TestCommand):
@@ -24,6 +24,7 @@ setup(
     author='Ilya Baryshev',
     author_email='baryhsev@gmail.com',
     description='Show coverage stats online via coveralls.io',
+    long_description=open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read(),
     entry_points={
         'console_scripts': [
             'coveralls = coveralls.cli:main',
