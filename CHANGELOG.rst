@@ -1,7 +1,8 @@
-0.2dev (?)
-----------
+0.2 (2013-05-26)
+----------------
 * Python 3.2 and PyPy support
 * Graceful handling of coverage exceptions
+* Fixed UnicodeDecodeError in json encoding
 * Improved readme
 
 0.1.1 (2013-02-13)
