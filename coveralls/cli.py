@@ -27,6 +27,7 @@ Example:
 import logging
 from docopt import docopt
 from coveralls import Coveralls
+from coveralls.api import CoverallsException
 
 
 log = logging.getLogger('coveralls')
@@ -40,14 +41,21 @@ def main(argv=None):
     log.addHandler(logging.StreamHandler())
     log.setLevel(level)
 
-    coverallz = Coveralls()
-    if not options['debug']:
-        log.info("Submitting coverage to coveralls.io...")
-        result = coverallz.wear()
-        log.info("Coverage submitted!")
-        log.info(result['message'])
-        log.info(result['url'])
-        log.debug(result)
-    else:
-        log.info("Testing coveralls-python...")
-        coverallz.wear(dry_run=True)
+    try:
+        coverallz = Coveralls()
+        if not options['debug']:
+            log.info("Submitting coverage to coveralls.io...")
+            result = coverallz.wear()
+            log.info("Coverage submitted!")
+            log.info(result['message'])
+            log.info(result['url'])
+            log.debug(result)
+        else:
+            log.info("Testing coveralls-python...")
+            coverallz.wear(dry_run=True)
+    except KeyboardInterrupt:  # pragma: no cover
+        log.info('Aborted')
+    except CoverallsException as e:  # pragma: no cover
+        log.error(unicode(e))
+    except Exception:  # pragma: no cover
+        raise

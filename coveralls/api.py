@@ -14,6 +14,10 @@ from .reporter import CoverallReporter
 log = logging.getLogger('coveralls')
 
 
+class CoverallsException(Exception):
+    pass
+
+
 class Coveralls(object):
     config_filename = '.coveralls.yml'
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
@@ -36,14 +40,14 @@ class Coveralls(object):
         """
         self._data = None
         self.config = kwargs
-        file_config = self.load_config()
-        repo_token = self.config.get('repo_token') or file_config.get('repo_token')
+        file_config = self.load_config() or {}
+        repo_token = self.config.get('repo_token') or file_config.get('repo_token', None)
         if repo_token:
             self.config['repo_token'] = repo_token
 
         if os.environ.get('TRAVIS'):
             is_travis = True
-            self.config['service_name'] = file_config.get('service_name') or 'travis-ci'
+            self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
             if os.environ.get('COVERALLS_REPO_TOKEN', None):
                 self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
@@ -52,7 +56,7 @@ class Coveralls(object):
             self.config['service_name'] = file_config.get('service_name') or self.default_client
 
         if not self.config.get('repo_token') and not is_travis:
-            raise Exception('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
+            raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
 
     def load_config(self):
         try:
