@@ -2,7 +2,7 @@
 ----------
 * Python 3.2 and PyPy support
 * Graceful handling of coverage exceptions
-* Rewrote readme
+* Improved readme
 
 0.1.1 (2013-02-13)
 -----------------

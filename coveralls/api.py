@@ -58,7 +58,7 @@ class Coveralls(object):
         try:
             return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
         except (OSError, IOError):
-            log.warning('Missing %s file. Using only env variables.', self.config_filename)
+            log.debug('Missing %s file. Using only env variables.', self.config_filename)
             return {}
 
     def wear(self, dry_run=False):

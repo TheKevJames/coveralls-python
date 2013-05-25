@@ -124,8 +124,15 @@ Sometimes it can be tedious to mark them in code, so you can `specify whole line
 .. _report with only your packages: http://nedbatchelder.com/code/coverage/source.html#source
 .. _specify whole lines to .coveragerc: http://nedbatchelder.com/code/coverage/excluding.html
 
-Tests
------
-::
+Development
+-----------
+
+Run tests::
 
     $ python setup.py test
+
+Install latest `unstable version`_::
+
+    $ pip install coveralls==dev
+
+.. _unstable version: https://github.com/coagulant/coveralls-python/archive/master.zip#egg=coveralls-dev
