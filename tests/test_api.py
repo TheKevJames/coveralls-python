@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import unicode_literals
+import json
 import os
 from os.path import join, dirname
 import re
@@ -131,8 +132,17 @@ class ReporterTest(unittest.TestCase):
         assert self.cover.get_coverage() == []
 
 
+def test_non_unicode():
+    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    sh.coverage('run', 'nonunicode.py')
+    expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print (\'I like P\\u00f3lya distribution.\')"'
+    assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
+
 @patch('coveralls.api.requests')
 class WearTest(unittest.TestCase):
+
+    def setUp(self):
+        sh.rm('-f', '.coverage')
 
     def setup_mock(self, mock_requests):
         self.expected_json = {'url': 'https://coveralls.io/jobs/5869', 'message': 'Job #7.1 - 44.58% Covered'}
