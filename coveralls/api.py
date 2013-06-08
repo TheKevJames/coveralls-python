@@ -49,11 +49,12 @@ class Coveralls(object):
             is_travis = True
             self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
-            if os.environ.get('COVERALLS_REPO_TOKEN', None):
-                self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
         else:
             is_travis = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
+
+        if os.environ.get('COVERALLS_REPO_TOKEN', None):
+            self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
         if not self.config.get('repo_token') and not is_travis:
             raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
