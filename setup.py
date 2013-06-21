@@ -22,7 +22,7 @@ setup(
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
     author='Ilya Baryshev',
-    author_email='baryhsev@gmail.com',
+    author_email='baryshev@gmail.com',
     description='Show coverage stats online via coveralls.io',
     long_description=open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read(),
     entry_points={
