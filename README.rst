@@ -10,9 +10,6 @@ Coveralls for python
 .. image:: https://pypip.in/v/coveralls/badge.png
     :target: https://crate.io/packages/coveralls/
 
-.. image:: https://pypip.in/d/coveralls/badge.png
-    :target: https://crate.io/packages/coveralls/
-
 `Coveralls.io`_ is service to publish your coverage stats online with a lot of `nice features`_.
 This package provides seamless integration with ``coverage.py`` in your python projects.
 For ruby projects, there is an `official gem`_.
