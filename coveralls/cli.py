@@ -29,6 +29,11 @@ from docopt import docopt
 from coveralls import Coveralls
 from coveralls.api import CoverallsException
 
+try:
+    to_unicode = unicode
+except NameError:
+    to_unicode = str
+
 
 log = logging.getLogger('coveralls')
 
@@ -56,6 +61,6 @@ def main(argv=None):
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
     except CoverallsException as e:  # pragma: no cover
-        log.error(unicode(e))
+        log.error(to_unicode(e))
     except Exception:  # pragma: no cover
         raise
