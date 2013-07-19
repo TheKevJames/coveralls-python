@@ -55,7 +55,7 @@ def main(argv=None):
             coverallz.wear(dry_run=True)
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
-    except CoverallsException as e:  # pragma: no cover
-        log.error(unicode(e))
+    except CoverallsException as e:
+        log.error(e)
     except Exception:  # pragma: no cover
         raise

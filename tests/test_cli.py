@@ -2,8 +2,10 @@
 import os
 
 from mock import patch, call
+import pytest
 
 import coveralls
+from coveralls.api import CoverallsException
 import coveralls.cli
 
 
@@ -23,3 +25,13 @@ def test_real(mock_wear, mock_log):
     coveralls.cli.main(argv=[])
     mock_wear.assert_called_with()
     mock_log.assert_has_calls([call("Submitting coverage to coveralls.io..."), call("Coverage submitted!")])
+
+
+exc = CoverallsException('bad stuff happened')
+
+@patch.object(coveralls.cli.log, 'error')
+@patch.object(coveralls.Coveralls, 'wear', side_effect=exc)
+@patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_exception(mock_coveralls, mock_log):
+    coveralls.cli.main(argv=[])
+    mock_log.assert_has_calls([call(exc)])
