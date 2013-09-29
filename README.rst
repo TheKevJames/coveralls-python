@@ -43,7 +43,7 @@ This package can possibly work with different CI environments, but it's only tes
 4. Execute run ``coveralls`` in ``after_success`` section::
 
     after_success:
-        coveralls
+      - coveralls
 
 Full example of .travis.yml::
 
