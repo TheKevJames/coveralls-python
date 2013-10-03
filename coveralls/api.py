@@ -85,6 +85,11 @@ class Coveralls(object):
             result = {}
         json_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
         log.debug(json_string)
+        log.info("==\nReporting %s files\n==\n" % len(data['source_files']))
+        for source_file in data['source_files']:
+            log.debug('%s - %s/%s' % (source_file['name'],
+                                      sum(filter(None, source_file['coverage'])),
+                                      len(source_file['coverage'])))
         return result
 
     def create_data(self):
