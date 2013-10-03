@@ -27,6 +27,12 @@ def test_real(mock_wear, mock_log):
     mock_log.assert_has_calls([call("Submitting coverage to coveralls.io..."), call("Coverage submitted!")])
 
 
+@patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@patch('coveralls.cli.Coveralls')
+def test_rcfile(mock_coveralls):
+    coveralls.cli.main(argv=['--rcfile=coveragerc'])
+    mock_coveralls.assert_called_with(config_file='coveragerc')
+
 exc = CoverallsException('bad stuff happened')
 
 @patch.object(coveralls.cli.log, 'error')

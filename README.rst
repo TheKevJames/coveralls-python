@@ -85,7 +85,7 @@ so please make sure you're not ruining your own security! For private projects t
 .. _Coveralls Pro: https://coveralls.io/docs/pro
 
 
-Tips for coverage.rc config
+Tips for .coveragerc config
 ---------------------------
 
 This section is a list of most common options for coverage.py, which collects all the data.

@@ -14,8 +14,9 @@ Usage:
     It also forces verbose output.
 
 Global options:
-    -h --help       Display this help
-    -v --verbose    Print extra info, True for debug command
+    --rcfile=<file>   Specify configuration file. [default: .coveragerc]
+    -h --help         Display this help
+    -v --verbose      Print extra info, True for debug command
 
 Example:
     $ coveralls
@@ -42,7 +43,7 @@ def main(argv=None):
     log.setLevel(level)
 
     try:
-        coverallz = Coveralls()
+        coverallz = Coveralls(config_file=options['--rcfile'])
         if not options['debug']:
             log.info("Submitting coverage to coveralls.io...")
             result = coverallz.wear()
