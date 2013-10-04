@@ -62,7 +62,7 @@ Full example of .travis.yml::
 Usage (another CI)
 ~~~~~~~~~~~~~~~~~~
 
-If you're NOT using Travis, you have to provide at least a ``repo_token`` option in ``.coveralls.yml``
+If you're NOT using Travis, first option is to provide a ``repo_token`` option in ``.coveralls.yml``
 at the root of your repo. This is your own secret token, which is available at the bottom of your repository's page on Coveralls.
 Make sure it stays **secret**, do not put it in your public repo.
 
@@ -70,6 +70,8 @@ Example of .coveralls.yml::
 
     # .coveralls.yml
     repo_token: TjkDuVpGjuQcRhNW8dots9c8SSnv7ReM5
+
+Another alternative is to use ``COVERALLS_REPO_TOKEN`` env variable.
 
 .. _add your repo: https://coveralls.io/repos/new
 .. _Travis CI: http://travis-ci.org
