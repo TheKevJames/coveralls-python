@@ -8,7 +8,7 @@ Changelog
 
 0.3 (2013-10-02)
 ~~~~~~~~~~~~~~~~
-* Added initial support for Circle CI (thnx, Damian Fuentes)
+* Added initial support for Circle CI
 * Fixed Unicode not defined error in python 3
 
 0.2 (2013-05-26)
