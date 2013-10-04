@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+0.4 (TBA)
+~~~~~~~~~~~
+* Added support for --rcfile=<file> option to cli
+* Improved docs: nosetests and troubleshooting sections added
+
 0.3 (2013-10-02)
 ~~~~~~~~~~~~~~~~
 * Added initial support for Circle CI (thnx, Damian Fuentes)

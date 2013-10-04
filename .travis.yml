@@ -6,9 +6,9 @@ python:
   - 3.3
   - pypy
 install:
-  - python setup.py develop
+  python setup.py develop
 script:
   - coverage run --source=coveralls setup.py test
   - coverage report -m
 after_script:
-  - coveralls --verbose
+  coveralls --verbose
