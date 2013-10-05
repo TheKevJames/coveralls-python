@@ -5,6 +5,7 @@ Changelog
 ~~~~~~~~~~~
 * Added support for --rcfile=<file> option to cli
 * Improved docs: nosetests and troubleshooting sections added
+* Added debug in case of UnicodeDecodeError
 
 0.3 (2013-10-02)
 ~~~~~~~~~~~~~~~~
