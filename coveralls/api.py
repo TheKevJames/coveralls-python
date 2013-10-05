@@ -72,7 +72,12 @@ class Coveralls(object):
             data = self.create_data()
         except coverage.CoverageException as e:
             return {'message': 'Failure to gather coverage: %s' % str(e)}
-        json_string = json.dumps(data)
+        try:
+            json_string = json.dumps(data)
+        except UnicodeDecodeError as e:
+            log.error("ERROR: While preparing JSON received exception: %s" % e)
+            self.debug_bad_encoding(data)
+            raise
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
             try:
@@ -85,7 +90,7 @@ class Coveralls(object):
             result = {}
         json_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
         log.debug(json_string)
-        log.info("==\nReporting %s files\n==\n" % len(data['source_files']))
+        log.debug("==\nReporting %s files\n==\n" % len(data['source_files']))
         for source_file in data['source_files']:
             log.debug('%s - %s/%s' % (source_file['name'],
                                       sum(filter(None, source_file['coverage'])),
@@ -161,6 +166,19 @@ class Coveralls(object):
                         for line in git.remote('-v') if '(fetch)' in line]
         }}
         return git_info
+
+    def debug_bad_encoding(self, data):
+        """ Let's try to help user figure out what is at fault"""
+        at_fault_files = set()
+        for source_file_data in data['source_files']:
+            for key, value in source_file_data.items():
+                try:
+                    _ = json.dumps(value)
+                except UnicodeDecodeError:
+                    at_fault_files.add(source_file_data['name'])
+        if at_fault_files:
+            log.error("HINT: Following files cannot be decoded properly into unicode."
+                      "Check their content: %s" % (', '.join(at_fault_files)))
 
 
 def gitlog(format):
