@@ -171,3 +171,9 @@ Install latest `unstable version`_::
     $ pip install coveralls==dev
 
 .. _unstable version: https://github.com/coagulant/coveralls-python/archive/master.zip#egg=coveralls-dev
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/coagulant/coveralls-python/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
