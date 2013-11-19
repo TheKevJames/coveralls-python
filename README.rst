@@ -52,8 +52,8 @@ Full example of .travis.yml::
       - 2.7
       - 3.3
     install:
-      - pip install -r requirements.txt --use-mirrors
-      - pip install coveralls --use-mirrors
+      - pip install -r requirements.txt
+      - pip install coveralls
     script:
       coverage run --source=moscowdjango,meetup manage.py test
     after_success:
