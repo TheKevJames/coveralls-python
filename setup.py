@@ -17,7 +17,7 @@ class PyTest(TestCommand):
 
 setup(
     name='coveralls',
-    version='0.4dev',
+    version='0.4',
     packages=['coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
@@ -34,7 +34,7 @@ setup(
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     cmdclass={'test': PyTest},
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Topic :: Software Development :: Testing',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
