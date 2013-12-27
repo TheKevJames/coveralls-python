@@ -3,10 +3,11 @@ import json
 import logging
 import os
 import re
+import subprocess
+
 import coverage
 import requests
 import yaml
-from sh import git
 
 from .reporter import CoverallReporter
 
@@ -151,6 +152,7 @@ class Coveralls(object):
             }
         """
 
+        rev = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
         git_info = {'git': {
             'head': {
                 'id': gitlog('%H'),
@@ -160,10 +162,10 @@ class Coveralls(object):
                 'committer_email': gitlog('%ce'),
                 'message': gitlog('%s'),
             },
-            'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('TRAVIS_BRANCH', git('rev-parse', '--abbrev-ref', 'HEAD').strip()), 
+            'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('TRAVIS_BRANCH', rev),
             #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                        for line in git.remote('-v') if '(fetch)' in line]
+                        for line in subprocess.check_output(['git', 'remote', '-v']).splitlines() if '(fetch)' in line]
         }}
         return git_info
 
@@ -173,7 +175,7 @@ class Coveralls(object):
         for source_file_data in data['source_files']:
             for key, value in source_file_data.items():
                 try:
-                    _ = json.dumps(value)
+                    json.dumps(value)
                 except UnicodeDecodeError:
                     at_fault_files.add(source_file_data['name'])
         if at_fault_files:
@@ -182,4 +184,4 @@ class Coveralls(object):
 
 
 def gitlog(format):
-    return str(git('--no-pager', 'log', "-1", pretty="format:%s" % format))
+    return str(subprocess.check_output(['git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format]))
