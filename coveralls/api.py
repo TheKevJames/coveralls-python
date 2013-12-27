@@ -190,4 +190,4 @@ def gitlog(format):
 def run_command(*args):
     cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     assert cmd.wait() == 0
-    return cmd.stdout.read()
+    return cmd.stdout.read().decode()
