@@ -152,7 +152,7 @@ class Coveralls(object):
             }
         """
 
-        rev = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
+        rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
         git_info = {'git': {
             'head': {
                 'id': gitlog('%H'),
@@ -165,7 +165,7 @@ class Coveralls(object):
             'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('TRAVIS_BRANCH', rev),
             #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                        for line in subprocess.check_output(['git', 'remote', '-v']).splitlines() if '(fetch)' in line]
+                        for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
         }}
         return git_info
 
@@ -184,4 +184,10 @@ class Coveralls(object):
 
 
 def gitlog(format):
-    return str(subprocess.check_output(['git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format]))
+    return str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+
+
+def run_command(*args):
+    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    assert cmd.wait() == 0
+    return cmd.stdout.read()
