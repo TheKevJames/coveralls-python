@@ -1,11 +1,12 @@
 Changelog
 ---------
 
-0.4 (TBA)
-~~~~~~~~~~~
+0.4 (2013-12-27)
+~~~~~~~~~~~~~~~~
 * Added support for --rcfile=<file> option to cli
 * Improved docs: nosetests and troubleshooting sections added
 * Added debug in case of UnicodeDecodeError
+* Removed sh dependency in favor of Windows compatibility
 
 0.3 (2013-10-02)
 ~~~~~~~~~~~~~~~~
