@@ -184,10 +184,19 @@ class Coveralls(object):
 
 
 def gitlog(format):
-    return str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+    try:
+        log = str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+    except UnicodeEncodeError:
+        log = unicode(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+    return log
 
 
 def run_command(*args):
     cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     assert cmd.wait() == 0
-    return cmd.stdout.read().decode()
+    output = cmd.stdout.read()
+    try:
+        output = output.decode()
+    except UnicodeDecodeError:
+        output = output.decode('utf-8')
+    return output
