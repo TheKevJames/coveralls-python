@@ -23,7 +23,7 @@ class GitBasedTest(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
         sh.cd(self.dir)
         sh.git.init()
-        sh.git('config', 'user.name', '"Guido"')
+        sh.git('config', 'user.name', '"Daniël"')
         sh.git('config', 'user.email', '"me@here.com"')
         sh.touch('README')
         sh.git.add('README')
@@ -91,9 +91,9 @@ class Git(GitBasedTest):
             'head': {
                 'committer_email': 'me@here.com',
                 'author_email': 'me@here.com',
-                'author_name': 'Guido',
+                'author_name': 'Daniël',
                 'message': 'first commit',
-                'committer_name': 'Guido',
+                'committer_name': 'Daniël',
             },
             'remotes': [{
                 'url': 'https://github.com/username/Hello-World.git',
