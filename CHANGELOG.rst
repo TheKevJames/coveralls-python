@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.4.1 (2014-01-15)
+~~~~~~~~~~~~~~~~~~
+* Fix gitlog output with utf8
+
 0.4 (2013-12-27)
 ~~~~~~~~~~~~~~~~
 * Added support for --rcfile=<file> option to cli
