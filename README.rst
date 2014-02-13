@@ -86,7 +86,7 @@ Nosetests
 
 However, it gathers coverage for all executed code, ignoring ``source`` config option in ``.coveragerc``.
 It means, that ``coveralls`` will report unnecessary files, which is inconvenient.
-Here is a workaround, use ``omit`` option in your ``.coverage.rc``to specify a list of filename patterns,
+Here is a workaround, use ``omit`` option in your ``.coveragerc`` to specify a list of filename patterns,
 the files to leave out of reporting (your paths might differ) ::
 
     [report]
