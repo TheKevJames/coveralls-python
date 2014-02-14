@@ -96,7 +96,7 @@ the files to leave out of reporting (your paths might differ) ::
 
 Note, that native coverage.py and py.test are not affected by this problem and do not require this workaround.
 
-.. _Nosetests:http://nose.readthedocs.org/en/latest/plugins/cover.html
+.. _Nosetests: http://nose.readthedocs.org/en/latest/plugins/cover.html
 
 How it works
 ------------
@@ -160,7 +160,7 @@ you can use debug::
 Debug mode doesn't send anything, just outputs prepared json and reported files list to stdout.
 
 Contributing
------------
+------------
 
 Run tests::
 
