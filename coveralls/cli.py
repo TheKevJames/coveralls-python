@@ -58,7 +58,7 @@ def main(argv=None):
         log.info('Aborted')
     except CoverallsException as e:
         log.error(e)
-    except KeyError:  # pragma: no cover
+    except KeyError as e:  # pragma: no cover
         log.error(e)
     except Exception:  # pragma: no cover
         raise
