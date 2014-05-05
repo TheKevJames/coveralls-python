@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.4.2 (2014-05-05)
+~~~~~~~~~~~~~~~~~~
+* Handle 503 errors from coveralls.io
+
 0.4.1 (2014-01-15)
 ~~~~~~~~~~~~~~~~~~
 * Fix gitlog output with utf8
