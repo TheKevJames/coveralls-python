@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.4.3 (2014-09-28)
+~~~~~~~~~~~~~~~~~~
+* Fix coverage.py dependency version
+
 0.4.2 (2014-05-05)
 ~~~~~~~~~~~~~~~~~~
 * Handle 503 errors from coveralls.io
