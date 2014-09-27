@@ -30,7 +30,7 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
-    install_requires=['PyYAML>=3.10', 'docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0'],
+    install_requires=['PyYAML>=3.10', 'docopt>=0.6.1', 'coverage>=3.6,<4.0', 'requests>=1.0.0'],
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     cmdclass={'test': PyTest},
     classifiers=[
