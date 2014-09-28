@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.4.4 (2014-09-28)
+~~~~~~~~~~~~~~~~~~
+* Proper fix coverage.py dependency version
+
 0.4.3 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
 * Fix coverage.py dependency version
