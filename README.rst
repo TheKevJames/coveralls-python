@@ -18,7 +18,7 @@ Only projects hosted on Github are supported.
 Works with python 2.6+, 3.2+ and pypy 1.9.
 
 .. _Coveralls.io: http://coveralls.io
-.. _nice features: https://coveralls.io/info/features
+.. _nice features: https://coveralls.io/features
 .. _official gem: https://coveralls.io/docs/ruby
 
 Usage (Travis CI)
