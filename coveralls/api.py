@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import re
-import subprocess
+from subprocess import Popen, PIPE
 
 import coverage
 import requests
@@ -192,11 +192,11 @@ def gitlog(format):
 
 
 def run_command(*args):
-    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    assert cmd.wait() == 0
-    output = cmd.stdout.read()
+    cmd = Popen(list(args), stdout=PIPE, stderr=PIPE)
+    stdout, stderr = cmd.communicate()
+    assert cmd.returncode == 0
     try:
-        output = output.decode()
+        output = stdout.decode()
     except UnicodeDecodeError:
-        output = output.decode('utf-8')
+        output = stdout.decode('utf-8')
     return output
