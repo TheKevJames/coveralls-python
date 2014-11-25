@@ -70,15 +70,9 @@ class Coveralls(object):
     def wear(self, dry_run=False):
         """ run! """
         try:
-            data = self.create_data()
+            json_string = self.create_report()
         except coverage.CoverageException as e:
             return {'message': 'Failure to gather coverage: %s' % str(e)}
-        try:
-            json_string = json.dumps(data)
-        except UnicodeDecodeError as e:
-            log.error("ERROR: While preparing JSON received exception: %s" % e)
-            self.debug_bad_encoding(data)
-            raise
         if not dry_run:
             response = requests.post(self.api_endpoint, files={'json_file': json_string})
             try:
@@ -89,14 +83,27 @@ class Coveralls(object):
                     'text': response.text}}
         else:
             result = {}
-        json_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
-        log.debug(json_string)
-        log.debug("==\nReporting %s files\n==\n" % len(data['source_files']))
-        for source_file in data['source_files']:
-            log.debug('%s - %s/%s' % (source_file['name'],
-                                      sum(filter(None, source_file['coverage'])),
-                                      len(source_file['coverage'])))
         return result
+
+    def create_report(self):
+        """Generate json dumped report for coveralls api."""
+
+        try:
+            data = self.create_data()
+            json_string = json.dumps(data)
+        except UnicodeDecodeError as e:
+            log.error("ERROR: While preparing JSON received exception: %s" % e)
+            self.debug_bad_encoding(data)
+            raise
+        else:
+            log_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
+            log.debug(log_string)
+            log.debug("==\nReporting %s files\n==\n" % len(data['source_files']))
+            for source_file in data['source_files']:
+                log.debug('%s - %s/%s' % (source_file['name'],
+                                          sum(filter(None, source_file['coverage'])),
+                                          len(source_file['coverage'])))
+            return json_string
 
     def create_data(self):
         """ Generate object for api.
