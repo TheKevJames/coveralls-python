@@ -15,6 +15,7 @@ Usage:
 
 Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
+    --output=<file>   Write report to file.  Doesn't send anything.
     -h --help         Display this help
     -v --verbose      Print extra info, True for debug command
 
@@ -44,16 +45,19 @@ def main(argv=None):
 
     try:
         coverallz = Coveralls(config_file=options['--rcfile'])
-        if not options['debug']:
+        if options['debug']:
+            log.info("Testing coveralls-python...")
+            coverallz.wear(dry_run=True)
+        elif options['--output']:
+            log.info('Write coverage report to file...')
+            coverallz.save_report(options['--output'])
+        else:
             log.info("Submitting coverage to coveralls.io...")
             result = coverallz.wear()
             log.info("Coverage submitted!")
             log.info(result['message'])
             log.info(result['url'])
             log.debug(result)
-        else:
-            log.info("Testing coveralls-python...")
-            coverallz.wear(dry_run=True)
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
     except CoverallsException as e:
