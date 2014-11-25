@@ -41,3 +41,12 @@ exc = CoverallsException('bad stuff happened')
 def test_exception(mock_coveralls, mock_log):
     coveralls.cli.main(argv=[])
     mock_log.assert_has_calls([call(exc)])
+
+
+@patch.object(coveralls.Coveralls, 'save_report')
+@patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_save_report_to_file(mock_coveralls):
+    """Check save_report api usage."""
+
+    coveralls.cli.main(argv=['--output=test.log'])
+    mock_coveralls.assert_called_with('test.log')
