@@ -105,6 +105,17 @@ class Coveralls(object):
                                           len(source_file['coverage'])))
             return json_string
 
+    def save_report(self, file_path):
+        """Write coveralls report to file."""
+
+        with open(file_path, 'w') as report_file:
+            try:
+                report = self.create_report()
+            except coverage.CoverageException as e:
+                logging.error('Failure to gather coverage: %s' % str(e))
+            else:
+                report_file.write(report)
+
     def create_data(self):
         """ Generate object for api.
             Example json:
