@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+0.5 (TBA)
+~~~~~~~~~
+* Add --output=<file> option to save json to file for possible merging with other coveralls plugins
+
 0.4.4 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
 * Proper fix coverage.py dependency version
