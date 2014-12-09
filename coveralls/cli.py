@@ -16,6 +16,7 @@ Usage:
 Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --output=<file>   Write report to file.  Doesn't send anything.
+    --merge=<file>    Merge report from file when submitting.
     -h --help         Display this help
     -v --verbose      Print extra info, True for debug command
 
@@ -45,6 +46,9 @@ def main(argv=None):
 
     try:
         coverallz = Coveralls(config_file=options['--rcfile'])
+        if options['--merge']:
+            coverallz.merge(options['--merge'])
+
         if options['debug']:
             log.info("Testing coveralls-python...")
             coverallz.wear(dry_run=True)
