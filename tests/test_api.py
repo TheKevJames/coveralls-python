@@ -11,6 +11,7 @@ import coverage
 
 import sh
 from mock import patch
+from mock import mock_open
 import pytest
 
 from coveralls import Coveralls
@@ -152,6 +153,14 @@ class WearTest(unittest.TestCase):
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear(dry_run=False)
         assert result == self.expected_json
+
+    def test_merge(self, mock_requests):
+        api = Coveralls(repo_token='xxx')
+        with patch('json.load') as mock_load:
+            mock_load.return_value = {'source_files': [{'name': 'foobar', 'coverage': []}]}
+            api.merge(__file__)
+        result = api.create_report()
+        assert json.loads(result)['source_files'] == [{'name': 'foobar', 'coverage': []}]
 
     def test_dry_run(self, mock_requests):
         self.setup_mock(mock_requests)
