@@ -76,27 +76,24 @@ Another alternative is to use ``COVERALLS_REPO_TOKEN`` env variable.
 .. _add your repo: https://coveralls.io/repos/new
 .. _Travis CI: http://travis-ci.org
 
+Multiple languages (experimental)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Nosetests
-~~~~~~~~~
+Tracking multi-language repo coverage requires extra setup of merging coverage data for submission.
+If you already have json file from coveralls library from another language (example from `coveralls-lcov`_)::
 
-`Nosetests`_ provide a plugin for coverage measurement of your code::
+    # coveralls-lcov example
+    lcov --compat-libtool --directory . --capture --output-file coverage.info
+    coveralls-lcov -v -n coverage.info > coverage.json
 
-    $ nosetests  --with-coverage --cover-package=<your_package_name>
+    # merges python coverage with coveralls-style json file and sends it to api endpoint
+    coveralls --merge=coverage.json
 
-However, it gathers coverage for all executed code, ignoring ``source`` config option in ``.coveragerc``.
-It means, that ``coveralls`` will report unnecessary files, which is inconvenient.
-Here is a workaround, use ``omit`` option in your ``.coveragerc`` to specify a list of filename patterns,
-the files to leave out of reporting (your paths might differ) ::
+If you'd like to just use json data from coveralls (with other tools)::
 
-    [report]
-    omit =
-        */python?.?/*
-        */site-packages/nose/*
+    coveralls --output=coverage.json  # output single json with python coverage in coveralls format
 
-Note, that native coverage.py and py.test are not affected by this problem and do not require this workaround.
-
-.. _Nosetests: http://nose.readthedocs.org/en/latest/plugins/cover.html
+.. _coveralls-lcov: https://github.com/okkez/coveralls-lcov
 
 How it works
 ------------
@@ -149,6 +146,29 @@ Finally, if you're using non-default configuration file, specify it to coveralls
 .. _report with only your packages: http://nedbatchelder.com/code/coverage/source.html#source
 .. _specify whole lines to .coveragerc: http://nedbatchelder.com/code/coverage/excluding.html
 
+
+Nosetests
+~~~~~~~~~
+
+`Nosetests`_ provide a plugin for coverage measurement of your code::
+
+    $ nosetests  --with-coverage --cover-package=<your_package_name>
+
+However, it gathers coverage for all executed code, ignoring ``source`` config option in ``.coveragerc``.
+It means, that ``coveralls`` will report unnecessary files, which is inconvenient.
+Here is a workaround, use ``omit`` option in your ``.coveragerc`` to specify a list of filename patterns,
+the files to leave out of reporting (your paths might differ) ::
+
+    [report]
+    omit =
+        */python?.?/*
+        */site-packages/nose/*
+
+Note, that native coverage.py and py.test are not affected by this problem and do not require this workaround.
+
+.. _Nosetests: http://nose.readthedocs.org/en/latest/plugins/cover.html
+
+
 Troubleshooting
 ---------------
 
@@ -158,6 +178,7 @@ you can use debug::
     $ coveralls debug
 
 Debug mode doesn't send anything, just outputs prepared json and reported files list to stdout.
+
 
 Contributing
 ------------

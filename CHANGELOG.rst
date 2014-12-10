@@ -1,9 +1,10 @@
 Changelog
 ---------
 
-0.5 (TBA)
-~~~~~~~~~
-* Add --output=<file> option to save json to file for possible merging with other coveralls plugins
+0.5 (2014-12-10)
+~~~~~~~~~~~~~~~~
+* Add option --output=<file> for saving json to file for possible merging with coverages from other languages
+* Add merge command for sending coverage stats from multiple languages
 
 0.4.4 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
