@@ -17,7 +17,7 @@ class PyTest(TestCommand):
 
 setup(
     name='coveralls',
-    version='0.4.4',
+    version='0.5',
     packages=['coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
