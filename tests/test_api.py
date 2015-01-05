@@ -1,18 +1,19 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import json
+import logging
 import os
 from os.path import join, dirname
 import re
 import shutil
 import tempfile
 import unittest
-import coverage
 
+import coverage
 import sh
 from mock import patch
-from mock import mock_open
 import pytest
+import sys
 
 from coveralls import Coveralls
 from coveralls.api import log
@@ -138,6 +139,18 @@ def test_non_unicode():
     sh.coverage('run', 'nonunicode.py')
     expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print (\'I like P\\u00f3lya distribution.\')"'
     assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
+
+
+@pytest.mark.skipif(sys.version_info >= (3, 0), reason="python 3 not affected")
+def test_malformed_encoding_declaration(capfd):
+    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    sh.coverage('run', 'malformed.py')
+    logging.getLogger('coveralls').addHandler(logging.StreamHandler())
+    result_object = Coveralls(repo_token='xxx').get_coverage()
+    assert result_object == []
+    out, err = capfd.readouterr()
+    assert 'Source file malformed.py can not be properly decoded' in err
+
 
 @patch('coveralls.api.requests')
 class WearTest(unittest.TestCase):

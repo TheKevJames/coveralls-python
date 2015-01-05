@@ -1,5 +1,6 @@
 # coding: utf-8
 import logging
+from os.path import basename
 import sys
 
 from coverage.misc import NoSource, NotPython
@@ -62,6 +63,10 @@ class CoverallReporter(Reporter):
                 encoding = source_encoding(source)
                 if encoding != 'utf-8':
                     source = source.decode(encoding).encode('utf-8')
+        except UnicodeDecodeError:
+            log.warn('Source file %s can not be properly decoded, skipping. '
+                     'Please check if encoding declaration is ok', basename(cu.filename))
+            return
         finally:
             source_file.close()
         self.source_files.append({
