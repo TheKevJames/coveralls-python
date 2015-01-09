@@ -1,25 +1,27 @@
 Coveralls for python
 ====================
 
-.. image:: https://travis-ci.org/coagulant/coveralls-python.png?branch=master
-    :target: https://travis-ci.org/coagulant/coveralls-python
-
-.. image:: https://coveralls.io/repos/coagulant/coveralls-python/badge.png?branch=master
+.. image:: https://img.shields.io/coveralls/coagulant/coveralls-python.svg
     :target: https://coveralls.io/r/coagulant/coveralls-python
 
-.. image:: https://pypip.in/v/coveralls/badge.png
-    :target: https://crate.io/packages/coveralls/
+.. image:: https://travis-ci.org/coagulant/coveralls-python.svg?branch=master
+    :target: https://travis-ci.org/coagulant/coveralls-python
+
+.. image:: https://pypip.in/version/coveralls/badge.svg
+    :target: https://pypi.python.org/pypi/coveralls
+
+.. image:: https://pypip.in/py_versions/coveralls/badge.svg
+    :target: https://pypi.python.org/pypi/coveralls/
+
+.. image:: https://pypip.in/download/coveralls/badge.svg
+    :target: https://pypi.python.org/pypi/coveralls/
 
 `Coveralls.io`_ is service to publish your coverage stats online with a lot of `nice features`_.
 This package provides seamless integration with ``coverage.py`` in your python projects.
-For ruby projects, there is an `official gem`_.
 Only projects hosted on Github are supported.
-
-Works with python 2.6+, 3.2+ and pypy 1.9.
 
 .. _Coveralls.io: http://coveralls.io
 .. _nice features: https://coveralls.io/features
-.. _official gem: https://coveralls.io/docs/ruby
 
 Usage (Travis CI)
 -----------------
@@ -186,15 +188,4 @@ Contributing
 Run tests::
 
     $ python setup.py test
-
-Install latest `unstable version`_::
-
-    $ pip install coveralls==dev
-
-.. _unstable version: https://github.com/coagulant/coveralls-python/archive/master.zip#egg=coveralls-dev
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/coagulant/coveralls-python/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
 
