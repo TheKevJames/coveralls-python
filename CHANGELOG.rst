@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+1.0
+~~~
+* Backwards incompatible: make pyyaml optional.
+If you're using .coveralls.yml, make sure to install coveralls[yaml]
+
 0.5 (2014-12-10)
 ~~~~~~~~~~~~~~~~
 * Add option --output=<file> for saving json to file for possible merging with coverages from other languages

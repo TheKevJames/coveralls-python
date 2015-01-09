@@ -7,7 +7,6 @@ from subprocess import Popen, PIPE
 
 import coverage
 import requests
-import yaml
 
 from .reporter import CoverallReporter
 
@@ -62,7 +61,10 @@ class Coveralls(object):
 
     def load_config(self):
         try:
+            import yaml
             return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
+        except ImportError:
+            return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.', self.config_filename)
             return {}

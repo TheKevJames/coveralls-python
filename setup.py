@@ -17,7 +17,7 @@ class PyTest(TestCommand):
 
 setup(
     name='coveralls',
-    version='0.5',
+    version='1.0a',
     packages=['coveralls'],
     url='http://github.com/coagulant/coveralls-python',
     license='MIT',
@@ -30,8 +30,11 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
-    install_requires=['PyYAML>=3.10', 'docopt>=0.6.1', 'coverage>=3.6,<3.999', 'requests>=1.0.0'],
+    install_requires=['docopt>=0.6.1', 'coverage>=3.6,<3.999', 'requests>=1.0.0'],
     tests_require=['mock', 'pytest', 'sh>=1.08'],
+    extras_require={
+        'yaml': ['PyYAML>=3.10']
+    },
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -44,6 +47,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: Implementation :: CPython',
     ],

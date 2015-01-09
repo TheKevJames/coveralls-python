@@ -8,12 +8,16 @@ import re
 import shutil
 import tempfile
 import unittest
+import sys
 
 import coverage
 import sh
 from mock import patch
 import pytest
-import sys
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 from coveralls import Coveralls
 from coveralls.api import log
@@ -36,6 +40,7 @@ class GitBasedTest(unittest.TestCase):
         shutil.rmtree(self.dir)
 
 
+@pytest.mark.skipif(yaml is None, reason="requires pyyaml")
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
 
