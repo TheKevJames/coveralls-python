@@ -4,7 +4,7 @@ Coveralls for python
 .. image:: https://img.shields.io/coveralls/coagulant/coveralls-python.svg
     :target: https://coveralls.io/r/coagulant/coveralls-python
 
-.. image:: https://travis-ci.org/coagulant/coveralls-python.svg?branch=master
+.. image:: https://img.shields.io/travis/coagulant/coveralls-python/master.svg
     :target: https://travis-ci.org/coagulant/coveralls-python
 
 .. image:: https://pypip.in/version/coveralls/badge.svg
