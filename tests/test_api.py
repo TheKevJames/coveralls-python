@@ -174,9 +174,10 @@ class WearTest(unittest.TestCase):
 
     def test_merge(self, mock_requests):
         api = Coveralls(repo_token='xxx')
-        with patch('json.load') as mock_load:
-            mock_load.return_value = {'source_files': [{'name': 'foobar', 'coverage': []}]}
-            api.merge(__file__)
+        coverage_file = tempfile.NamedTemporaryFile()
+        coverage_file.write(b'{"source_files": [{"name": "foobar", "coverage": []}]}')
+        coverage_file.seek(0)
+        api.merge(coverage_file.name)
         result = api.create_report()
         assert json.loads(result)['source_files'] == [{'name': 'foobar', 'coverage': []}]
 

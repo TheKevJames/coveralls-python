@@ -1,4 +1,5 @@
 # coding: utf-8
+import codecs
 import json
 import logging
 import os
@@ -70,8 +71,9 @@ class Coveralls(object):
             return {}
 
     def merge(self, path):
+        reader = codecs.getreader("utf-8")
         with open(path, 'rb') as fh:
-            extra = json.load(fh)
+            extra = json.load(reader(fh))
             self.create_data(extra)
 
     def wear(self, dry_run=False):
