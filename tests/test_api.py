@@ -109,6 +109,13 @@ class Git(GitBasedTest):
             'branch': 'master'
         }}
 
+
+def assert_coverage(actual, expected):
+    assert actual['source'].strip() == expected['source'].strip()
+    assert actual['name'] == expected['name']
+    assert actual['coverage'] == expected['coverage']
+
+
 class ReporterTest(unittest.TestCase):
 
     def setUp(self):
@@ -119,12 +126,15 @@ class ReporterTest(unittest.TestCase):
 
     def test_reporter(self):
         sh.coverage('run', 'runtests.py')
-        assert self.cover.get_coverage() == [{
+        results = self.cover.get_coverage()
+        assert len(results) == 2
+        assert_coverage({
             'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')',
             'name': 'project.py',
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0]}, {
+            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0]}, results[0])
+        assert_coverage({
             'source': "# coding: utf-8\nfrom project import hello\n\nif __name__ == '__main__':\n    hello()",
-            'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1]}]
+            'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1]}, results[1])
 
     def test_missing_file(self):
         sh.echo('print("Python rocks!")', _out="extra.py")
@@ -142,11 +152,12 @@ class ReporterTest(unittest.TestCase):
 def test_non_unicode():
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'nonunicode.py')
-    expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print (\'I like P\\u00f3lya distribution.\')"'
+    expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print (\'I like P\\u00f3lya distribution.\')'
     assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
 
 
 @pytest.mark.skipif(sys.version_info >= (3, 0), reason="python 3 not affected")
+@pytest.mark.skipif(coverage.__version__.startswith('4.'), reason="coverage 4 not affected")
 def test_malformed_encoding_declaration(capfd):
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
@@ -155,6 +166,19 @@ def test_malformed_encoding_declaration(capfd):
     assert result_object == []
     out, err = capfd.readouterr()
     assert 'Source file malformed.py can not be properly decoded' in err
+
+
+@pytest.mark.skipif(sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
+                    reason="python 2 or coverage 3 fail")
+def test_malformed_encoding_declaration_py3_or_coverage4(capfd):
+    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    sh.coverage('run', 'malformed.py')
+    logging.getLogger('coveralls').addHandler(logging.StreamHandler())
+    result_object = Coveralls(repo_token='xxx').get_coverage()
+    assert len(result_object) == 1
+    assert_coverage({'coverage': [None, None, 1, 0], 'name': 'malformed.py',
+                     'source': '# -*- cоding: utf-8 -*-\n\ndef hello():\n    return 1\n'},
+                    result_object[0])
 
 
 @patch('coveralls.api.requests')
