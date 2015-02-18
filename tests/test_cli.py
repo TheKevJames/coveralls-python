@@ -20,6 +20,14 @@ def test_debug(mock_wear, mock_log):
 
 @patch.object(coveralls.cli.log, 'info')
 @patch.object(coveralls.Coveralls, 'wear')
+def test_debug_no_token(mock_wear, mock_log):
+    coveralls.cli.main(argv=['debug'])
+    mock_wear.assert_called_with(dry_run=True)
+    mock_log.assert_has_calls([call("Testing coveralls-python...")])
+
+
+@patch.object(coveralls.cli.log, 'info')
+@patch.object(coveralls.Coveralls, 'wear')
 @patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_real(mock_wear, mock_log):
     coveralls.cli.main(argv=[])
@@ -31,7 +39,7 @@ def test_real(mock_wear, mock_log):
 @patch('coveralls.cli.Coveralls')
 def test_rcfile(mock_coveralls):
     coveralls.cli.main(argv=['--rcfile=coveragerc'])
-    mock_coveralls.assert_called_with(config_file='coveragerc')
+    mock_coveralls.assert_called_with(True, config_file='coveragerc')
 
 exc = CoverallsException('bad stuff happened')
 
@@ -47,6 +55,14 @@ def test_exception(mock_coveralls, mock_log):
 @patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_save_report_to_file(mock_coveralls):
     """Check save_report api usage."""
+
+    coveralls.cli.main(argv=['--output=test.log'])
+    mock_coveralls.assert_called_with('test.log')
+
+
+@patch.object(coveralls.Coveralls, 'save_report')
+def test_save_report_to_file_no_token(mock_coveralls):
+    """Check save_report api usage when token is not set."""
 
     coveralls.cli.main(argv=['--output=test.log'])
     mock_coveralls.assert_called_with('test.log')

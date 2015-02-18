@@ -45,7 +45,8 @@ def main(argv=None):
     log.setLevel(level)
 
     try:
-        coverallz = Coveralls(config_file=options['--rcfile'])
+        token_required = not options['debug'] and not options['--output']
+        coverallz = Coveralls(token_required, config_file=options['--rcfile'])
         if options['--merge']:
             coverallz.merge(options['--merge'])
 

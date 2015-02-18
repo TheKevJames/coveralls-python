@@ -24,7 +24,7 @@ class Coveralls(object):
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
     default_client = 'coveralls-python'
 
-    def __init__(self, **kwargs):
+    def __init__(self, token_required=True, **kwargs):
         """ Coveralls!
 
         * repo_token
@@ -57,7 +57,7 @@ class Coveralls(object):
         if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
-        if not self.config.get('repo_token') and not is_travis:
+        if token_required and not self.config.get('repo_token') and not is_travis:
             raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
 
     def load_config(self):
