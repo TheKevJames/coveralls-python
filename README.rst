@@ -84,11 +84,17 @@ Multiple languages (experimental)
 Tracking multi-language repo coverage requires extra setup of merging coverage data for submission.
 If you already have json file from coveralls library from another language (example from `coveralls-lcov`_)::
 
-    # coveralls-lcov example
+    # Generate data with lcov
     lcov --compat-libtool --directory . --capture --output-file coverage.info
+
+    # Or: generate data with mocha
+    mocha --reporter mocha-lcov-reporter */tests/static/js/* > coverage.info
+
+    # Convert data with coveralls-lcov
     coveralls-lcov -v -n coverage.info > coverage.json
 
-    # merges python coverage with coveralls-style json file and sends it to api endpoint
+    # Merge python coverage with coveralls-style json file and send it to api endpoint
+    # Note: This file must contain "source_files" data or it will not be merged
     coveralls --merge=coverage.json
 
 If you'd like to just use json data from coveralls (with other tools)::

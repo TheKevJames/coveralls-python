@@ -205,6 +205,18 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == [{'name': 'foobar', 'coverage': []}]
 
+    @patch.object(log, 'warn')
+    def test_merge_invalid_data(self, mock_logger, mock_requests):
+        api = Coveralls(repo_token='xxx')
+        coverage_file = tempfile.NamedTemporaryFile()
+        coverage_file.write(b'{}')
+        coverage_file.seek(0)
+        api.merge(coverage_file.name)
+        result = api.create_report()
+        assert json.loads(result)['source_files'] == []
+        mock_logger.assert_called_once_with('No data to be merged; does the '
+                                            'json file contain "source_files" data?')
+
     def test_dry_run(self, mock_requests):
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear(dry_run=True)
