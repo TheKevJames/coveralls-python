@@ -1,10 +1,11 @@
 Changelog
 ---------
 
-1.0
-~~~
-* Backwards incompatible: make pyyaml optional.
-If you're using .coveralls.yml, make sure to install coveralls[yaml]
+1.0a1 (TBA)
+~~~~~~~~~~~
+* **Backwards incompatible**: make pyyaml optional. If you're using .coveralls.yml, make sure to install coveralls[yaml]
+* coverage 4 alpha support
+* Fix merge command for python 3.X
 
 0.5 (2014-12-10)
 ~~~~~~~~~~~~~~~~
