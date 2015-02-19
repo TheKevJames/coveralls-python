@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+1.0a3 (TBA)
+~~~~~~~~~~~
+* Repo token usage is deprecated (but still supported) in favor of env variable.
+
 1.0a2 (2015-02-19)
 ~~~~~~~~~~~~~~~~~~
 * Fix latest alpha coverage.py support
