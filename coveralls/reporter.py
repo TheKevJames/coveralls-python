@@ -54,8 +54,8 @@ class CoverallReporter(Reporter):
 
     def parse_file(self, cu, analysis):
         """ Generate data for single file """
-        filename = cu.file_locator.relative_filename(cu.filename)
         if hasattr(analysis, 'parser'):
+            filename = cu.file_locator.relative_filename(cu.filename)
             source_lines = analysis.parser.lines
             with cu.source_file() as source_file:
                 source = source_file.read()
@@ -69,6 +69,7 @@ class CoverallReporter(Reporter):
                          'Please check if encoding declaration is ok', basename(cu.filename))
                 return
         else:
+            filename = analysis.coverage.file_locator.relative_filename(cu.filename)
             source_lines = list(enumerate(analysis.file_reporter.source_token_lines()))
             source = analysis.file_reporter.source()
         coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(source_lines) + 1)]

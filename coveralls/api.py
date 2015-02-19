@@ -149,10 +149,11 @@ class Coveralls(object):
             self._data = {'source_files': self.get_coverage()}
             self._data.update(self.git_info())
             self._data.update(self.config)
-            if extra and 'source_files' in extra:
-                self._data['source_files'].extend(extra['source_files'])
-            else:
-                log.warn('No data to be merged; does the json file contain "source_files" data?')
+            if extra:
+                if 'source_files' in extra:
+                    self._data['source_files'].extend(extra['source_files'])
+                else:
+                    log.warn('No data to be merged; does the json file contain "source_files" data?')
         return self._data
 
     def get_coverage(self):
