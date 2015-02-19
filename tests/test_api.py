@@ -205,11 +205,20 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == [{'name': 'foobar', 'coverage': []}]
 
+    def test_merge_empty_data(self, mock_requests):
+        api = Coveralls(repo_token='xxx')
+        coverage_file = tempfile.NamedTemporaryFile()
+        coverage_file.write(b'{}')
+        coverage_file.seek(0)
+        api.merge(coverage_file.name)
+        result = api.create_report()
+        assert json.loads(result)['source_files'] == []
+
     @patch.object(log, 'warn')
     def test_merge_invalid_data(self, mock_logger, mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
-        coverage_file.write(b'{}')
+        coverage_file.write(b'{"random": "stuff"}')
         coverage_file.seek(0)
         api.merge(coverage_file.name)
         result = api.create_report()
