@@ -97,8 +97,8 @@ class Coveralls(object):
     def create_report(self):
         """Generate json dumped report for coveralls api."""
 
+        data = self.create_data()
         try:
-            data = self.create_data()
             json_string = json.dumps(data)
         except UnicodeDecodeError as e:
             log.error("ERROR: While preparing JSON received exception: %s" % e)
