@@ -194,7 +194,7 @@ class Coveralls(object):
                 'committer_email': gitlog('%ce'),
                 'message': gitlog('%s'),
             },
-            'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('TRAVIS_BRANCH', rev),
+            'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('CI_BRANCH') or os.environ.get('TRAVIS_BRANCH', rev),
             #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                         for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
