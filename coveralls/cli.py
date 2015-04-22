@@ -28,6 +28,7 @@ Example:
     https://coveralls.io/jobs/92059
 """
 import logging
+import sys
 from docopt import docopt
 from coveralls import Coveralls
 from coveralls.api import CoverallsException
@@ -67,7 +68,9 @@ def main(argv=None):
         log.info('Aborted')
     except CoverallsException as e:
         log.error(e)
+        sys.exit(1)
     except KeyError as e:  # pragma: no cover
         log.error(e)
+        sys.exit(2)
     except Exception:  # pragma: no cover
         raise
