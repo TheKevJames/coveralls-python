@@ -226,8 +226,8 @@ def gitlog(format):
 def run_command(*args):
     cmd = Popen(list(args), stdout=PIPE, stderr=PIPE)
     stdout, stderr = cmd.communicate()
-    assert cmd.returncode == 0, ('command return code %d, STDOUT: %s\n'
-                                 'STDERR: %s' % (cmd.returncode, stdout, stderr))
+    assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
+                                 'STDERR: "%s"' % (cmd.returncode, stdout, stderr))
     try:
         output = stdout.decode()
     except UnicodeDecodeError:
