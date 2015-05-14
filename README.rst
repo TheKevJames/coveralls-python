@@ -69,6 +69,29 @@ Full example of .travis.yml::
     after_success:
       coveralls
 
+Usage (Travis CI and Tox >= v2.0)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Running coveralls from within a `tox`_ environment (`tox`_ v2.0 and above):
+
+Pass the environment variables ``TRAVIS``, ``TRAVIS_JOB_ID``, ``TRAVIS_BRANCH`` to all tox environments
+that submit the coverage report.
+
+Example of tox.ini::
+
+    [tox]
+    envlist = py27,py33,py34
+
+    [testenv]
+    passenv = TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH
+    deps = 
+	coveralls
+    commands =
+        coverage run --source=yourpackagename setup.py test
+        coveralls
+
+.. _tox: https://testrun.org/tox/latest/
+
 Usage (another CI)
 ~~~~~~~~~~~~~~~~~~
 
