@@ -70,7 +70,7 @@ Full example of .travis.yml::
       coveralls
 
 Usage (Travis CI and Tox >= v2.0)
-+++++++++++++++++++++++++++++++++
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Running coveralls from within a `tox`_ environment (`tox`_ v2.0 and above):
 
