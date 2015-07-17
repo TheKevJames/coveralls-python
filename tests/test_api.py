@@ -82,7 +82,8 @@ class NoConfig(unittest.TestCase):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
 
-        assert str(excinfo.value) == 'You have to provide either repo_token in .coveralls.mock, or launch via Travis'
+        assert str(excinfo.value) == 'You have to provide either repo_token in .coveralls.mock, or launch via Travis ' \
+                                     'or CircleCI'
 
 
 class Git(GitBasedTest):
