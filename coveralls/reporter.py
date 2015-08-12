@@ -21,19 +21,23 @@ class CoverallReporter(Reporter):
         `outfile` is a file object to write the json to.
         """
         self.source_files = []
-        self.find_code_units(morfs)
+        if hasattr(self, 'find_code_units'):
+            self.find_code_units(morfs)
+        else:
+            self.find_file_reporters(morfs)
 
-        for cu in self.code_units:
+        units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+        for cu in units:
             try:
                 self.parse_file(cu, self.coverage._analyze(cu))
             except NoSource:
                 if not self.config.ignore_errors:
-                    log.warn('No source for %s', cu.name)
+                    log.warn('No source for %s', cu.filename)
             except NotPython:
                 # Only report errors for .py files, and only if we didn't
                 # explicitly suppress those errors.
                 if cu.should_be_python() and not self.config.ignore_errors:
-                    log.warn('Source file is not python %s', cu.name)
+                    log.warn('Source file is not python %s', cu.filename)
 
         return self.source_files
 
@@ -69,7 +73,10 @@ class CoverallReporter(Reporter):
                          'Please check if encoding declaration is ok', basename(cu.filename))
                 return
         else:
-            filename = analysis.coverage.file_locator.relative_filename(cu.filename)
+            if hasattr(cu, 'relative_filename'):
+                filename = cu.relative_filename()
+            else:
+                filename = analysis.coverage.file_locator.relative_filename(cu.filename)
             source_lines = list(enumerate(analysis.file_reporter.source_token_lines()))
             source = analysis.file_reporter.source()
         coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(source_lines) + 1)]
