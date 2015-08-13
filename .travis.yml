@@ -8,11 +8,17 @@ python:
   - 3.5
   - pypy
   - pypy3
+env:
+  matrix:
+    - COV=coverage
+    - COV=coverage==4.0b1
 matrix:
   allow_failures:
+    - python: 3.2
     - python: 3.5
 install:
-  python setup.py develop
+  - pip install $COV
+  - python setup.py develop
 script:
   - coverage run --source=coveralls setup.py test
   - coverage report -m
