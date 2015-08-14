@@ -1,9 +1,13 @@
 Changelog
 ---------
 
-1.0a3 (TBA)
-~~~~~~~~~~~
+1.0b1 (2015-08-14)
+~~~~~~~~~~~~~~~~~~
+* Coverage 4 beta support
+* Codeship experimetal support (CI_BRANCH env variable)
+* Drop python 3.2 support (as coverage 4 does not support it)
 * Repo token usage is deprecated (but still supported) in favor of env variable.
+* Error reporting is improved, exist status codes added
 
 1.0a2 (2015-02-19)
 ~~~~~~~~~~~~~~~~~~
