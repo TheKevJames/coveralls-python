@@ -7,13 +7,13 @@ Coveralls for python
 .. image:: https://img.shields.io/travis/coagulant/coveralls-python/master.svg
     :target: https://travis-ci.org/coagulant/coveralls-python
 
-.. image:: https://pypip.in/version/coveralls/badge.svg
+.. image:: https://img.shields.io/pypi/v/coveralls.svg
     :target: https://pypi.python.org/pypi/coveralls
 
-.. image:: https://pypip.in/py_versions/coveralls/badge.svg
+.. image:: https://img.shields.io/pypi/pyversions/coveralls.svg
     :target: https://pypi.python.org/pypi/coveralls/
 
-.. image:: https://pypip.in/download/coveralls/badge.svg
+.. image:: https://img.shields.io/pypi/dd/coveralls.svg
     :target: https://pypi.python.org/pypi/coveralls/
 
 `Coveralls.io`_ is service to publish your coverage stats online with a lot of `nice features`_.
