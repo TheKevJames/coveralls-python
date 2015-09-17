@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+1.0 (2015-09-17)
+~~~~~~~~~~~~~~~~
+* Official coverage 4.0 support
+
 1.0b1 (2015-08-14)
 ~~~~~~~~~~~~~~~~~~
 * Coverage 4 beta support
