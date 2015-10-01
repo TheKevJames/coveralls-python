@@ -85,6 +85,15 @@ class NoConfig(unittest.TestCase):
         assert str(excinfo.value) == 'You have to provide either repo_token in .coveralls.mock, or launch via Travis ' \
                                      'or CircleCI'
 
+    @patch.dict(os.environ, {'CIRCLECI': 'True',
+                             'CIRCLE_BUILD_NUM': '888',
+                             'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'}, clear=True)
+    def test_circleci_no_config(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'circle-ci'
+        assert cover.config['service_job_id'] == '888'
+        assert cover.config['service_pull_request'] == '9999'
+
 
 class Git(GitBasedTest):
 
