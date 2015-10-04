@@ -10,16 +10,11 @@ python:
   - pypy3
 env:
   matrix:
-    - COV=coverage
-    - COV=coverage==4.0b1
-matrix:
-  allow_failures:
-    - python: 3.5
+    - $COVPYYAML=cov3-default
+    - $COVPYYAML=cov4-pyyaml
+    - $COVPYYAML=cov3-default
+    - $COVPYYAML=cov4-pyyaml
 install:
-  - pip install $COV
-  - python setup.py develop
+  - pip install tox
 script:
-  - coverage run --source=coveralls setup.py test
-  - coverage report -m
-after_script:
-  coveralls --verbose
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML,coveralls
