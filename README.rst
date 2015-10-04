@@ -18,7 +18,6 @@ Coveralls for python
 
 `Coveralls.io`_ is service to publish your coverage stats online with a lot of `nice features`_.
 This package provides seamless integration with ``coverage.py`` in your python projects.
-Only projects hosted on Github are supported.
 
 .. _Coveralls.io: http://coveralls.io
 .. _nice features: https://coveralls.io/features
@@ -99,6 +98,7 @@ Usage (another CI)
 ~~~~~~~~~~~~~~~~~~
 
 The difference from Travis is coveralls authentication via repo token.
+Circle CI is supported since version 1.1, so no need to add env variables.
 It's required to set environment variable ``COVERALLS_REPO_TOKEN`` in you CI build.
 This is your own secret token, which is available at the right sidebar of your repository's page on Coveralls.
 Launch ``coveralls`` after gathering python coverage in your build script.

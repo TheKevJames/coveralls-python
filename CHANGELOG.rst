@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+1.1 (2015-10-04)
+~~~~~~~~~~~~~~~~
+* Suupport for Circle CI
+
 1.0 (2015-09-17)
 ~~~~~~~~~~~~~~~~
 * Official coverage 4.0 support
