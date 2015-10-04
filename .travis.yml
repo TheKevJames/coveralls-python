@@ -10,11 +10,11 @@ python:
   - pypy3
 env:
   matrix:
-    - $COVPYYAML=cov3-default
-    - $COVPYYAML=cov4-pyyaml
-    - $COVPYYAML=cov3-default
-    - $COVPYYAML=cov4-pyyaml
+    - $COVPYYAML=cov3-default,coveralls3
+    - $COVPYYAML=cov4-pyyaml,coveralls4
+    - $COVPYYAML=cov3-default,coveralls3
+    - $COVPYYAML=cov4-pyyaml,coveralls4
 install:
   - pip install tox
 script:
-  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML,coveralls
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML
