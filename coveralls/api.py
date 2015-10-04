@@ -47,18 +47,25 @@ class Coveralls(object):
             self.config['repo_token'] = repo_token
 
         if os.environ.get('TRAVIS'):
-            is_travis = True
+            is_travis_or_circle = True
             self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
+        elif os.environ.get('CIRCLECI'):
+            is_travis_or_circle = True
+            self.config['service_name'] = file_config.get('service_name', None) or 'circle-ci'
+            self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
+            if os.environ.get('CI_PULL_REQUEST', None):
+                self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
         else:
-            is_travis = False
+            is_travis_or_circle = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
 
         if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
-        if token_required and not self.config.get('repo_token') and not is_travis:
-            raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis' % self.config_filename)
+        if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
+            raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis or CircleCI'
+                                     % self.config_filename)
 
     def load_config(self):
         try:
