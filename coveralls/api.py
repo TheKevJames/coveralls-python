@@ -56,6 +56,12 @@ class Coveralls(object):
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
             if os.environ.get('CI_PULL_REQUEST', None):
                 self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
+        elif os.environ.get('APPVEYOR'):
+            is_travis_or_circle = False
+            self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
+            if os.environ.get('APPVEYOR_REPO_BRANCH'):
+                # Enable Coveralls.git_info() to report the proper branch name.
+                os.environ['CI_BRANCH'] = os.environ['APPVEYOR_REPO_BRANCH']
         else:
             is_travis_or_circle = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
