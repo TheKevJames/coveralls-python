@@ -94,6 +94,15 @@ class NoConfig(unittest.TestCase):
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
+    @patch.dict(os.environ, {'APPVEYOR': 'True',
+                             'APPVEYOR_BUILD_ID': '1234567',
+                             'APPVEYOR_PULL_REQUEST_NUMBER': '1234'}, clear=True)
+    def test_appveyor_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'appveyor'
+        assert cover.config['service_job_id'] == '1234567'
+        assert cover.config['service_pull_request'] == '1234'
+
 
 class Git(GitBasedTest):
 
