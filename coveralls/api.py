@@ -56,6 +56,12 @@ class Coveralls(object):
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
             if os.environ.get('CI_PULL_REQUEST', None):
                 self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
+        elif os.environ.get('APPVEYOR'):
+            is_travis_or_circle = False
+            self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
+            self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
+            if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
+                self.config['service_pull_request'] = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
         else:
             is_travis_or_circle = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
@@ -204,7 +210,10 @@ class Coveralls(object):
                 'committer_email': gitlog('%ce'),
                 'message': gitlog('%s'),
             },
-            'branch': os.environ.get('CIRCLE_BRANCH') or os.environ.get('CI_BRANCH') or os.environ.get('TRAVIS_BRANCH', rev),
+            'branch': (os.environ.get('CIRCLE_BRANCH') or
+                       os.environ.get('APPVEYOR_REPO_BRANCH') or
+                       os.environ.get('CI_BRANCH') or
+                       os.environ.get('TRAVIS_BRANCH', rev)),
             #origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                         for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
