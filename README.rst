@@ -177,6 +177,29 @@ Finally, if you're using non-default configuration file, specify it to coveralls
 .. _report with only your packages: http://nedbatchelder.com/code/coverage/source.html#source
 .. _specify whole lines to .coveragerc: http://nedbatchelder.com/code/coverage/excluding.html
 
+Specifying the service_name
+---------------------------
+
+In order to specify a ``service_name`` value other than the default defined per-service, create a 
+``.coveralls.yml`` file in your project's root, naming the correct ``service_name``. For example, for
+``travis-pro``::
+
+    service_name: travis-pro
+
+For ``.coveralls.yml`` to load properly, alter your ``pip install`` configuration to read::
+
+    install:
+      - pip install -r requirements.txt
+      - pip install coveralls[yaml]
+
+If you prefer not to add a ``.coveralls.yml`` file, you may also use the ``--service=<name>`` command
+line option. To use this approach on our ``travis-pro`` example above, set your ``after_success`` 
+command to this::
+
+    after_success:
+      coveralls --service=travis-pro
+      
+No validation is done on this option, so make sure you are careful to use the correct value.
 
 Nosetests
 ~~~~~~~~~

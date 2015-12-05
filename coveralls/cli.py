@@ -17,6 +17,7 @@ Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --output=<file>   Write report to file.  Doesn't send anything.
     --merge=<file>    Merge report from file when submitting.
+    --service=<name>  Explicitly specify the service_name. [default: coveralls-python]
     -h --help         Display this help
     -v --verbose      Print extra info, True for debug command
 
@@ -47,7 +48,9 @@ def main(argv=None):
 
     try:
         token_required = not options['debug'] and not options['--output']
-        coverallz = Coveralls(token_required, config_file=options['--rcfile'])
+        coverallz = Coveralls(token_required,
+                              config_file=options['--rcfile'],
+                              service_name=options['--service'])
         if options['--merge']:
             coverallz.merge(options['--merge'])
 
