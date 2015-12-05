@@ -45,20 +45,26 @@ class Coveralls(object):
         repo_token = self.config.get('repo_token') or file_config.get('repo_token', None)
         if repo_token:
             self.config['repo_token'] = repo_token
+        service_name = self.config.get('service_name') or file_config.get('service_name', None)
+        if service_name:
+            self.config['service_name'] = service_name
 
         if os.environ.get('TRAVIS'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
+            if self.config['service_name'] == self.default_client:
+                self.config['service_name'] = 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
         elif os.environ.get('CIRCLECI'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'circle-ci'
+            if self.config['service_name'] == self.default_client:
+                self.config['service_name'] = 'circle-ci'
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
             if os.environ.get('CI_PULL_REQUEST', None):
                 self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
         elif os.environ.get('APPVEYOR'):
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
+            if self.config['service_name'] == self.default_client:
+                self.config['service_name'] = 'appveyor'
             self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
             if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
                 self.config['service_pull_request'] = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
@@ -78,6 +84,7 @@ class Coveralls(object):
             import yaml
             return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
         except ImportError:
+            log.debug('%s was not loaded; "import yaml" failed.', self.config_filename)
             return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.', self.config_filename)
