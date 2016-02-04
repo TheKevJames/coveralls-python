@@ -40,7 +40,6 @@ class GitBasedTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
-@pytest.mark.skipif(yaml is None, reason="requires pyyaml")
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
 
@@ -52,6 +51,7 @@ class Configration(unittest.TestCase):
     def tearDown(self):
         os.remove('.coveralls.mock')
 
+    @pytest.mark.skipif(yaml is None, reason="requires pyyaml")
     @patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
