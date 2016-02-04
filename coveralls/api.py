@@ -77,7 +77,8 @@ class Coveralls(object):
         try:
             import yaml
             return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
-        except ImportError:
+        except ImportError as exc:
+            log.warn('Seems, like some modules are not installed: %s', exc)
             return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.', self.config_filename)
