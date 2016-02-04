@@ -75,10 +75,13 @@ class Coveralls(object):
 
     def load_config(self):
         try:
-            import yaml
-            return yaml.safe_load(open(os.path.join(os.getcwd(), self.config_filename)))
-        except ImportError:
-            return {}
+            with open(os.path.join(os.getcwd(), self.config_filename)) as config:
+                try:
+                    import yaml
+                    return yaml.safe_load(config)
+                except ImportError as exc:
+                    log.warn('Seems, like some modules are not installed: %s', exc)
+                    return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.', self.config_filename)
             return {}
@@ -214,7 +217,7 @@ class Coveralls(object):
                        os.environ.get('APPVEYOR_REPO_BRANCH') or
                        os.environ.get('CI_BRANCH') or
                        os.environ.get('TRAVIS_BRANCH', rev)),
-            #origin	git@github.com:coagulant/coveralls-python.git (fetch)
+            # origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                         for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
         }}
