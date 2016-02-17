@@ -80,7 +80,7 @@ class Coveralls(object):
                     import yaml
                     return yaml.safe_load(config)
                 except ImportError as exc:
-                    log.warn('Seems, like some modules are not installed: %s', exc)
+                    log.warning('Seems, like some modules are not installed: %s', exc)
                     return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.', self.config_filename)
@@ -169,7 +169,7 @@ class Coveralls(object):
                 if 'source_files' in extra:
                     self._data['source_files'].extend(extra['source_files'])
                 else:
-                    log.warn('No data to be merged; does the json file contain "source_files" data?')
+                    log.warning('No data to be merged; does the json file contain "source_files" data?')
         return self._data
 
     def get_coverage(self):

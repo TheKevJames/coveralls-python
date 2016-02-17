@@ -71,13 +71,19 @@ class Configration(unittest.TestCase):
                 return origin(name, *args)
         return import_func
 
-    @patch.object(log, 'warn')
+    @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
         
+        if sys.version_info < (3,0):
+            builtin_import_func = '__builtin__.__import__'
+        else:
+            builtin_import_func = 'builtins.__import__'
+
         yaml_import_mock = self.generate_import_mock('yaml', 'No module named yaml')
         try:
-            with patch('__builtin__.__import__', side_effect=yaml_import_mock):
+            # patching of `import` function of the Coveralls module (it shoud throw ImportException):
+            with patch(builtin_import_func, side_effect=yaml_import_mock):
                 Coveralls()
         except:
             pass
@@ -256,7 +262,7 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == []
 
-    @patch.object(log, 'warn')
+    @patch.object(log, 'warning')
     def test_merge_invalid_data(self, mock_logger, mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
