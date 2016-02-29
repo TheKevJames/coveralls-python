@@ -13,6 +13,7 @@ import sys
 import coverage
 import sh
 from mock import patch
+import mock
 import pytest
 try:
     import yaml
@@ -39,8 +40,6 @@ class GitBasedTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
-
-@pytest.mark.skipif(yaml is None, reason="requires pyyaml")
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
 
@@ -52,6 +51,7 @@ class Configration(unittest.TestCase):
     def tearDown(self):
         os.remove('.coveralls.mock')
 
+    @pytest.mark.skipif(yaml is None, reason="requires pyyaml")
     @patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
@@ -59,6 +59,35 @@ class Configration(unittest.TestCase):
         assert cover.config['repo_token'] == 'xxx'
         assert 'service_job_id' not in cover.config
 
+    def generate_import_mock(self, bad_module_name, msg):
+        """ Returns replacement for builting import function, which raises 
+        exception on importing appropriate module"""
+
+        origin = __import__
+        def import_func(name, *args):
+            if name == bad_module_name:
+                raise ImportError(msg)
+            else:
+                return origin(name, *args)
+        return import_func
+
+    @patch.object(log, 'warning')
+    def test_local_with_config_without_yaml_module(self, mock_logger):
+        """test local with config in yaml, but without yaml-installed"""
+        
+        if sys.version_info < (3,0):
+            builtin_import_func = '__builtin__.__import__'
+        else:
+            builtin_import_func = 'builtins.__import__'
+
+        yaml_import_mock = self.generate_import_mock('yaml', 'No module named yaml')
+        try:
+            # patching of `import` function of the Coveralls module (it shoud throw ImportException):
+            with patch(builtin_import_func, side_effect=yaml_import_mock):
+                Coveralls()
+        except:
+            pass
+        mock_logger.assert_called_once_with('Seems, like some modules are not installed: %s', mock.ANY)
 
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfig(unittest.TestCase):
@@ -233,7 +262,7 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == []
 
-    @patch.object(log, 'warn')
+    @patch.object(log, 'warning')
     def test_merge_invalid_data(self, mock_logger, mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
