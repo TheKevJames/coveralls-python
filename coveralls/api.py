@@ -69,8 +69,9 @@ class Coveralls(object):
         if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
-        if os.environ.get('COVERALLS_PARALLEL', False):
-            self.config['parallel'] = os.environ.get('COVERALLS_PARALLEL')
+        parallel = os.environ.get('COVERALLS_PARALLEL', '')
+        if parallel.lower() == 'true':
+            self.config['parallel'] = True
 
         if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
             raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis or CircleCI'
