@@ -73,6 +73,9 @@ class Coveralls(object):
         if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
+        if os.environ.get('COVERALLS_PARALLEL', False):
+            self.config['parallel'] = os.environ.get('COVERALLS_PARALLEL')
+
         if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
             raise CoverallsException(
                 'Not on Travis or CircleCI. You have to provide either repo_token in %s '
@@ -164,7 +167,8 @@ class Coveralls(object):
                         "source": "def seven\n  eight\n  nine\nend",
                         "coverage": [null, 1, 0, null]
                     }
-                ]
+                ],
+                "parallel": True
             }
         """
         if not self._data:
