@@ -12,8 +12,10 @@ env:
   matrix:
     - $COVPYYAML=cov3-default,coveralls3
     - $COVPYYAML=cov4-pyyaml,coveralls4
+    - $COVPYYAML=cov41-pyyaml,coveralls41
     - $COVPYYAML=cov3-default,coveralls3
     - $COVPYYAML=cov4-pyyaml,coveralls4
+    - $COVPYYAML=cov41-pyyaml,coveralls41
 install:
   - pip install tox
 script:

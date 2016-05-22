@@ -20,13 +20,17 @@ class CoverallReporter(Reporter):
         `morfs` is a list of modules or filenames.
         `outfile` is a file object to write the json to.
         """
+        units = None
+
         self.source_files = []
         if hasattr(self, 'find_code_units'):
             self.find_code_units(morfs)
         else:
-            self.find_file_reporters(morfs)
+            units = self.find_file_reporters(morfs)
 
-        units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+        if units is None:
+            units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+
         for cu in units:
             try:
                 self.parse_file(cu, self.coverage._analyze(cu))
