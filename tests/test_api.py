@@ -110,9 +110,8 @@ class NoConfig(unittest.TestCase):
     def test_misconfigured(self):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
-
-        assert str(excinfo.value) == 'You have to provide either repo_token in .coveralls.mock, or launch via Travis ' \
-                                     'or CircleCI'
+        assert str(excinfo.value) == 'Not on Travis or CircleCI. You have to provide either repo_token in .coveralls.mock ' \
+                                     'or set the COVERALLS_REPO_TOKEN env var.'
 
     @patch.dict(os.environ, {'CIRCLECI': 'True',
                              'CIRCLE_BUILD_NUM': '888',
