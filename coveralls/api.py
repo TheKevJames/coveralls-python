@@ -70,8 +70,10 @@ class Coveralls(object):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
         if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
-            raise CoverallsException('You have to provide either repo_token in %s, or launch via Travis or CircleCI'
-                                     % self.config_filename)
+            raise CoverallsException(
+                'Not on Travis or CircleCI. You have to provide either repo_token in %s '
+                'or set the COVERALLS_REPO_TOKEN env var.' % self.config_filename
+            )
 
     def load_config(self):
         try:
