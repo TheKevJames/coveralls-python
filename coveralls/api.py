@@ -219,6 +219,7 @@ class Coveralls(object):
             },
             'branch': (os.environ.get('CIRCLE_BRANCH') or
                        os.environ.get('APPVEYOR_REPO_BRANCH') or
+                       os.environ.get('BUILDKITE_BRANCH') or
                        os.environ.get('CI_BRANCH') or
                        os.environ.get('TRAVIS_BRANCH', rev)),
             # origin	git@github.com:coagulant/coveralls-python.git (fetch)
