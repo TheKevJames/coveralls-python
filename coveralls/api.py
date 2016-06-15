@@ -56,6 +56,10 @@ class Coveralls(object):
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
             if os.environ.get('CI_PULL_REQUEST', None):
                 self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
+        elif os.environ.get('BUILDKITE'):
+            is_travis_or_circle = False
+            self.config['service_name'] = file_config.get('service_name', None) or 'buildkite'
+            self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
         elif os.environ.get('APPVEYOR'):
             is_travis_or_circle = False
             self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
@@ -215,6 +219,7 @@ class Coveralls(object):
             },
             'branch': (os.environ.get('CIRCLE_BRANCH') or
                        os.environ.get('APPVEYOR_REPO_BRANCH') or
+                       os.environ.get('BUILDKITE_BRANCH') or
                        os.environ.get('CI_BRANCH') or
                        os.environ.get('TRAVIS_BRANCH', rev)),
             # origin	git@github.com:coagulant/coveralls-python.git (fetch)

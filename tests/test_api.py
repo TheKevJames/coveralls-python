@@ -132,6 +132,13 @@ class NoConfig(unittest.TestCase):
         assert cover.config['service_job_id'] == '1234567'
         assert cover.config['service_pull_request'] == '1234'
 
+    @patch.dict(os.environ, {'BUILDKITE': 'True',
+                             'BUILDKITE_JOB_ID': '1234567'}, clear=True)
+    def test_buildkite_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'buildkite'
+        assert cover.config['service_job_id'] == '1234567'
+
 
 class Git(GitBasedTest):
 
