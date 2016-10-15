@@ -193,6 +193,7 @@ the files to leave out of reporting (your paths might differ) ::
     [report]
     omit =
         */python?.?/*
+        */python?.?-dev/*
         */site-packages/nose/*
 
 Note, that native coverage.py and py.test are not affected by this problem and do not require this workaround.
