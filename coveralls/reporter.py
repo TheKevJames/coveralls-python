@@ -56,9 +56,13 @@ class CoverallReporter(Reporter):
         """
         if line_num in analysis.missing:
             return 0
-        if line_num in analysis.statements:
+        if line_num not in analysis.statements:
+            return None
+        if not analysis.has_arcs():
             return 1
-        return None
+        if line_num in analysis.missing_branch_arcs():
+            return 0
+        return 1
 
     def parse_file(self, cu, analysis):
         """ Generate data for single file """
