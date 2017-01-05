@@ -60,7 +60,7 @@ class Configration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     def generate_import_mock(self, bad_module_name, msg):
-        """ Returns replacement for builting import function, which raises 
+        """ Returns replacement for builting import function, which raises
         exception on importing appropriate module"""
 
         origin = __import__
@@ -74,7 +74,7 @@ class Configration(unittest.TestCase):
     @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        
+
         if sys.version_info < (3,0):
             builtin_import_func = '__builtin__.__import__'
         else:
@@ -304,6 +304,16 @@ class WearTest(unittest.TestCase):
         self.setup_mock(mock_requests)
         result = Coveralls(repo_token='xxx').wear()
         assert result == {'message': 'Failure to gather coverage: No data to report'}
+
+    @patch.dict(os.environ, {'COVERALLS_HOST': 'https://coveralls.my-enterprise.info'}, clear=True)
+    def test_coveralls_host_env_var_overrides_api_url(self, mock_requests):
+        Coveralls(repo_token='xxx').wear(dry_run=False)
+        mock_requests.post.assert_called_once_with('https://coveralls.my-enterprise.info/api/v1/jobs', files=mock.ANY)
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
+        Coveralls(repo_token='xxx').wear(dry_run=False)
+        mock_requests.post.assert_called_once_with('https://coveralls.io/api/v1/jobs', files=mock.ANY)
 
 
 def test_output_to_file(tmpdir):
