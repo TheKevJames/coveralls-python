@@ -1,5 +1,5 @@
 Release
--------
+=======
 
 This project is released on PyPI as `coveralls`_.
 
