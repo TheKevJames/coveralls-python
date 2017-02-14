@@ -6,7 +6,7 @@ This project is released on PyPI as `coveralls`_.
 To cut a new release, ensure the latest master passes all tests. Then, create a release commit:
 
 1. Update the :code:`CHANGELOG.rst` with the new version.
-2. Bump the version number in :code:`setup.py`.
+2. Bump the version number in :code:`version.py`.
 3. Tag that commit with the version number (:code:`git tag x.y.z`).
 
 Make sure to push the release commit to GitHub.

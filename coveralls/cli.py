@@ -31,13 +31,14 @@ import sys
 from docopt import docopt
 from coveralls import Coveralls
 from coveralls.api import CoverallsException
+from coveralls.version import __version__
 
 
 log = logging.getLogger('coveralls')
 
 
 def main(argv=None):
-    options = docopt(__doc__, argv=argv)
+    options = docopt(__doc__, argv=argv, version=__version__)
     if options['debug']:
         options['--verbose'] = True
     level = logging.DEBUG if options['--verbose'] else logging.INFO
