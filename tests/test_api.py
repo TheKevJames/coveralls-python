@@ -183,12 +183,24 @@ class ReporterTest(unittest.TestCase):
         results = self.cover.get_coverage()
         assert len(results) == 2
         assert_coverage({
-            'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')',
+            'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')\n\ndef branch(cond1, cond2):\n    if cond1:\n        print(\'condition tested both ways\')\n    if cond2:\n        print(\'condition not tested both ways\')',
             'name': 'project.py',
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0]}, results[0])
+            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 1, 1]}, results[0])
         assert_coverage({
-            'source': "# coding: utf-8\nfrom project import hello\n\nif __name__ == '__main__':\n    hello()",
-            'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1]}, results[1])
+            'source': "# coding: utf-8\nfrom project import hello, branch\n\nif __name__ == '__main__':\n    hello()\n    branch(False, True)\n    branch(True, True)",
+            'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1, 1, 1]}, results[1])
+
+    def test_reporter_with_branches(self):
+        sh.coverage('run', '--branch', 'runtests.py')
+        results = self.cover.get_coverage()
+        assert len(results) == 2
+        assert_coverage({
+            'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')\n\ndef branch(cond1, cond2):\n    if cond1:\n        print(\'condition tested both ways\')\n    if cond2:\n        print(\'condition not tested both ways\')',
+            'name': 'project.py',
+            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 0, 1]}, results[0])
+        assert_coverage({
+            'source': "# coding: utf-8\nfrom project import hello, branch\n\nif __name__ == '__main__':\n    hello()\n    branch(False, True)\n    branch(True, True)",
+            'name': 'runtests.py', 'coverage': [None, 1, None, 0, 1, 1, 1]}, results[1])
 
     def test_missing_file(self):
         sh.echo('print("Python rocks!")', _out="extra.py")
