@@ -84,7 +84,7 @@ Example of tox.ini::
 
     [testenv]
     passenv = TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH
-    deps = 
+    deps =
         coveralls
     commands =
         coverage run --source=yourpackagename setup.py test
@@ -152,7 +152,7 @@ To exclude parts of your source from coverage, for example migrations folders::
     [report]
     omit = */migrations/*
 
-Some lines are never executed in your tests, but that can be ok. 
+Some lines are never executed in your tests, but that can be ok.
 To mark those lines use inline comments right in your source code::
 
     if debug:   # pragma: no cover
@@ -219,3 +219,8 @@ Run tests::
 
     $ python setup.py test
 
+Or, even better, use `tox`_::
+
+    $ tox
+
+.. _`tox`: http://tox.readthedocs.io/en/latest/index.html
