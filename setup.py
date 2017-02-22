@@ -1,17 +1,24 @@
+import os
 from setuptools import setup
 
 
+VERSION_FILE = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                            'coveralls', 'version.py')
+
 DESCRIPTION = open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read()
+
+VERSION = None
+with open(VERSION_FILE, 'r') as f:
+    VERSION = f.read().split()[2]
 
 
 setup(
     name='coveralls',
-    version='1.1',
+    version=VERSION,
     packages=['coveralls'],
-    url='http://github.com/coagulant/coveralls-python',
+    url='http://github.com/coveralls-clients/coveralls-python',
     license='MIT',
-    author='Ilya Baryshev',
-    author_email='baryshev@gmail.com',
+    author='coveralls-clients contributors',
     description='Show coverage stats online via coveralls.io',
     long_description=DESCRIPTION,
     entry_points={
