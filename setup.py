@@ -1,18 +1,7 @@
-import sys
-from setuptools.command.test import test as TestCommand
 from setuptools import setup
 
 
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
+DESCRIPTION = open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read()
 
 
 setup(
@@ -24,18 +13,18 @@ setup(
     author='Ilya Baryshev',
     author_email='baryshev@gmail.com',
     description='Show coverage stats online via coveralls.io',
-    long_description=open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read(),
+    long_description=DESCRIPTION,
     entry_points={
         'console_scripts': [
             'coveralls = coveralls.cli:main',
         ],
     },
     install_requires=['docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0'],
-    tests_require=['mock', 'pytest>=2.7.3,<2.8', 'sh>=1.08'],
+    setup_requires=['pytest-runner'],
+    tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
         'yaml': ['PyYAML>=3.10']
     },
-    cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Topic :: Software Development :: Testing',
