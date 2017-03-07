@@ -58,11 +58,30 @@ class CoverallReporter(Reporter):
             return 0
         if line_num not in analysis.statements:
             return None
-        if not analysis.has_arcs():
-            return 1
-        if line_num in analysis.missing_branch_arcs():
-            return 0
         return 1
+
+    def get_arcs(self, analysis):
+        """ Hit stats for each branch.
+
+            Compacted array of:
+            * line-number
+            * block-number (not used)
+            * branch-number
+            * hits
+        """
+        if not analysis.has_arcs():
+            return []
+        branch_lines = analysis.branch_lines()
+        executed = analysis.arcs_executed()
+        missing = analysis.arcs_missing()
+        branches = []
+        for l1, l2 in executed:
+            if l1 in branch_lines:
+                branches.extend((l1, 0, abs(l2), 1))
+        for l1, l2 in missing:
+            if l1 in branch_lines:
+                branches.extend((l1, 0, abs(l2), 0))
+        return branches
 
     def parse_file(self, cu, analysis):
         """ Generate data for single file """
@@ -88,8 +107,10 @@ class CoverallReporter(Reporter):
             source_lines = list(enumerate(analysis.file_reporter.source_token_lines()))
             source = analysis.file_reporter.source()
         coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(source_lines) + 1)]
+        branches = self.get_arcs(analysis)
         self.source_files.append({
             'name': filename,
             'source': source,
-            'coverage': coverage_lines
+            'coverage': coverage_lines,
+            'branches': branches,
         })

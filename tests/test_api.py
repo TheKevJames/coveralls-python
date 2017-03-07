@@ -168,6 +168,8 @@ def assert_coverage(actual, expected):
     assert actual['source'].strip() == expected['source'].strip()
     assert actual['name'] == expected['name']
     assert actual['coverage'] == expected['coverage']
+    if 'branches' in actual and 'branches' in expected:
+        assert actual['branches'] == expected['branches']
 
 
 class ReporterTest(unittest.TestCase):
@@ -194,13 +196,25 @@ class ReporterTest(unittest.TestCase):
         sh.coverage('run', '--branch', 'runtests.py')
         results = self.cover.get_coverage()
         assert len(results) == 2
+
+        branches = results[0]['branches']
+        assert not len(branches) % 4
+        branches = [branches[i:i+4] for i in range(0, len(branches), 4)]
+        assert [16, 0, 17, 1] in branches
+        assert [16, 0, 18, 1] in branches
+        assert [18, 0, 19, 1] in branches
+        assert [18, 0, 15, 0] in branches
+
         assert_coverage({
             'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')\n\ndef branch(cond1, cond2):\n    if cond1:\n        print(\'condition tested both ways\')\n    if cond2:\n        print(\'condition not tested both ways\')',
             'name': 'project.py',
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 0, 1]}, results[0])
+            'branches': [16, 0, 17, 1, 16, 0, 18, 1, 18, 0, 19, 1, 18, 0, 15, 0],
+            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 1, 1]}, results[0])
         assert_coverage({
             'source': "# coding: utf-8\nfrom project import hello, branch\n\nif __name__ == '__main__':\n    hello()\n    branch(False, True)\n    branch(True, True)",
-            'name': 'runtests.py', 'coverage': [None, 1, None, 0, 1, 1, 1]}, results[1])
+            'name': 'runtests.py',
+            'branches': [4, 0, 5, 1, 4, 0, 2, 0],
+            'coverage': [None, 1, None, 1, 1, 1, 1]}, results[1])
 
     def test_missing_file(self):
         sh.echo('print("Python rocks!")', _out="extra.py")
