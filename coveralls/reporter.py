@@ -63,14 +63,14 @@ class CoverallReporter(Reporter):
     def get_arcs(self, analysis):
         """ Hit stats for each branch.
 
-            Compacted array of:
-            * line-number
-            * block-number (not used)
-            * branch-number
-            * hits
+            Returns a flat list where every four values represent a branch:
+            1. line-number
+            2. block-number (not used)
+            3. branch-number
+            4. hits (we only get 1/0 from coverage.py)
         """
         if not analysis.has_arcs():
-            return []
+            return None
         branch_lines = analysis.branch_lines()
         executed = analysis.arcs_executed()
         missing = analysis.arcs_missing()
@@ -107,10 +107,14 @@ class CoverallReporter(Reporter):
             source_lines = list(enumerate(analysis.file_reporter.source_token_lines()))
             source = analysis.file_reporter.source()
         coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(source_lines) + 1)]
-        branches = self.get_arcs(analysis)
-        self.source_files.append({
+
+        results = {
             'name': filename,
             'source': source,
             'coverage': coverage_lines,
-            'branches': branches,
-        })
+        }
+        branches = self.get_arcs(analysis)
+        if branches:
+            results['branches'] = branches
+
+        self.source_files.append(results)
