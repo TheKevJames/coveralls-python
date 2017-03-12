@@ -3,6 +3,7 @@ import logging
 from os.path import basename
 import sys
 
+from coverage import __version__
 from coverage.misc import NoSource, NotPython
 from coverage.phystokens import source_encoding
 from coverage.report import Reporter
@@ -42,6 +43,14 @@ class CoverallReporter(Reporter):
                 # explicitly suppress those errors.
                 if cu.should_be_python() and not self.config.ignore_errors:
                     log.warn('Source file is not python %s', cu.filename)
+            except KeyError:
+                if __version__[0] < 4 or (__version__[0] == 4 and __version__[1] < 1):
+                    raise CoverallsException(
+                        'Old (<4.1) versions of coverage.py do not work consistently '
+                        'on new versions of Python. Please upgrade your coverage.py.'
+                    )
+                raise
+
 
         return self.source_files
 
