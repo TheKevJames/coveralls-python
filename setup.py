@@ -30,7 +30,8 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
-        'yaml': ['PyYAML>=3.10']
+        'yaml': ['PyYAML>=3.10'],
+        ':python_version < "3"': ['urllib3[secure]'],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
