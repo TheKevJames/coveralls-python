@@ -190,6 +190,8 @@ class Coveralls(object):
             workman._harvest_data()
         else:
             workman.get_data()
+        if self.config['rel_dir'] is not None:
+            coverage.files.RELATIVE_DIR = self.config['rel_dir']
         reporter = CoverallReporter(workman, workman.config)
         return reporter.report()
 

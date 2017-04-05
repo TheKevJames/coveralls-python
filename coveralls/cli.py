@@ -16,6 +16,7 @@ Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --output=<file>   Write report to file.  Doesn't send anything.
     --merge=<file>    Merge report from file when submitting.
+    --rdir=<dir>      Set relative dir, 'r' could also stand for 'root' or 'reference'
     -h --help         Display this help
     -v --verbose      Print extra info, True for debug command
 
@@ -47,7 +48,8 @@ def main(argv=None):
 
     try:
         token_required = not options['debug'] and not options['--output']
-        coverallz = Coveralls(token_required, config_file=options['--rcfile'])
+        coverallz = Coveralls(token_required, config_file=options['--rcfile'],
+                              rel_dir=options['--rdir'])
         if options['--merge']:
             coverallz.merge(options['--merge'])
 
