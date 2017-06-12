@@ -4,15 +4,28 @@ import json
 import logging
 import os
 import re
-from subprocess import Popen, PIPE
+
+
+import six
 
 import coverage
 import requests
 
 from .reporter import CoverallReporter
+from .utilities import run_command
 
 
 log = logging.getLogger('coveralls')
+
+
+TEMPLATE_MAPPING = {
+    'id': {'git': '%H', 'hg': 'node'},
+    'author_name': {'git': '%aN', 'hg': 'author|person'},
+    'author_email': {'git': '%ae', 'hg': 'author|email'},
+    'committer_name': {'git': '%cN', 'hg': 'author|person'},
+    'committer_email': {'git': '%ce', 'hg': 'author|email'},
+    'message': {'git': '%s', 'hg': 'desc'},
+    }
 
 
 class CoverallsException(Exception):
@@ -174,7 +187,7 @@ class Coveralls(object):
         """
         if not self._data:
             self._data = {'source_files': self.get_coverage()}
-            self._data.update(self.git_info())
+            self._data.update(self.dvcs_info())
             self._data.update(self.config)
             if extra:
                 if 'source_files' in extra:
@@ -193,7 +206,8 @@ class Coveralls(object):
         reporter = CoverallReporter(workman, workman.config)
         return reporter.report()
 
-    def git_info(self):
+
+    def dvcs_info(self):
         """ A hash of Git data that can be used to display more information to users.
 
             Example:
@@ -213,27 +227,35 @@ class Coveralls(object):
                 }]
             }
         """
-
-        rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
-        git_info = {'git': {
+        GIT_OR_HG = 'hg' if os.environ.get('USE_HG') == 'True' else 'git'
+        if GIT_OR_HG == 'git':
+            rev = run_command(
+                'git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
+        else:
+            rev = run_command(
+                "hg", "tip", "--template", "'{bookmarks}\n'", shell=True)
+            if not rev.replace("\n",''):
+                rev = run_command('hg', 'branch', shell=True)
+        dvcs_info = {GIT_OR_HG: {  # this might need to be always git, but we'll see.
             'head': {
-                'id': gitlog('%H'),
-                'author_name': gitlog('%aN'),
-                'author_email': gitlog('%ae'),
-                'committer_name': gitlog('%cN'),
-                'committer_email': gitlog('%ce'),
-                'message': gitlog('%s'),
+                'id': dvcs_log(TEMPLATE_MAPPING['id'], GIT_OR_HG),
+                'author_name': dvcs_log(TEMPLATE_MAPPING['author_name'], GIT_OR_HG),
+                'author_email': dvcs_log(TEMPLATE_MAPPING['author_email'], GIT_OR_HG),
+                'committer_name': dvcs_log(TEMPLATE_MAPPING['committer_name'], GIT_OR_HG),
+                'committer_email': dvcs_log(TEMPLATE_MAPPING['committer_email'], GIT_OR_HG),
+                'message': dvcs_log(TEMPLATE_MAPPING['message'], GIT_OR_HG),
             },
             'branch': (os.environ.get('CIRCLE_BRANCH') or
                        os.environ.get('APPVEYOR_REPO_BRANCH') or
                        os.environ.get('BUILDKITE_BRANCH') or
                        os.environ.get('CI_BRANCH') or
                        os.environ.get('TRAVIS_BRANCH', rev)),
-            # origin	git@github.com:coagulant/coveralls-python.git (fetch)
-            'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                        for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
         }}
-        return git_info
+        if GIT_OR_HG == 'git':  # api says this is optional
+            # origin    git@github.com:coagulant/coveralls-python.git (fetch)
+            dvcs_info[GIT_OR_HG]['remotes'] = [{'name': line.split()[0], 'url': line.split()[1]}
+                        for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
+        return dvcs_info
 
     def debug_bad_encoding(self, data):
         """ Let's try to help user figure out what is at fault"""
@@ -249,21 +271,22 @@ class Coveralls(object):
                       "Check their content: %s" % (', '.join(at_fault_files)))
 
 
+def dvcs_log(format, GIT_OR_HG):
+    if GIT_OR_HG == 'git':
+        return gitlog(format[GIT_OR_HG])
+    else:
+        return hglog(format[GIT_OR_HG])
+
 def gitlog(format):
     try:
         log = str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
     except UnicodeEncodeError:
-        log = unicode(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+        log = six.text_type(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
     return log
 
-
-def run_command(*args):
-    cmd = Popen(list(args), stdout=PIPE, stderr=PIPE)
-    stdout, stderr = cmd.communicate()
-    assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
-                                 'STDERR: "%s"' % (cmd.returncode, stdout, stderr))
+def hglog(format):
     try:
-        output = stdout.decode()
-    except UnicodeDecodeError:
-        output = stdout.decode('utf-8')
-    return output
+        log = str(run_command('hg', 'tip', '--template', "'{%s}'" % format, shell=True))
+    except UnicodeEncodeError:
+        log = six.text_type(run_command('hg', 'tip', '--template', "'{%s}'" % format, shell=True))
+    return log
