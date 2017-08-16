@@ -9,6 +9,10 @@ import sh
 from coveralls import Coveralls
 
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+EXAMPLE = os.path.join(ROOT_DIR, 'example')
+
+
 def assert_coverage(actual, expected):
     assert actual['source'].strip() == expected['source'].strip()
     assert actual['name'] == expected['name']
@@ -18,8 +22,7 @@ def assert_coverage(actual, expected):
 
 class ReporterTest(unittest.TestCase):
     def setUp(self):
-        os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                              'example'))
+        os.chdir(EXAMPLE)
         sh.rm('-f', '.coverage')
         sh.rm('-f', 'extra.py')
 

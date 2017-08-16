@@ -74,8 +74,8 @@ def main(argv=None):
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
     except CoverallsException as e:
-        log.error(e)
+        log.exception(e)
         sys.exit(1)
     except KeyError as e:  # pragma: no cover
-        log.error(e)
+        log.exception(e)
         sys.exit(2)

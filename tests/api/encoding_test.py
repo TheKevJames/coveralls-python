@@ -13,9 +13,12 @@ import pytest
 from coveralls import Coveralls
 
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+NONUNICODE = os.path.join(ROOT_DIR, 'nonunicode')
+
+
 def test_non_unicode():
-    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                          'nonunicode'))
+    os.chdir(NONUNICODE)
     sh.coverage('run', 'nonunicode.py')
 
     coverage_obj = Coveralls(repo_token='xxx').get_coverage()
@@ -30,8 +33,7 @@ def test_non_unicode():
 @pytest.mark.skipif(coverage.__version__.startswith('4.'),
                     reason='coverage 4 not affected')
 def test_malformed_encoding_declaration(capfd):
-    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                          'nonunicode'))
+    os.chdir(NONUNICODE)
     sh.coverage('run', 'malformed.py')
 
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
@@ -46,8 +48,7 @@ def test_malformed_encoding_declaration(capfd):
     sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
     reason='python 2 or coverage 3 fail')
 def test_malformed_encoding_declaration_py3_or_coverage4():
-    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                          'nonunicode'))
+    os.chdir(NONUNICODE)
     sh.coverage('run', 'malformed.py')
 
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
