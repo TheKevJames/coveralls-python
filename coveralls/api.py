@@ -21,7 +21,7 @@ class CoverallsException(Exception):
 
 class Coveralls(object):
     config_filename = '.coveralls.yml'
-    api_endpoint = 'https://coveralls.io/api/v1/jobs'
+    default_coveralls_host = 'https://coveralls.io'
     default_client = 'coveralls-python'
 
     def __init__(self, token_required=True, **kwargs):
@@ -109,7 +109,9 @@ class Coveralls(object):
         except coverage.CoverageException as e:
             return {'message': 'Failure to gather coverage: %s' % str(e)}
         if not dry_run:
-            response = requests.post(self.api_endpoint, files={'json_file': json_string})
+            coveralls_host = os.environ.get('COVERALLS_HOST') or self.default_coveralls_host
+            jobs_api_url = '%s/api/v1/jobs' % coveralls_host.rstrip('/')
+            response = requests.post(jobs_api_url, files={'json_file': json_string})
             try:
                 result = response.json()
             except ValueError:
