@@ -39,7 +39,7 @@ class Config(unittest.TestCase):
         """test local with config in yaml, but without yaml-installed"""
         Coveralls()
         mock_logger.assert_called_once_with(
-            'PyYAML is not installed, ignoring', '.coveralls.mock')
+            'PyYAML is not installed, ignoring %s', '.coveralls.mock')
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')

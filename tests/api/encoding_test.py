@@ -26,7 +26,7 @@ def test_non_unicode():
     assert (
         '"source": "# coding: iso-8859-15\\n\\n'
         'def hello():\\n'
-        '    print (\'I like P\\u00f3lya distribution.\')') in result
+        '    print (\'I like P\\u00f3lya distribution.\')\\n') in result
 
 
 @pytest.mark.skipif(sys.version_info >= (3, 0), reason='python 3 not affected')

@@ -28,7 +28,7 @@ class WearTest(unittest.TestCase):
         result = Coveralls(repo_token='xxx').wear(dry_run=False)
         assert result == EXPECTED
 
-    def test_merge(self):
+    def test_merge(self, _mock_requests):
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(
             b'{"source_files": [{"name": "foobar", "coverage": []}]}')
@@ -40,7 +40,7 @@ class WearTest(unittest.TestCase):
         result_source = json.loads(result)['source_files']
         assert result_source == [{'name': 'foobar', 'coverage': []}]
 
-    def test_merge_empty_data(self):
+    def test_merge_empty_data(self, _mock_requests):
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(b'{}')
         coverage_file.seek(0)
@@ -51,7 +51,7 @@ class WearTest(unittest.TestCase):
         assert json.loads(result)['source_files'] == []
 
     @mock.patch.object(log, 'warning')
-    def test_merge_invalid_data(self, mock_logger):
+    def test_merge_invalid_data(self, mock_logger, _mock_requests):
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(b'{"random": "stuff"}')
         coverage_file.seek(0)
