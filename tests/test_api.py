@@ -60,7 +60,7 @@ class Configration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     def generate_import_mock(self, bad_module_name, msg):
-        """ Returns replacement for builting import function, which raises 
+        """ Returns replacement for builting import function, which raises
         exception on importing appropriate module"""
 
         origin = __import__
@@ -74,7 +74,7 @@ class Configration(unittest.TestCase):
     @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        
+
         if sys.version_info < (3,0):
             builtin_import_func = '__builtin__.__import__'
         else:
