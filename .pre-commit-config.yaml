@@ -15,6 +15,7 @@
     -   id: double-quote-string-fixer
         exclude: nonunicode.py
     -   id: debug-statements
+        exclude: nonunicode.py  # will be fixed in v0.9.2
     -   id: name-tests-test
     -   id: requirements-txt-fixer
 -   repo: git://github.com/pre-commit/mirrors-pylint
@@ -28,3 +29,4 @@
         - -d locally-disabled
         - -d missing-docstring
         - -d no-self-use
+        exclude: example/*
