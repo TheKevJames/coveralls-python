@@ -122,9 +122,10 @@ class NoConfig(unittest.TestCase):
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
-    @patch.dict(os.environ, {'JENKINS_HOME': '/var/lib/jenkins', 'BUILD_NUMBER': '888'}, clear=True)
+    @patch.dict(os.environ, {'JENKINS_HOME': '/var/lib/jenkins',
+                             'BUILD_NUMBER': '888'}, clear=True)
     def test_jenkins_no_config(self):
-        cover = Coveralls()
+        cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'jenkins'
         assert cover.config['service_job_id'] == '888'
 
