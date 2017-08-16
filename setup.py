@@ -5,11 +5,11 @@ from setuptools import setup
 VERSION_FILE = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             'coveralls', 'version.py')
 
-DESCRIPTION = open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read()
+DESCRIPTION = open('README.rst').read() + '\n\n' + open('CHANGELOG.md').read()
 
 VERSION = None
 with open(VERSION_FILE, 'r') as f:
-    VERSION = f.read().split()[2]
+    VERSION = f.read().split()[2][1:-1]
 
 
 setup(
