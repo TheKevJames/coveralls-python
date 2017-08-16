@@ -14,9 +14,7 @@ Make sure to push the release commit to GitHub.
 To create a new PyPI release, do the following:
 
 1. Build the sources (:code:`python setup.py sdist bdist_wheel`).
-2. Register & upload the sources. We recommend using `twine`_.
-    * to register: :code:`twine register dist/coveralls-x.y.z.tar.gz`, etc.
-    * to upload: :code:`twine upload dist/*`
+2. Register & upload the sources. (:code:`twine upload dist/*`).
 
 NOTE: in the future, we may want to expand this to include other sources, such as eggs for various Python versions. Since we already test with :code:`tox`, this could be as simple as::
 
@@ -25,4 +23,3 @@ NOTE: in the future, we may want to expand this to include other sources, such a
     # etc
 
 .. _`coveralls`: https://pypi.org/project/coveralls/
-.. _`twine`: https://pypi.org/project/twine/

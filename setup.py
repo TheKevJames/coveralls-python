@@ -9,7 +9,7 @@ DESCRIPTION = open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read()
 
 VERSION = None
 with open(VERSION_FILE, 'r') as f:
-    VERSION = f.read().split()[2]
+    VERSION = f.read().split()[2][1:-1]
 
 
 setup(
