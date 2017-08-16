@@ -38,6 +38,7 @@ class Coveralls(object):
           service_name.
         """
         self._data = None
+        self._token_required = token_required
 
         # parameters override file config
         self.config = self.load_config()
@@ -49,10 +50,11 @@ class Coveralls(object):
         if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
             self.config['parallel'] = True
 
+        self.require_token()
         if os.environ.get('APPVEYOR'):
-            self.init_appveyor(token_required)
+            self.init_appveyor()
         elif os.environ.get('BUILDKITE'):
-            self.init_buildkite(token_required)
+            self.init_buildkite()
         elif os.environ.get('CIRCLECI'):
             self.init_circleci()
         elif os.environ.get('TRAVIS'):
@@ -61,14 +63,21 @@ class Coveralls(object):
         if not self.config.get('service_name'):
             self.config['service_name'] = self.default_client
 
-    def init_appveyor(self, token_required):
-        if token_required and not self.config.get('repo_token'):
+    def require_token(self):
+        if os.environ.get('CIRCLECI') or os.environ.get('TRAVIS'):
+            return
+
+        if not self._token_required:
+            return
+
+        if not self.config.get('repo_token'):
             raise CoverallsException(
                 'Not on Travis or CircleCI. You have to provide either '
                 'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
                 'var.'.format(self.config_filename)
             )
 
+    def init_appveyor(self):
         self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
         if not self.config.get('service_name'):
             self.config['service_name'] = 'appveyor'
@@ -76,14 +85,7 @@ class Coveralls(object):
             pr_number = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
             self.config['service_pull_request'] = pr_number
 
-    def init_buildkite(self, token_required):
-        if token_required and not self.config.get('repo_token'):
-            raise CoverallsException(
-                'Not on Travis or CircleCI. You have to provide either '
-                'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
-                'var.'.format(self.config_filename)
-            )
-
+    def init_buildkite(self):
         self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
         if not self.config.get('service_name'):
             self.config['service_name'] = 'buildkite'
