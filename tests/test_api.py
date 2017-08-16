@@ -60,7 +60,7 @@ class Configration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     def generate_import_mock(self, bad_module_name, msg):
-        """ Returns replacement for builting import function, which raises 
+        """ Returns replacement for builting import function, which raises
         exception on importing appropriate module"""
 
         origin = __import__
@@ -74,7 +74,7 @@ class Configration(unittest.TestCase):
     @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        
+
         if sys.version_info < (3,0):
             builtin_import_func = '__builtin__.__import__'
         else:
@@ -121,6 +121,12 @@ class NoConfig(unittest.TestCase):
         assert cover.config['service_name'] == 'circle-ci'
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
+
+    @patch.dict(os.environ, {'JENKINS_HOME': '/var/lib/jenkins', 'BUILD_NUMBER': '888'}, clear=True)
+    def test_jenkins_no_config(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'jenkins'
+        assert cover.config['service_job_id'] == '888'
 
     @patch.dict(os.environ, {'APPVEYOR': 'True',
                              'APPVEYOR_BUILD_ID': '1234567',

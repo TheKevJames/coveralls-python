@@ -66,6 +66,10 @@ class Coveralls(object):
             self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
             if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
                 self.config['service_pull_request'] = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
+        elif os.environ.get('JENKINS_HOME'):
+            is_travis_or_circle = False
+            self.config['service_name'] = file_config.get('service_name', None) or 'jenkins'
+            self.config['service_job_id'] = os.environ.get('BUILD_NUMBER')
         else:
             is_travis_or_circle = False
             self.config['service_name'] = file_config.get('service_name') or self.default_client
@@ -228,6 +232,7 @@ class Coveralls(object):
                        os.environ.get('APPVEYOR_REPO_BRANCH') or
                        os.environ.get('BUILDKITE_BRANCH') or
                        os.environ.get('CI_BRANCH') or
+                       os.environ.get('GIT_BRANCH') or
                        os.environ.get('TRAVIS_BRANCH', rev)),
             # origin	git@github.com:coagulant/coveralls-python.git (fetch)
             'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
