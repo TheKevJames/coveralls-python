@@ -4,19 +4,16 @@ import json
 import logging
 import os
 import re
-from subprocess import Popen, PIPE
+import subprocess
 
 import coverage
 import requests
 
+from .exception import CoverallsException
 from .reporter import CoverallReporter
 
 
 log = logging.getLogger('coveralls')
-
-
-class CoverallsException(Exception):
-    pass
 
 
 class Coveralls(object):
@@ -28,8 +25,8 @@ class Coveralls(object):
         """ Coveralls!
 
         * repo_token
-          The secret token for your repository, found at the bottom of your repository's
-           page on Coveralls.
+          The secret token for your repository, found at the bottom of your
+          repository's page on Coveralls.
 
         * service_name
           The CI service or other environment in which the test suite was run.
@@ -37,67 +34,92 @@ class Coveralls(object):
           (travis-ci, travis-pro, or coveralls-ruby).
 
         * [service_job_id]
-          A unique identifier of the job on the service specified by service_name.
+          A unique identifier of the job on the service specified by
+          service_name.
         """
         self._data = None
-        self.config = kwargs
-        file_config = self.load_config() or {}
-        repo_token = self.config.get('repo_token') or file_config.get('repo_token', None)
-        if repo_token:
-            self.config['repo_token'] = repo_token
+        self._token_required = token_required
 
-        if os.environ.get('TRAVIS'):
-            is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
-            self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
-        elif os.environ.get('CIRCLECI'):
-            is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'circle-ci'
-            self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
-            if os.environ.get('CI_PULL_REQUEST', None):
-                self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
-        elif os.environ.get('BUILDKITE'):
-            is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name', None) or 'buildkite'
-            self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
-        elif os.environ.get('APPVEYOR'):
-            is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
-            self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
-            if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
-                self.config['service_pull_request'] = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
-        else:
-            is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name') or self.default_client
+        # parameters override file config
+        self.config = self.load_config()
+        self.config.update(kwargs)
 
-        if os.environ.get('COVERALLS_REPO_TOKEN', None):
-            self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
-
-        parallel = os.environ.get('COVERALLS_PARALLEL', '')
-        if parallel.lower() == 'true':
+        # env vars override parameters and file config
+        if os.environ.get('COVERALLS_REPO_TOKEN'):
+            self.config['repo_token'] = os.environ['COVERALLS_REPO_TOKEN']
+        if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
             self.config['parallel'] = True
 
-        if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
+        self.require_token()
+        if os.environ.get('APPVEYOR'):
+            self.init_appveyor()
+        elif os.environ.get('BUILDKITE'):
+            self.init_buildkite()
+        elif os.environ.get('CIRCLECI'):
+            self.init_circleci()
+        elif os.environ.get('TRAVIS'):
+            self.init_travis()
+
+        if not self.config.get('service_name'):
+            self.config['service_name'] = self.default_client
+
+    def require_token(self):
+        if os.environ.get('CIRCLECI') or os.environ.get('TRAVIS'):
+            return
+
+        if not self._token_required:
+            return
+
+        if not self.config.get('repo_token'):
             raise CoverallsException(
-                'Not on Travis or CircleCI. You have to provide either repo_token in %s '
-                'or set the COVERALLS_REPO_TOKEN env var.' % self.config_filename
+                'Not on Travis or CircleCI. You have to provide either '
+                'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
+                'var.'.format(self.config_filename)
             )
+
+    def init_appveyor(self):
+        self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
+        if not self.config.get('service_name'):
+            self.config['service_name'] = 'appveyor'
+        if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
+            pr_number = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
+            self.config['service_pull_request'] = pr_number
+
+    def init_buildkite(self):
+        self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
+        if not self.config.get('service_name'):
+            self.config['service_name'] = 'buildkite'
+
+    def init_circleci(self):
+        self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
+        if not self.config.get('service_name'):
+            self.config['service_name'] = 'circle-ci'
+        if os.environ.get('CI_PULL_REQUEST'):
+            branch = os.environ['CI_PULL_REQUEST'].split('/')[-1]
+            self.config['service_pull_request'] = branch
+
+    def init_travis(self):
+        self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
+        if not self.config.get('service_name'):
+            self.config['service_name'] = 'travis-ci'
 
     def load_config(self):
         try:
-            with open(os.path.join(os.getcwd(), self.config_filename)) as config:
-                try:
-                    import yaml
-                    return yaml.safe_load(config)
-                except ImportError as exc:
-                    log.warning('Seems, like some modules are not installed: %s', exc)
-                    return {}
+            path = os.path.join(os.getcwd(), self.config_filename)
+            with open(path) as config:
+                import yaml
+                return yaml.safe_load(config)
+        except ImportError:
+            log.warning('PyYAML is not installed, ignoring %s',
+                        self.config_filename)
+            return {}
         except (OSError, IOError):
-            log.debug('Missing %s file. Using only env variables.', self.config_filename)
+            log.debug('Missing %s file. Using only env variables.',
+                      self.config_filename)
             return {}
 
     def merge(self, path):
-        reader = codecs.getreader("utf-8")
+        reader = codecs.getreader('utf-8')
         with open(path, 'rb') as fh:
             extra = json.load(reader(fh))
             self.create_data(extra)
@@ -107,47 +129,53 @@ class Coveralls(object):
         try:
             json_string = self.create_report()
         except coverage.CoverageException as e:
-            return {'message': 'Failure to gather coverage: %s' % str(e)}
-        if not dry_run:
-            response = requests.post(self.api_endpoint, files={'json_file': json_string})
-            try:
-                result = response.json()
-            except ValueError:
-                result = {'message': 'Failure to submit data. Response [%(status)s]: %(text)s' % {
-                    'status': response.status_code,
-                    'text': response.text}}
-        else:
-            result = {}
-        return result
+            return {'message': 'Failure to gather coverage: {}'.format(str(e))}
+
+        if dry_run:
+            return {}
+
+        response = requests.post(self.api_endpoint,
+                                 files={'json_file': json_string})
+
+        try:
+            return response.json()
+        except ValueError:
+            return {'message': ('Failure to submit data. Response [{}]: '
+                                '{}'.format(response.status_code,
+                                            response.text))}
 
     def create_report(self):
         """Generate json dumped report for coveralls api."""
-
         data = self.create_data()
+
         try:
             json_string = json.dumps(data)
         except UnicodeDecodeError as e:
-            log.error("ERROR: While preparing JSON received exception: %s" % e)
+            log.error('ERROR: While preparing JSON received exception:')
+            log.exception(e)
             self.debug_bad_encoding(data)
             raise
-        else:
-            log_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
-            log.debug(log_string)
-            log.debug("==\nReporting %s files\n==\n" % len(data['source_files']))
-            for source_file in data['source_files']:
-                log.debug('%s - %s/%s' % (source_file['name'],
-                                          sum(filter(None, source_file['coverage'])),
-                                          len(source_file['coverage'])))
-            return json_string
+
+        log_string = re.sub(r'"repo_token": "(.+?)"',
+                            '"repo_token": "[secure]"', json_string)
+        log.debug(log_string)
+        log.debug('==\nReporting %s files\n==\n', len(data['source_files']))
+
+        for source_file in data['source_files']:
+            log.debug('%s - %s/%s', source_file['name'],
+                      sum(filter(None, source_file['coverage'])),
+                      len(source_file['coverage']))
+
+        return json_string
 
     def save_report(self, file_path):
         """Write coveralls report to file."""
-
         with open(file_path, 'w') as report_file:
             try:
                 report = self.create_report()
             except coverage.CoverageException as e:
-                logging.error('Failure to gather coverage: %s' % str(e))
+                logging.error('Failure to gather coverage:')
+                logging.exception(e)
             else:
                 report_file.write(report)
 
@@ -172,29 +200,38 @@ class Coveralls(object):
                 "parallel": True
             }
         """
-        if not self._data:
-            self._data = {'source_files': self.get_coverage()}
-            self._data.update(self.git_info())
-            self._data.update(self.config)
-            if extra:
-                if 'source_files' in extra:
-                    self._data['source_files'].extend(extra['source_files'])
-                else:
-                    log.warning('No data to be merged; does the json file contain "source_files" data?')
+        if self._data:
+            return self._data
+
+        self._data = {'source_files': self.get_coverage()}
+        self._data.update(self.git_info())
+        self._data.update(self.config)
+
+        if extra:
+            if 'source_files' in extra:
+                self._data['source_files'].extend(extra['source_files'])
+            else:
+                log.warning('No data to be merged; does the json file '
+                            'contain "source_files" data?')
+
         return self._data
 
     def get_coverage(self):
-        workman = coverage.coverage(config_file=self.config.get('config_file', True))
+        workman = coverage.coverage(config_file=self.config.get('config_file',
+                                                                True))
         workman.load()
+
         if hasattr(workman, '_harvest_data'):
-            workman._harvest_data()
+            workman._harvest_data()  # pylint: disable=W0212
         else:
             workman.get_data()
+
         reporter = CoverallReporter(workman, workman.config)
         return reporter.report()
 
     def git_info(self):
-        """ A hash of Git data that can be used to display more information to users.
+        """ A hash of Git data that can be used to display more information to
+            users.
 
             Example:
             "git": {
@@ -213,57 +250,63 @@ class Coveralls(object):
                 }]
             }
         """
+        branch = (os.environ.get('APPVEYOR_REPO_BRANCH') or
+                  os.environ.get('BUILDKITE_BRANCH') or
+                  os.environ.get('CI_BRANCH') or
+                  os.environ.get('CIRCLE_BRANCH') or
+                  os.environ.get('TRAVIS_BRANCH') or
+                  run_command('git', 'rev-parse',
+                              '--abbrev-ref', 'HEAD').strip())
+        remotes = run_command('git', 'remote', '-v').splitlines()
 
-        rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
-        git_info = {'git': {
-            'head': {
-                'id': gitlog('%H'),
-                'author_name': gitlog('%aN'),
-                'author_email': gitlog('%ae'),
-                'committer_name': gitlog('%cN'),
-                'committer_email': gitlog('%ce'),
-                'message': gitlog('%s'),
-            },
-            'branch': (os.environ.get('CIRCLE_BRANCH') or
-                       os.environ.get('APPVEYOR_REPO_BRANCH') or
-                       os.environ.get('BUILDKITE_BRANCH') or
-                       os.environ.get('CI_BRANCH') or
-                       os.environ.get('TRAVIS_BRANCH', rev)),
-            # origin	git@github.com:coagulant/coveralls-python.git (fetch)
-            'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                        for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
-        }}
-        return git_info
+        return {
+            'git': {
+                'head': {
+                    'id': gitlog('%H'),
+                    'author_name': gitlog('%aN'),
+                    'author_email': gitlog('%ae'),
+                    'committer_name': gitlog('%cN'),
+                    'committer_email': gitlog('%ce'),
+                    'message': gitlog('%s'),
+                },
+                'branch': branch,
+                'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
+                            for line in remotes if '(fetch)' in line]
+            }
+        }
 
     def debug_bad_encoding(self, data):
         """ Let's try to help user figure out what is at fault"""
         at_fault_files = set()
         for source_file_data in data['source_files']:
-            for key, value in source_file_data.items():
+            for value in source_file_data.values():
                 try:
                     json.dumps(value)
                 except UnicodeDecodeError:
                     at_fault_files.add(source_file_data['name'])
+
         if at_fault_files:
-            log.error("HINT: Following files cannot be decoded properly into unicode."
-                      "Check their content: %s" % (', '.join(at_fault_files)))
+            log.error(('HINT: Following files cannot be decoded properly into '
+                       'unicode. Check their content: %s'),
+                      ', '.join(at_fault_files))
 
 
-def gitlog(format):
+def gitlog(fmt):
+    loglines = run_command('git', '--no-pager', 'log', '-1',
+                           '--pretty=format:{}'.format(fmt))
+
     try:
-        log = str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+        return str(loglines)
     except UnicodeEncodeError:
-        log = unicode(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
-    return log
+        return unicode(loglines)  # pylint: disable=undefined-variable
 
 
 def run_command(*args):
-    cmd = Popen(list(args), stdout=PIPE, stderr=PIPE)
+    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
     stdout, stderr = cmd.communicate()
-    assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
-                                 'STDERR: "%s"' % (cmd.returncode, stdout, stderr))
-    try:
-        output = stdout.decode()
-    except UnicodeDecodeError:
-        output = stdout.decode('utf-8')
-    return output
+    assert cmd.returncode == 0, ('command return code {}\nSTDOUT:\n{}\n'
+                                 'STDERR:\n{}\n'.format(cmd.returncode, stdout,
+                                                        stderr))
+
+    return stdout.decode()
