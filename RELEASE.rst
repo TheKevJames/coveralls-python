@@ -8,6 +8,8 @@ To cut a new release, ensure the latest master passes all tests. Then, create a 
 1. Update the :code:`CHANGELOG.md` with the new version.
 2. Bump the version number in :code:`version.py`.
 3. Tag that commit with the version number (:code:`git tag x.y.z`).
+4. Push the new tag to GitHub.
+5. Create a new `GitHub release`_.
 
 Make sure to push the release commit to GitHub.
 
@@ -23,3 +25,4 @@ NOTE: in the future, we may want to expand this to include other sources, such a
     # etc
 
 .. _`coveralls`: https://pypi.org/project/coveralls/
+.. _`GitHub release`: https://github.com/coveralls-clients/coveralls-python/releases/new
