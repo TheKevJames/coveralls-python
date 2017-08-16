@@ -9,14 +9,11 @@ import subprocess
 import coverage
 import requests
 
+from .exception import CoverallsException
 from .reporter import CoverallReporter
 
 
 log = logging.getLogger('coveralls')
-
-
-class CoverallsException(Exception):
-    pass
 
 
 class Coveralls(object):
@@ -299,7 +296,7 @@ def gitlog(fmt):
     try:
         return str(loglines)
     except UnicodeEncodeError:
-        return unicode(loglines)
+        return unicode(loglines)  # pylint: disable=undefined-variable
 
 
 def run_command(*args):

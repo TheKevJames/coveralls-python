@@ -8,7 +8,7 @@ from coverage.misc import NoSource, NotPython
 from coverage.phystokens import source_encoding
 from coverage.report import Reporter
 
-from coveralls.api import CoverallsException
+from .exception import CoverallsException
 
 
 log = logging.getLogger('coveralls')

@@ -4,7 +4,7 @@ import os
 import mock
 
 import coveralls
-from coveralls.api import CoverallsException
+from coveralls.exception import CoverallsException
 import coveralls.cli
 
 

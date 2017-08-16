@@ -27,3 +27,4 @@
         - -d invalid-name
         - -d locally-disabled
         - -d missing-docstring
+        - -d no-self-use
