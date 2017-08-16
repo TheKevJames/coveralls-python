@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: python:2.7-alpine
     steps:
-      - run: apk add --no-cache git openssh-client
+      - run: apk add --no-cache gcc git openssh-client
       - checkout
       - run: pip install tox
       - run: tox -e "py27-cov{3,4,41}-{default,pyyaml}"
@@ -48,7 +48,7 @@ jobs:
 
   test-pypy2:
     docker:
-      - image: pypy:2-5.8.0-slim
+      - image: pypy:2-5.8.0
     steps:
       - checkout
       - run: pip install tox
@@ -56,7 +56,7 @@ jobs:
 
   test-pypy3:
     docker:
-      - image: pypy:3-5.8.0-slim
+      - image: pypy:3-5.8.0
     steps:
       - checkout
       - run: pip install tox
