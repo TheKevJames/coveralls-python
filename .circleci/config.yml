@@ -64,7 +64,7 @@ jobs:
 
 workflows:
   version: 2
-  check-build-and-deploy:
+  test-all-envs:
     jobs:
       - test-py27
       - test-py33
