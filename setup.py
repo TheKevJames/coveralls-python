@@ -26,7 +26,7 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
-    install_requires=['docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0'],
+    install_requires=['docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0', 'six>=1.10.0'],
     setup_requires=['pytest-runner'],
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
@@ -45,6 +45,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Programming Language :: Python :: Implementation :: CPython',
     ],

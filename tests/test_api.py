@@ -40,6 +40,23 @@ class GitBasedTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
+class HGBasedTest(unittest.TestCase):
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        sh.cd(self.dir)
+        sh.hg.init()
+        sh.echo("[ui]\nusername = Daniel <me@here.com>", _out='.hg/hgrc')
+        # sh.echo("[ui]\nusername = Daniël <me@here.com>,", _out='.hg/hgrc')
+        sh.touch('README')
+        sh.hg.add('README')
+        sh.hg.commit('-m', 'first commit')
+
+
+    def tearDown(self):
+        shutil.rmtree(self.dir)
+
+
 @patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
 
@@ -60,7 +77,7 @@ class Configration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     def generate_import_mock(self, bad_module_name, msg):
-        """ Returns replacement for builting import function, which raises 
+        """ Returns replacement for builting import function, which raises
         exception on importing appropriate module"""
 
         origin = __import__
@@ -74,7 +91,7 @@ class Configration(unittest.TestCase):
     @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        
+
         if sys.version_info < (3,0):
             builtin_import_func = '__builtin__.__import__'
         else:
@@ -144,7 +161,7 @@ class Git(GitBasedTest):
     @patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
     def test_git(self):
         cover = Coveralls(repo_token='xxx')
-        git_info = cover.git_info()
+        git_info = cover.dvcs_info()
         commit_id = git_info['git']['head'].pop('id')
 
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
@@ -161,6 +178,25 @@ class Git(GitBasedTest):
                 'name': 'origin'
             }],
             'branch': 'master'
+        }}
+
+class HG(HGBasedTest):
+
+    @patch.dict(os.environ, {'TRAVIS_BRANCH': 'default', 'USE_HG': "True"}, clear=True)
+    def test_hg(self):
+        cover = Coveralls(repo_token='xxx')
+        hg_info = cover.dvcs_info()
+        commit_id = hg_info['hg']['head'].pop('id')
+        assert re.match(r'^[a-f0-9]{40}$', commit_id)
+        assert hg_info == {'hg': {
+            'head': {
+                'committer_email': 'me@here.com',
+                'author_email': 'me@here.com',
+                'author_name': 'Daniel',
+                'message': 'first commit',
+                'committer_name': 'Daniel',
+            },
+            'branch': 'default'
         }}
 
 
