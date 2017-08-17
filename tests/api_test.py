@@ -239,7 +239,7 @@ def test_malformed_encoding_declaration(capfd):
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
     result_object = Coveralls(repo_token='xxx').get_coverage()
     assert result_object == []
-    out, err = capfd.readouterr()
+    _, err = capfd.readouterr()
     assert 'Source file malformed.py can not be properly decoded' in err
 
 
@@ -309,7 +309,7 @@ class WearTest(unittest.TestCase):
     @patch.object(log, 'debug')
     def test_repo_token_in_not_compromised_verbose(self, mock_logger, mock_requests):
         self.setup_mock(mock_requests)
-        result = Coveralls(repo_token='xxx').wear(dry_run=True)
+        Coveralls(repo_token='xxx').wear(dry_run=True)
         assert 'xxx' not in mock_logger.call_args[0][0]
 
     def test_coveralls_unavailable(self, mock_requests):

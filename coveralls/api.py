@@ -239,7 +239,7 @@ class Coveralls(object):
         """ Let's try to help user figure out what is at fault"""
         at_fault_files = set()
         for source_file_data in data['source_files']:
-            for key, value in source_file_data.items():
+            for value in source_file_data.values():
                 try:
                     json.dumps(value)
                 except UnicodeDecodeError:
