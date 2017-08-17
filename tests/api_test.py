@@ -245,7 +245,7 @@ def test_malformed_encoding_declaration(capfd):
 
 @pytest.mark.skipif(sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
                     reason='python 2 or coverage 3 fail')
-def test_malformed_encoding_declaration_py3_or_coverage4(_capfd):
+def test_malformed_encoding_declaration_py3_or_coverage4():
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
