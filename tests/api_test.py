@@ -4,8 +4,6 @@ from __future__ import unicode_literals
 import json
 import logging
 import os
-import re
-import shutil
 import sys
 import tempfile
 import unittest
@@ -22,22 +20,6 @@ except ImportError:
 from coveralls import Coveralls
 from coveralls.api import log
 
-
-class GitBasedTest(unittest.TestCase):
-
-    def setUp(self):
-        self.dir = tempfile.mkdtemp()
-        sh.cd(self.dir)
-        sh.git.init()
-        sh.git('config', 'user.name', '"Daniël"')
-        sh.git('config', 'user.email', '"me@here.com"')
-        sh.touch('README')
-        sh.git.add('README')
-        sh.git.commit('-m', 'first commit')
-        sh.git('remote', 'add', 'origin', 'https://github.com/username/Hello-World.git')
-
-    def tearDown(self):
-        shutil.rmtree(self.dir)
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
@@ -136,31 +118,6 @@ class NoConfig(unittest.TestCase):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'
         assert cover.config['service_job_id'] == '1234567'
-
-
-class Git(GitBasedTest):
-
-    @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
-    def test_git(self):
-        cover = Coveralls(repo_token='xxx')
-        git_info = cover.git_info()
-        commit_id = git_info['git']['head'].pop('id')
-
-        assert re.match(r'^[a-f0-9]{40}$', commit_id)
-        assert git_info == {'git': {
-            'head': {
-                'committer_email': 'me@here.com',
-                'author_email': 'me@here.com',
-                'author_name': 'Daniël',
-                'message': 'first commit',
-                'committer_name': 'Daniël',
-            },
-            'remotes': [{
-                'url': 'https://github.com/username/Hello-World.git',
-                'name': 'origin'
-            }],
-            'branch': 'master'
-        }}
 
 
 def assert_coverage(actual, expected):
