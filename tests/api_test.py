@@ -75,7 +75,7 @@ class Configration(unittest.TestCase):
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
 
-        if sys.version_info < (3,0):
+        if sys.version_info < (3, 0):
             builtin_import_func = '__builtin__.__import__'
         else:
             builtin_import_func = 'builtins.__import__'
