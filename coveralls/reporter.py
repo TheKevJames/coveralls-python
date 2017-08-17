@@ -39,7 +39,8 @@ class CoverallReporter(Reporter):
 
         for cu in units:
             try:
-                self.parse_file(cu, self.coverage._analyze(cu))
+                analyzed = self.coverage._analyze(cu)  # pylint: disable=W0212
+                self.parse_file(cu, analyzed)
             except NoSource:
                 if not self.config.ignore_errors:
                     log.warning('No source for %s', cu.filename)
