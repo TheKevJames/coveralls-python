@@ -17,6 +17,10 @@ log = logging.getLogger('coveralls')
 class CoverallReporter(Reporter):
     """ Custom coverage.py reporter for coveralls.io
     """
+    def __init__(self, *args, **kwargs):
+        self.source_files = []
+        super(CoverallReporter, self).__init__(*args, **kwargs)
+
     def report(self, morfs=None):
         """ Generate a part of json report for coveralls
 
@@ -25,7 +29,6 @@ class CoverallReporter(Reporter):
         """
         units = None
 
-        self.source_files = []
         if hasattr(self, 'find_code_units'):
             self.find_code_units(morfs)
         else:
