@@ -17,66 +17,6 @@ from coveralls import Coveralls
 from coveralls.api import log
 
 
-def assert_coverage(actual, expected):
-    assert actual['source'].strip() == expected['source'].strip()
-    assert actual['name'] == expected['name']
-    assert actual['coverage'] == expected['coverage']
-    assert actual.get('branches') == expected.get('branches')
-
-
-class ReporterTest(unittest.TestCase):
-
-    def setUp(self):
-        os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'example'))
-        sh.rm('-f', '.coverage')
-        sh.rm('-f', 'extra.py')
-        self.cover = Coveralls(repo_token='xxx')
-
-    def test_reporter(self):
-        sh.coverage('run', 'runtests.py')
-        results = self.cover.get_coverage()
-        assert len(results) == 2
-        assert_coverage({
-            'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')\n\ndef branch(cond1, cond2):\n    if cond1:\n        print(\'condition tested both ways\')\n    if cond2:\n        print(\'condition not tested both ways\')',
-            'name': 'project.py',
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 1, 1]}, results[0])
-        assert_coverage({
-            'source': "# coding: utf-8\nfrom project import hello, branch\n\nif __name__ == '__main__':\n    hello()\n    branch(False, True)\n    branch(True, True)",
-            'name': 'runtests.py', 'coverage': [None, 1, None, 1, 1, 1, 1]}, results[1])
-
-    def test_reporter_with_branches(self):
-        sh.coverage('run', '--branch', 'runtests.py')
-        results = self.cover.get_coverage()
-        assert len(results) == 2
-
-        # Branches are expressed as four values each in a flat list
-        assert not len(results[0]['branches']) % 4
-        assert not len(results[1]['branches']) % 4
-
-        assert_coverage({
-            'source': '# coding: utf-8\n\n\ndef hello():\n    print(\'world\')\n\n\nclass Foo(object):\n    """ Bar """\n\n\ndef baz():\n    print(\'this is not tested\')\n\ndef branch(cond1, cond2):\n    if cond1:\n        print(\'condition tested both ways\')\n    if cond2:\n        print(\'condition not tested both ways\')',
-            'name': 'project.py',
-            'branches': [16, 0, 17, 1, 16, 0, 18, 1, 18, 0, 19, 1, 18, 0, 15, 0],
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None, None, 1, 0, None, 1, 1, 1, 1, 1]}, results[0])
-        assert_coverage({
-            'source': "# coding: utf-8\nfrom project import hello, branch\n\nif __name__ == '__main__':\n    hello()\n    branch(False, True)\n    branch(True, True)",
-            'name': 'runtests.py',
-            'branches': [4, 0, 5, 1, 4, 0, 2, 0],
-            'coverage': [None, 1, None, 1, 1, 1, 1]}, results[1])
-
-    def test_missing_file(self):
-        sh.echo('print("Python rocks!")', _out='extra.py')
-        sh.coverage('run', 'extra.py')
-        sh.rm('-f', 'extra.py')
-        assert self.cover.get_coverage() == []
-
-    def test_not_python(self):
-        sh.echo('print("Python rocks!")', _out='extra.py')
-        sh.coverage('run', 'extra.py')
-        sh.echo("<h1>This isn't python!</h1>", _out='extra.py')
-        assert self.cover.get_coverage() == []
-
-
 def test_non_unicode():
     os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'nonunicode.py')
@@ -104,9 +44,13 @@ def test_malformed_encoding_declaration_py3_or_coverage4():
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
     result_object = Coveralls(repo_token='xxx').get_coverage()
     assert len(result_object) == 1
-    assert_coverage({'coverage': [None, None, 1, 0], 'name': 'malformed.py',
-                     'source': '# -*- cоding: utf-8 -*-\n\ndef hello():\n    return 1\n'},
-                    result_object[0])
+
+    assert result_object[0]['coverage'] == [None, None, 1, 0]
+    assert result_object[0]['name'] == 'malformed.py'
+    assert result_object[0]['source'].strip() == ('# -*- cоding: utf-8 -*-\n\n'
+                                                  'def hello():\n'
+                                                  '    return 1')
+    assert 'branches' not in result_object[0]
 
 
 @mock.patch('coveralls.api.requests')
