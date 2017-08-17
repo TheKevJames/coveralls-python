@@ -9,14 +9,11 @@ from subprocess import Popen, PIPE
 import coverage
 import requests
 
+from .exception import CoverallsException
 from .reporter import CoverallReporter
 
 
 log = logging.getLogger('coveralls')
-
-
-class CoverallsException(Exception):
-    pass
 
 
 class Coveralls(object):

@@ -29,9 +29,10 @@ Example:
 import logging
 import sys
 from docopt import docopt
-from coveralls import Coveralls
-from coveralls.api import CoverallsException
-from coveralls.version import __version__
+
+from .api import Coveralls
+from .exception import CoverallsException
+from .version import __version__
 
 
 log = logging.getLogger('coveralls')
