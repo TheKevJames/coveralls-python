@@ -227,7 +227,7 @@ class ReporterTest(unittest.TestCase):
 def test_non_unicode():
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'nonunicode.py')
-    expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print (\'I like P\\u00f3lya distribution.\')'
+    expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print(\'I like P\\u00f3lya distribution.\')'
     assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
 
 
