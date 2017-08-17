@@ -85,7 +85,7 @@ class Configration(unittest.TestCase):
             # patching of `import` function of the Coveralls module (it shoud throw ImportException):
             with patch(builtin_import_func, side_effect=yaml_import_mock):
                 Coveralls()
-        except:
+        except Exception:
             pass
         mock_logger.assert_called_once_with('Seems, like some modules are not installed: %s', mock.ANY)
 
