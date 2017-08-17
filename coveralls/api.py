@@ -251,10 +251,9 @@ class Coveralls(object):
 
 def gitlog(format):
     try:
-        log = str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
+        return str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
     except UnicodeEncodeError:
-        log = unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
-    return log
+        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
 
 
 def run_command(*args):
