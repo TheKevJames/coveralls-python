@@ -245,7 +245,7 @@ def test_malformed_encoding_declaration(capfd):
 
 @pytest.mark.skipif(sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
                     reason='python 2 or coverage 3 fail')
-def test_malformed_encoding_declaration_py3_or_coverage4(capfd):
+def test_malformed_encoding_declaration_py3_or_coverage4(_capfd):
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
@@ -271,7 +271,7 @@ class WearTest(unittest.TestCase):
         result = Coveralls(repo_token='xxx').wear(dry_run=False)
         assert result == self.expected_json
 
-    def test_merge(self, mock_requests):
+    def test_merge(self, _mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(b'{"source_files": [{"name": "foobar", "coverage": []}]}')
@@ -280,7 +280,7 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == [{'name': 'foobar', 'coverage': []}]
 
-    def test_merge_empty_data(self, mock_requests):
+    def test_merge_empty_data(self, _mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(b'{}')
@@ -290,7 +290,7 @@ class WearTest(unittest.TestCase):
         assert json.loads(result)['source_files'] == []
 
     @patch.object(log, 'warning')
-    def test_merge_invalid_data(self, mock_logger, mock_requests):
+    def test_merge_invalid_data(self, mock_logger, _mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
         coverage_file.write(b'{"random": "stuff"}')

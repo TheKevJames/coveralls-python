@@ -33,5 +33,4 @@
         - -d line-too-long  # TODO: remove me
         - -d no-self-use  # TODO: remove me
         - -d protected-access  # TODO: remove me
-        - -d unused-argument  # TODO: remove me
         exclude: example/*

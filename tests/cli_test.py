@@ -46,7 +46,7 @@ exc = CoverallsException('bad stuff happened')
 @patch.object(coveralls.cli.log, 'error')
 @patch.object(coveralls.Coveralls, 'wear', side_effect=exc)
 @patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-def test_exception(mock_coveralls, mock_log):
+def test_exception(_mock_coveralls, mock_log):
     try:
         coveralls.cli.main(argv=[])
         assert 0 == 1  # Should never reach this line
