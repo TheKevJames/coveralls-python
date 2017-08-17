@@ -36,7 +36,8 @@ class Configuration(unittest.TestCase):
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
         Coveralls()
-        mock_logger.assert_called_once_with('Seems, like some modules are not installed: %s', mock.ANY)
+        mock_logger.assert_called_once_with(
+            'Seems, like some modules are not installed: %s', mock.ANY)
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
