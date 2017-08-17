@@ -10,6 +10,7 @@
     -   id: check-yaml
     -   id: detect-private-key
     -   id: end-of-file-fixer
+        exclude: example/*  # TODO: remove this
     -   id: trailing-whitespace
     -   id: check-ast
     -   id: double-quote-string-fixer
