@@ -13,8 +13,6 @@ from coveralls import Coveralls
 
 GIT_COMMIT_MSG = 'first commit'
 GIT_EMAIL = 'me@here.com'
-GIT_NAME = 'Daniël'
-GIT_NAME_QUOTED = '"Daniël"'
 GIT_REMOTE = 'origin'
 GIT_URL = 'https://github.com/username/Hello-World.git'
 
@@ -27,7 +25,7 @@ class GitTest(unittest.TestCase):
         sh.touch('README')
 
         sh.git.init()
-        sh.git.config('user.name', GIT_NAME_QUOTED)
+        sh.git.config('user.name', '"Daniël"')
         sh.git.config('user.email', '"{}"'.format(GIT_EMAIL))
         sh.git.add('README')
         sh.git.commit('-m', GIT_COMMIT_MSG)
@@ -48,9 +46,9 @@ class GitTest(unittest.TestCase):
                 'head': {
                     'committer_email': GIT_EMAIL,
                     'author_email': GIT_EMAIL,
-                    'author_name': GIT_NAME,
+                    'author_name': 'Daniël',
                     'message': GIT_COMMIT_MSG,
-                    'committer_name': GIT_NAME,
+                    'committer_name': 'Daniël',
                 },
                 'remotes': [{
                     'url': GIT_URL,
