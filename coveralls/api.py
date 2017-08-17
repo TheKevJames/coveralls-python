@@ -250,7 +250,7 @@ def gitlog(fmt):
     try:
         return str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))
     except UnicodeEncodeError:
-        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))
+        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))  # pylint: disable=undefined-variable
 
 
 def run_command(*args):
