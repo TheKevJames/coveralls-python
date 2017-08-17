@@ -41,5 +41,4 @@
         - -d redefined-outer-name  # TODO: remove me
         - -d undefined-variable  # TODO: remove me
         - -d unused-argument  # TODO: remove me
-        - -d unused-import  # TODO: remove me
         exclude: example/*
