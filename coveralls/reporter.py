@@ -37,12 +37,12 @@ class CoverallReporter(Reporter):
                 self.parse_file(cu, self.coverage._analyze(cu))
             except NoSource:
                 if not self.config.ignore_errors:
-                    log.warn('No source for %s', cu.filename)
+                    log.warning('No source for %s', cu.filename)
             except NotPython:
                 # Only report errors for .py files, and only if we didn't
                 # explicitly suppress those errors.
                 if cu.should_be_python() and not self.config.ignore_errors:
-                    log.warn('Source file is not python %s', cu.filename)
+                    log.warning('Source file is not python %s', cu.filename)
             except KeyError:
                 if __version__[0] < 4 or (__version__[0] == 4 and __version__[1] < 1):
                     raise CoverallsException(
@@ -105,8 +105,8 @@ class CoverallReporter(Reporter):
                     if encoding != 'utf-8':
                         source = source.decode(encoding).encode('utf-8')
             except UnicodeDecodeError:
-                log.warn('Source file %s can not be properly decoded, skipping. '
-                         'Please check if encoding declaration is ok', basename(cu.filename))
+                log.warning('Source file %s can not be properly decoded, skipping. '
+                            'Please check if encoding declaration is ok', basename(cu.filename))
                 return
         else:
             if hasattr(cu, 'relative_filename'):
