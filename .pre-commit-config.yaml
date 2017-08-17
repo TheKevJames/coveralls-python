@@ -17,7 +17,7 @@
         exclude: nonunicode.py
     -   id: debug-statements
         exclude: nonunicode.py  # TODO: will be fixed by v0.9.2
-    # -   id: name-tests-test  # TODO: enable
+    -   id: name-tests-test
     -   id: requirements-txt-fixer
 -   repo: git://github.com/pre-commit/mirrors-pylint
     sha: v1.7.2
