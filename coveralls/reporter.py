@@ -3,10 +3,7 @@ import logging
 import os
 import sys
 
-from coverage import __version__
-from coverage.misc import NoSource, NotPython
-from coverage.phystokens import source_encoding
-from coverage.report import Reporter
+import coverage
 
 from .exception import CoverallsException
 
@@ -14,7 +11,7 @@ from .exception import CoverallsException
 log = logging.getLogger('coveralls')
 
 
-class CoverallReporter(Reporter):
+class CoverallReporter(coverage.report.Reporter):
     """ Custom coverage.py reporter for coveralls.io
     """
     def __init__(self, *args, **kwargs):
@@ -40,16 +37,16 @@ class CoverallReporter(Reporter):
         for cu in units:
             try:
                 self.parse_file(cu, self.coverage._analyze(cu))
-            except NoSource:
+            except coverage.misc.NoSource:
                 if not self.config.ignore_errors:
                     log.warning('No source for %s', cu.filename)
-            except NotPython:
+            except coverage.misc.NotPython:
                 # Only report errors for .py files, and only if we didn't
                 # explicitly suppress those errors.
                 if cu.should_be_python() and not self.config.ignore_errors:
                     log.warning('Source file is not python %s', cu.filename)
             except KeyError:
-                if __version__[0] < 4 or (__version__[0] == 4 and __version__[1] < 1):
+                if coverage.__version__[0] < 4 or (coverage.__version__[0] == 4 and coverage.__version__[1] < 1):
                     raise CoverallsException(
                         'Old (<4.1) versions of coverage.py do not work consistently '
                         'on new versions of Python. Please upgrade your coverage.py.'
@@ -106,7 +103,7 @@ class CoverallReporter(Reporter):
                 source = source_file.read()
             try:
                 if sys.version_info < (3, 0):
-                    encoding = source_encoding(source)
+                    encoding = coverage.phystokens.source_encoding(source)
                     if encoding != 'utf-8':
                         source = source.decode(encoding).encode('utf-8')
             except UnicodeDecodeError:

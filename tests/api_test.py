@@ -1,20 +1,19 @@
 # coding: utf-8
 from __future__ import unicode_literals
+
 import json
 import logging
 import os
-from os.path import join, dirname
 import re
 import shutil
+import sys
 import tempfile
 import unittest
-import sys
 
 import coverage
-import sh
-from mock import patch
 import mock
 import pytest
+import sh
 try:
     import yaml
 except ImportError:
@@ -40,7 +39,7 @@ class GitBasedTest(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.dir)
 
-@patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configration(unittest.TestCase):
 
     def setUp(self):
@@ -52,7 +51,7 @@ class Configration(unittest.TestCase):
         os.remove('.coveralls.mock')
 
     @pytest.mark.skipif(yaml is None, reason='requires pyyaml')
-    @patch.dict(os.environ, {}, clear=True)
+    @mock.patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
         assert cover.config['service_name'] == 'jenkins'
@@ -71,7 +70,7 @@ class Configration(unittest.TestCase):
                 return origin(name, *args)
         return import_func
 
-    @patch.object(log, 'warning')
+    @mock.patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
 
@@ -83,56 +82,56 @@ class Configration(unittest.TestCase):
         yaml_import_mock = self.generate_import_mock('yaml', 'No module named yaml')
         try:
             # patching of `import` function of the Coveralls module (it shoud throw ImportException):
-            with patch(builtin_import_func, side_effect=yaml_import_mock):
+            with mock.patch(builtin_import_func, side_effect=yaml_import_mock):
                 Coveralls()
         except Exception:
             pass
         mock_logger.assert_called_once_with('Seems, like some modules are not installed: %s', mock.ANY)
 
-@patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfig(unittest.TestCase):
 
-    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'}, clear=True)
+    @mock.patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'}, clear=True)
     def test_travis_no_config(self):
         cover = Coveralls()
         assert cover.config['service_name'] == 'travis-ci'
         assert cover.config['service_job_id'] == '777'
         assert 'repo_token' not in cover.config
 
-    @patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777', 'COVERALLS_REPO_TOKEN': 'yyy'}, clear=True)
+    @mock.patch.dict(os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777', 'COVERALLS_REPO_TOKEN': 'yyy'}, clear=True)
     def test_repo_token_from_env(self):
         cover = Coveralls()
         assert cover.config['service_name'] == 'travis-ci'
         assert cover.config['service_job_id'] == '777'
         assert cover.config['repo_token'] == 'yyy'
 
-    @patch.dict(os.environ, {}, clear=True)
+    @mock.patch.dict(os.environ, {}, clear=True)
     def test_misconfigured(self):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
         assert str(excinfo.value) == 'Not on Travis or CircleCI. You have to provide either repo_token in .coveralls.mock or ' \
                                      'set the COVERALLS_REPO_TOKEN env var.'
 
-    @patch.dict(os.environ, {'CIRCLECI': 'True',
-                             'CIRCLE_BUILD_NUM': '888',
-                             'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'}, clear=True)
+    @mock.patch.dict(os.environ, {'CIRCLECI': 'True',
+                                  'CIRCLE_BUILD_NUM': '888',
+                                  'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'}, clear=True)
     def test_circleci_no_config(self):
         cover = Coveralls()
         assert cover.config['service_name'] == 'circle-ci'
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
-    @patch.dict(os.environ, {'APPVEYOR': 'True',
-                             'APPVEYOR_BUILD_ID': '1234567',
-                             'APPVEYOR_PULL_REQUEST_NUMBER': '1234'}, clear=True)
+    @mock.patch.dict(os.environ, {'APPVEYOR': 'True',
+                                  'APPVEYOR_BUILD_ID': '1234567',
+                                  'APPVEYOR_PULL_REQUEST_NUMBER': '1234'}, clear=True)
     def test_appveyor_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'appveyor'
         assert cover.config['service_job_id'] == '1234567'
         assert cover.config['service_pull_request'] == '1234'
 
-    @patch.dict(os.environ, {'BUILDKITE': 'True',
-                             'BUILDKITE_JOB_ID': '1234567'}, clear=True)
+    @mock.patch.dict(os.environ, {'BUILDKITE': 'True',
+                                  'BUILDKITE_JOB_ID': '1234567'}, clear=True)
     def test_buildkite_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'
@@ -141,7 +140,7 @@ class NoConfig(unittest.TestCase):
 
 class Git(GitBasedTest):
 
-    @patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
+    @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
     def test_git(self):
         cover = Coveralls(repo_token='xxx')
         git_info = cover.git_info()
@@ -174,7 +173,7 @@ def assert_coverage(actual, expected):
 class ReporterTest(unittest.TestCase):
 
     def setUp(self):
-        os.chdir(join(dirname(dirname(__file__)), 'example'))
+        os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'example'))
         sh.rm('-f', '.coverage')
         sh.rm('-f', 'extra.py')
         self.cover = Coveralls(repo_token='xxx')
@@ -225,7 +224,7 @@ class ReporterTest(unittest.TestCase):
 
 
 def test_non_unicode():
-    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'nonunicode.py')
     expected_json_part = '"source": "# coding: iso-8859-15\\n\\ndef hello():\\n    print(\'I like P\\u00f3lya distribution.\')'
     assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
@@ -234,7 +233,7 @@ def test_non_unicode():
 @pytest.mark.skipif(sys.version_info >= (3, 0), reason='python 3 not affected')
 @pytest.mark.skipif(coverage.__version__.startswith('4.'), reason='coverage 4 not affected')
 def test_malformed_encoding_declaration(capfd):
-    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
     result_object = Coveralls(repo_token='xxx').get_coverage()
@@ -246,7 +245,7 @@ def test_malformed_encoding_declaration(capfd):
 @pytest.mark.skipif(sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
                     reason='python 2 or coverage 3 fail')
 def test_malformed_encoding_declaration_py3_or_coverage4():
-    os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
+    os.chdir(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
     result_object = Coveralls(repo_token='xxx').get_coverage()
@@ -256,7 +255,7 @@ def test_malformed_encoding_declaration_py3_or_coverage4():
                     result_object[0])
 
 
-@patch('coveralls.api.requests')
+@mock.patch('coveralls.api.requests')
 class WearTest(unittest.TestCase):
 
     def setUp(self):
@@ -289,7 +288,7 @@ class WearTest(unittest.TestCase):
         result = api.create_report()
         assert json.loads(result)['source_files'] == []
 
-    @patch.object(log, 'warning')
+    @mock.patch.object(log, 'warning')
     def test_merge_invalid_data(self, mock_logger, _mock_requests):
         api = Coveralls(repo_token='xxx')
         coverage_file = tempfile.NamedTemporaryFile()
@@ -306,7 +305,7 @@ class WearTest(unittest.TestCase):
         result = Coveralls(repo_token='xxx').wear(dry_run=True)
         assert result == {}
 
-    @patch.object(log, 'debug')
+    @mock.patch.object(log, 'debug')
     def test_repo_token_in_not_compromised_verbose(self, mock_logger, mock_requests):
         self.setup_mock(mock_requests)
         Coveralls(repo_token='xxx').wear(dry_run=True)
@@ -319,7 +318,7 @@ class WearTest(unittest.TestCase):
         result = Coveralls(repo_token='xxx').wear()
         assert result == {'message': 'Failure to submit data. Response [500]: <html>Http 1./1 500</html>'}
 
-    @patch('coveralls.reporter.CoverallReporter.report')
+    @mock.patch('coveralls.reporter.CoverallReporter.report')
     def test_no_coverage(self, report_files, mock_requests):
         report_files.side_effect = coverage.CoverageException('No data to report')
         self.setup_mock(mock_requests)

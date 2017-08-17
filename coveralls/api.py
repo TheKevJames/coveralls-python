@@ -4,7 +4,7 @@ import json
 import logging
 import os
 import re
-from subprocess import Popen, PIPE
+import subprocess
 
 import coverage
 import requests
@@ -256,7 +256,7 @@ def gitlog(fmt):
 
 
 def run_command(*args):
-    cmd = Popen(list(args), stdout=PIPE, stderr=PIPE)
+    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = cmd.communicate()
     assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
                                  'STDERR: "%s"' % (cmd.returncode, stdout, stderr))

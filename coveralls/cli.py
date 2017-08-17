@@ -28,7 +28,8 @@ Example:
 """
 import logging
 import sys
-from docopt import docopt
+
+import docopt
 
 from .api import Coveralls
 from .exception import CoverallsException
@@ -39,7 +40,7 @@ log = logging.getLogger('coveralls')
 
 
 def main(argv=None):
-    options = docopt(__doc__, argv=argv, version=__version__)
+    options = docopt.docopt(__doc__, argv=argv, version=__version__)
     if options['debug']:
         options['--verbose'] = True
     level = logging.DEBUG if options['--verbose'] else logging.INFO
