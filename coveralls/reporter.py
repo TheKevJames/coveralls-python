@@ -1,6 +1,6 @@
 # coding: utf-8
 import logging
-from os.path import basename
+import os
 import sys
 
 from coverage import __version__
@@ -111,7 +111,7 @@ class CoverallReporter(Reporter):
                         source = source.decode(encoding).encode('utf-8')
             except UnicodeDecodeError:
                 log.warning('Source file %s can not be properly decoded, skipping. '
-                            'Please check if encoding declaration is ok', basename(cu.filename))
+                            'Please check if encoding declaration is ok', os.path.basename(cu.filename))
                 return
         else:
             if hasattr(cu, 'relative_filename'):
