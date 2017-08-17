@@ -261,9 +261,9 @@ class WearTest(unittest.TestCase):
 
     def setUp(self):
         sh.rm('-f', '.coverage')
+        self.expected_json = {'url': 'https://coveralls.io/jobs/5869', 'message': 'Job #7.1 - 44.58% Covered'}
 
     def setup_mock(self, mock_requests):
-        self.expected_json = {'url': 'https://coveralls.io/jobs/5869', 'message': 'Job #7.1 - 44.58% Covered'}
         mock_requests.post.return_value.json.return_value = self.expected_json
 
     def test_wet_run(self, mock_requests):
