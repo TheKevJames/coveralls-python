@@ -249,11 +249,11 @@ class Coveralls(object):
                       'Check their content: %s' % (', '.join(at_fault_files)))
 
 
-def gitlog(format):
+def gitlog(fmt):
     try:
-        return str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
+        return str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))
     except UnicodeEncodeError:
-        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
+        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))
 
 
 def run_command(*args):
