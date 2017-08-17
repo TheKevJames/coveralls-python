@@ -1,0 +1,45 @@
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    sha: v0.9.1
+    hooks:
+    -   id: check-case-conflict
+    -   id: check-executables-have-shebangs
+    -   id: check-json
+    -   id: check-merge-conflict
+    -   id: check-symlinks
+    -   id: check-xml
+    -   id: check-yaml
+    -   id: detect-private-key
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+    -   id: check-ast
+    -   id: double-quote-string-fixer
+        exclude: nonunicode.py
+    -   id: debug-statements
+        exclude: nonunicode.py  # TODO: will be fixed by v0.9.2
+    # -   id: name-tests-test  # TODO: enable
+    -   id: requirements-txt-fixer
+-   repo: git://github.com/pre-commit/mirrors-pylint
+    sha: v1.7.2
+    hooks:
+    -   id: pylint
+        args:
+        - -d fixme
+        - -d import-error
+        - -d invalid-name
+        - -d locally-disabled
+        - -d missing-docstring
+        - -d attribute-defined-outside-init  # TODO: remove me
+        - -d bad-whitespace  # TODO: remove me
+        - -d bare-except  # TODO: remove me
+        - -d deprecated-method  # TODO: remove me
+        - -d line-too-long  # TODO: remove me
+        - -d logging-not-lazy  # TODO: remove me
+        - -d no-self-use  # TODO: remove me
+        - -d protected-access  # TODO: remove me
+        - -d redefined-builtin  # TODO: remove me
+        - -d redefined-outer-name  # TODO: remove me
+        - -d undefined-variable  # TODO: remove me
+        - -d unused-argument  # TODO: remove me
+        - -d unused-import  # TODO: remove me
+        - -d unused-variable  # TODO: remove me
+        exclude: example/*

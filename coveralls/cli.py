@@ -52,15 +52,15 @@ def main(argv=None):
             coverallz.merge(options['--merge'])
 
         if options['debug']:
-            log.info("Testing coveralls-python...")
+            log.info('Testing coveralls-python...')
             coverallz.wear(dry_run=True)
         elif options['--output']:
             log.info('Write coverage report to file...')
             coverallz.save_report(options['--output'])
         else:
-            log.info("Submitting coverage to coveralls.io...")
+            log.info('Submitting coverage to coveralls.io...')
             result = coverallz.wear()
-            log.info("Coverage submitted!")
+            log.info('Coverage submitted!')
             log.info(result['message'])
             log.info(result['url'])
             log.debug(result)

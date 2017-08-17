@@ -14,7 +14,7 @@ import coveralls.cli
 def test_debug(mock_wear, mock_log):
     coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
-    mock_log.assert_has_calls([call("Testing coveralls-python...")])
+    mock_log.assert_has_calls([call('Testing coveralls-python...')])
 
 
 @patch.object(coveralls.cli.log, 'info')
@@ -22,7 +22,7 @@ def test_debug(mock_wear, mock_log):
 def test_debug_no_token(mock_wear, mock_log):
     coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
-    mock_log.assert_has_calls([call("Testing coveralls-python...")])
+    mock_log.assert_has_calls([call('Testing coveralls-python...')])
 
 
 @patch.object(coveralls.cli.log, 'info')
@@ -31,8 +31,8 @@ def test_debug_no_token(mock_wear, mock_log):
 def test_real(mock_wear, mock_log):
     coveralls.cli.main(argv=[])
     mock_wear.assert_called_with()
-    mock_log.assert_has_calls([call("Submitting coverage to coveralls.io..."),
-                               call("Coverage submitted!")])
+    mock_log.assert_has_calls([call('Submitting coverage to coveralls.io...'),
+                               call('Coverage submitted!')])
 
 
 @patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)

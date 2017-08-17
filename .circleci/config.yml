@@ -1,6 +1,14 @@
 version: 2
 
 jobs:
+  check:
+    docker:
+      - image: python:3.6
+    steps:
+      - checkout
+      - run: pip install pre-commit
+      - run: pre-commit run --all-files
+
   test-py27:
     docker:
       - image: python:2.7-alpine
@@ -66,6 +74,7 @@ workflows:
   version: 2
   test-all-envs:
     jobs:
+      - check
       - test-py27
       - test-py33
       - test-py34

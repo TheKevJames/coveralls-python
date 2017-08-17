@@ -51,7 +51,7 @@ class Configration(unittest.TestCase):
     def tearDown(self):
         os.remove('.coveralls.mock')
 
-    @pytest.mark.skipif(yaml is None, reason="requires pyyaml")
+    @pytest.mark.skipif(yaml is None, reason='requires pyyaml')
     @patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
@@ -60,7 +60,7 @@ class Configration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     def generate_import_mock(self, bad_module_name, msg):
-        """ Returns replacement for builting import function, which raises 
+        """ Returns replacement for builting import function, which raises
         exception on importing appropriate module"""
 
         origin = __import__
@@ -74,7 +74,7 @@ class Configration(unittest.TestCase):
     @patch.object(log, 'warning')
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        
+
         if sys.version_info < (3,0):
             builtin_import_func = '__builtin__.__import__'
         else:
@@ -212,15 +212,15 @@ class ReporterTest(unittest.TestCase):
             'coverage': [None, 1, None, 1, 1, 1, 1]}, results[1])
 
     def test_missing_file(self):
-        sh.echo('print("Python rocks!")', _out="extra.py")
+        sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
         sh.rm('-f', 'extra.py')
         assert self.cover.get_coverage() == []
 
     def test_not_python(self):
-        sh.echo('print("Python rocks!")', _out="extra.py")
+        sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
-        sh.echo("<h1>This isn't python!</h1>", _out="extra.py")
+        sh.echo("<h1>This isn't python!</h1>", _out='extra.py')
         assert self.cover.get_coverage() == []
 
 
@@ -231,8 +231,8 @@ def test_non_unicode():
     assert expected_json_part in json.dumps(Coveralls(repo_token='xxx').get_coverage())
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 0), reason="python 3 not affected")
-@pytest.mark.skipif(coverage.__version__.startswith('4.'), reason="coverage 4 not affected")
+@pytest.mark.skipif(sys.version_info >= (3, 0), reason='python 3 not affected')
+@pytest.mark.skipif(coverage.__version__.startswith('4.'), reason='coverage 4 not affected')
 def test_malformed_encoding_declaration(capfd):
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')
@@ -244,7 +244,7 @@ def test_malformed_encoding_declaration(capfd):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 0) or coverage.__version__.startswith('3.'),
-                    reason="python 2 or coverage 3 fail")
+                    reason='python 2 or coverage 3 fail')
 def test_malformed_encoding_declaration_py3_or_coverage4(capfd):
     os.chdir(join(dirname(dirname(__file__)), 'nonunicode'))
     sh.coverage('run', 'malformed.py')

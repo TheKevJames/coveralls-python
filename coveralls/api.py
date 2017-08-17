@@ -97,7 +97,7 @@ class Coveralls(object):
             return {}
 
     def merge(self, path):
-        reader = codecs.getreader("utf-8")
+        reader = codecs.getreader('utf-8')
         with open(path, 'rb') as fh:
             extra = json.load(reader(fh))
             self.create_data(extra)
@@ -127,13 +127,13 @@ class Coveralls(object):
         try:
             json_string = json.dumps(data)
         except UnicodeDecodeError as e:
-            log.error("ERROR: While preparing JSON received exception: %s" % e)
+            log.error('ERROR: While preparing JSON received exception: %s' % e)
             self.debug_bad_encoding(data)
             raise
         else:
             log_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
             log.debug(log_string)
-            log.debug("==\nReporting %s files\n==\n" % len(data['source_files']))
+            log.debug('==\nReporting %s files\n==\n' % len(data['source_files']))
             for source_file in data['source_files']:
                 log.debug('%s - %s/%s' % (source_file['name'],
                                           sum(filter(None, source_file['coverage'])),
@@ -245,15 +245,15 @@ class Coveralls(object):
                 except UnicodeDecodeError:
                     at_fault_files.add(source_file_data['name'])
         if at_fault_files:
-            log.error("HINT: Following files cannot be decoded properly into unicode."
-                      "Check their content: %s" % (', '.join(at_fault_files)))
+            log.error('HINT: Following files cannot be decoded properly into unicode.'
+                      'Check their content: %s' % (', '.join(at_fault_files)))
 
 
 def gitlog(format):
     try:
-        log = str(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+        log = str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
     except UnicodeEncodeError:
-        log = unicode(run_command('git', '--no-pager', 'log', "-1", '--pretty=format:%s' % format))
+        log = unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % format))
     return log
 
 
