@@ -33,6 +33,7 @@ class Configuration(unittest.TestCase):
 
     @pytest.mark.skipif(yaml is not None, reason='requires no PyYAML')
     @mock.patch.object(log, 'warning')
+    @mock.patch.dict(os.environ, {'COVERALLS_REPO_TOKEN': 'xxx'}, clear=True)
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
         Coveralls()
