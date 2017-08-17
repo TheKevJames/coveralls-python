@@ -124,17 +124,18 @@ class Coveralls(object):
         try:
             json_string = json.dumps(data)
         except UnicodeDecodeError as e:
-            log.error('ERROR: While preparing JSON received exception: %s' % e)
+            log.error('ERROR: While preparing JSON:')
+            log.exception(e)
             self.debug_bad_encoding(data)
             raise
         else:
             log_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
             log.debug(log_string)
-            log.debug('==\nReporting %s files\n==\n' % len(data['source_files']))
+            log.debug('==\nReporting %s files\n==\n', len(data['source_files']))
             for source_file in data['source_files']:
-                log.debug('%s - %s/%s' % (source_file['name'],
-                                          sum(filter(None, source_file['coverage'])),
-                                          len(source_file['coverage'])))
+                log.debug('%s - %s/%s', source_file['name'],
+                          sum(filter(None, source_file['coverage'])),
+                          len(source_file['coverage']))
             return json_string
 
     def save_report(self, file_path):
@@ -144,7 +145,8 @@ class Coveralls(object):
             try:
                 report = self.create_report()
             except coverage.CoverageException as e:
-                logging.error('Failure to gather coverage: %s' % str(e))
+                logging.error('Failure to gather coverage:')
+                logging.exception(e)
             else:
                 report_file.write(report)
 
@@ -243,7 +245,7 @@ class Coveralls(object):
                     at_fault_files.add(source_file_data['name'])
         if at_fault_files:
             log.error('HINT: Following files cannot be decoded properly into unicode.'
-                      'Check their content: %s' % (', '.join(at_fault_files)))
+                      'Check their content: %s', ', '.join(at_fault_files))
 
 
 def gitlog(fmt):
