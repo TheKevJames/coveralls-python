@@ -25,8 +25,8 @@ class Coveralls(object):
         """ Coveralls!
 
         * repo_token
-          The secret token for your repository, found at the bottom of your repository's
-           page on Coveralls.
+          The secret token for your repository, found at the bottom of your
+          repository's page on Coveralls.
 
         * service_name
           The CI service or other environment in which the test suite was run.
@@ -34,38 +34,47 @@ class Coveralls(object):
           (travis-ci, travis-pro, or coveralls-ruby).
 
         * [service_job_id]
-          A unique identifier of the job on the service specified by service_name.
+          A unique identifier of the job on the service specified by
+          service_name.
         """
         self._data = None
         self.config = kwargs
         file_config = self.load_config() or {}
-        repo_token = self.config.get('repo_token') or file_config.get('repo_token', None)
+        repo_token = self.config.get('repo_token') or \
+                file_config.get('repo_token', None)
         if repo_token:
             self.config['repo_token'] = repo_token
 
         if os.environ.get('TRAVIS'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'travis-ci'
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
         elif os.environ.get('CIRCLECI'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name', None) or 'circle-ci'
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'circle-ci'
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
             if os.environ.get('CI_PULL_REQUEST', None):
-                self.config['service_pull_request'] = os.environ.get('CI_PULL_REQUEST').split('/')[-1]
+                self.config['service_pull_request'] = \
+                        os.environ.get('CI_PULL_REQUEST').split('/')[-1]
         elif os.environ.get('BUILDKITE'):
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name', None) or 'buildkite'
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'buildkite'
             self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
         elif os.environ.get('APPVEYOR'):
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name', None) or 'appveyor'
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'appveyor'
             self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
             if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
-                self.config['service_pull_request'] = os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
+                self.config['service_pull_request'] = \
+                        os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
         else:
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name') or self.default_client
+            self.config['service_name'] = file_config.get('service_name') \
+                    or self.default_client
 
         if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
@@ -74,23 +83,27 @@ class Coveralls(object):
         if parallel.lower() == 'true':
             self.config['parallel'] = True
 
-        if token_required and not self.config.get('repo_token') and not is_travis_or_circle:
+        if token_required and not self.config.get('repo_token') \
+                and not is_travis_or_circle:
             raise CoverallsException(
-                'Not on Travis or CircleCI. You have to provide either repo_token in %s '
-                'or set the COVERALLS_REPO_TOKEN env var.' % self.config_filename
-            )
+                'Not on Travis or CircleCI. You have to provide either '
+                'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
+                'var.'.format(self.config_filename))
 
     def load_config(self):
         try:
-            with open(os.path.join(os.getcwd(), self.config_filename)) as config:
+            with open(os.path.join(os.getcwd(),
+                                   self.config_filename)) as config:
                 try:
                     import yaml
                     return yaml.safe_load(config)
                 except ImportError as exc:
-                    log.warning('Seems, like some modules are not installed: %s', exc)
+                    log.warning(
+                        'Seems, like some modules are not installed: %s', exc)
                     return {}
         except (OSError, IOError):
-            log.debug('Missing %s file. Using only env variables.', self.config_filename)
+            log.debug('Missing %s file. Using only env variables.',
+                      self.config_filename)
             return {}
 
     def merge(self, path):
@@ -105,21 +118,21 @@ class Coveralls(object):
             json_string = self.create_report()
         except coverage.CoverageException as e:
             return {'message': 'Failure to gather coverage: %s' % str(e)}
-        if not dry_run:
-            response = requests.post(self.api_endpoint, files={'json_file': json_string})
-            try:
-                result = response.json()
-            except ValueError:
-                result = {'message': 'Failure to submit data. Response [%(status)s]: %(text)s' % {
-                    'status': response.status_code,
-                    'text': response.text}}
-        else:
-            result = {}
-        return result
+
+        if dry_run:
+            return {}
+
+        response = requests.post(self.api_endpoint,
+                                 files={'json_file': json_string})
+        try:
+            return response.json()
+        except ValueError:
+            return {
+                'message': 'Failure to submit data. Response [{}]: {}'.format(
+                    response.status_code, response.text)}
 
     def create_report(self):
         """Generate json dumped report for coveralls api."""
-
         data = self.create_data()
         try:
             json_string = json.dumps(data)
@@ -129,9 +142,11 @@ class Coveralls(object):
             self.debug_bad_encoding(data)
             raise
         else:
-            log_string = re.sub(r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string)
+            log_string = re.sub(r'"repo_token": "(.+?)"',
+                                '"repo_token": "[secure]"', json_string)
             log.debug(log_string)
-            log.debug('==\nReporting %s files\n==\n', len(data['source_files']))
+            log.debug('==\nReporting %s files\n==\n',
+                      len(data['source_files']))
             for source_file in data['source_files']:
                 log.debug('%s - %s/%s', source_file['name'],
                           sum(filter(None, source_file['coverage'])),
@@ -140,7 +155,6 @@ class Coveralls(object):
 
     def save_report(self, file_path):
         """Write coveralls report to file."""
-
         with open(file_path, 'w') as report_file:
             try:
                 report = self.create_report()
@@ -179,11 +193,15 @@ class Coveralls(object):
                 if 'source_files' in extra:
                     self._data['source_files'].extend(extra['source_files'])
                 else:
-                    log.warning('No data to be merged; does the json file contain "source_files" data?')
+                    log.warning(
+                        'No data to be merged; does the json file contain '
+                        '"source_files" data?')
+
         return self._data
 
     def get_coverage(self):
-        workman = coverage.coverage(config_file=self.config.get('config_file', True))
+        workman = coverage.coverage(
+            config_file=self.config.get('config_file', True))
         workman.load()
         if hasattr(workman, '_harvest_data'):
             workman._harvest_data()  # pylint: disable=W0212
@@ -255,19 +273,25 @@ class Coveralls(object):
 
 
 def gitlog(fmt):
+    glog = run_command('git', '--no-pager', 'log', '-1',
+                       '--pretty=format:{}'.format(fmt))
+
     try:
-        return str(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))
+        return str(glog)
     except UnicodeEncodeError:
-        return unicode(run_command('git', '--no-pager', 'log', '-1', '--pretty=format:%s' % fmt))  # pylint: disable=undefined-variable
+        return unicode(glog)  # pylint: disable=undefined-variable
 
 
 def run_command(*args):
-    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE)
     stdout, stderr = cmd.communicate()
+
     assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
-                                 'STDERR: "%s"' % (cmd.returncode, stdout, stderr))
+                                 'STDERR: "%s"' % (cmd.returncode, stdout,
+                                                   stderr))
+
     try:
-        output = stdout.decode()
+        return stdout.decode()
     except UnicodeDecodeError:
-        output = stdout.decode('utf-8')
-    return output
+        return stdout.decode('utf-8')

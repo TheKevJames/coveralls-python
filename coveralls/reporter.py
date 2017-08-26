@@ -35,7 +35,8 @@ class CoverallReporter(Reporter):
             units = self.find_file_reporters(morfs)
 
         if units is None:
-            units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+            units = self.code_units if hasattr(self, 'code_units') \
+                    else self.file_reporters
 
         for cu in units:
             try:
@@ -50,10 +51,12 @@ class CoverallReporter(Reporter):
                 if cu.should_be_python() and not self.config.ignore_errors:
                     log.warning('Source file is not python %s', cu.filename)
             except KeyError:
-                if __version__[0] < 4 or (__version__[0] == 4 and __version__[1] < 1):
+                if __version__[0] < 4 or \
+                        (__version__[0] == 4 and __version__[1] < 1):
                     raise CoverallsException(
-                        'Old (<4.1) versions of coverage.py do not work consistently '
-                        'on new versions of Python. Please upgrade your coverage.py.'
+                        'Old (<4.1) versions of coverage.py do not work '
+                        'consistently on new versions of Python. Please '
+                        'upgrade your coverage.py.'
                     )
                 raise
 
@@ -65,7 +68,8 @@ class CoverallReporter(Reporter):
         """ Source file stats for each line.
 
             * A positive integer if the line is covered,
-            representing the number of times the line is hit during the test suite.
+            representing the number of times the line is hit during the test
+            suite.
             * 0 if the line is not covered by the test suite.
             * null to indicate the line is not relevant to code coverage
               (it may be whitespace or a comment).
@@ -117,17 +121,22 @@ class CoverallReporter(Reporter):
                     if encoding != 'utf-8':
                         source = source.decode(encoding).encode('utf-8')
             except UnicodeDecodeError:
-                log.warning('Source file %s can not be properly decoded, skipping. '
-                            'Please check if encoding declaration is ok', os.path.basename(cu.filename))
+                log.warning(
+                    'Source file %s can not be properly decoded, skipping. '
+                    'Please check if encoding declaration is ok',
+                    os.path.basename(cu.filename))
                 return
         else:
             if hasattr(cu, 'relative_filename'):
                 filename = cu.relative_filename()
             else:
-                filename = analysis.coverage.file_locator.relative_filename(cu.filename)
-            source_lines = list(enumerate(analysis.file_reporter.source_token_lines()))
+                filename = analysis.coverage.file_locator.relative_filename(
+                    cu.filename)
+            source_lines = list(enumerate(
+                analysis.file_reporter.source_token_lines()))
             source = analysis.file_reporter.source()
-        coverage_lines = [self.get_hits(i, analysis) for i in range(1, len(source_lines) + 1)]
+        coverage_lines = [self.get_hits(i, analysis)
+                          for i in range(1, len(source_lines) + 1)]
 
         results = {
             'name': filename,

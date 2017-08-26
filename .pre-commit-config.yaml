@@ -10,7 +10,7 @@
     -   id: check-yaml
     -   id: detect-private-key
     -   id: end-of-file-fixer
-        exclude: example/*  # TODO: remove this
+        exclude: example/*
     -   id: trailing-whitespace
     -   id: check-ast
     -   id: double-quote-string-fixer
@@ -28,6 +28,4 @@
         - -d invalid-name
         - -d locally-disabled
         - -d missing-docstring
-        - -d broad-except  # TODO: remove me
-        - -d line-too-long  # TODO: remove me
         exclude: example/*
