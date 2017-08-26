@@ -19,13 +19,15 @@ def assert_coverage(actual, expected):
 
 
 class ReporterTest(unittest.TestCase):
-    def setUp(self):
+    @staticmethod
+    def setUp():
         os.chdir(EXAMPLE_DIR)
 
         sh.rm('-f', '.coverage')
         sh.rm('-f', 'extra.py')
 
-    def test_reporter(self):
+    @staticmethod
+    def test_reporter():
         sh.coverage('run', 'runtests.py')
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -57,7 +59,8 @@ class ReporterTest(unittest.TestCase):
             'name': 'runtests.py',
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
-    def test_reporter_with_branches(self):
+    @staticmethod
+    def test_reporter_with_branches():
         sh.coverage('run', '--branch', 'runtests.py')
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -96,13 +99,15 @@ class ReporterTest(unittest.TestCase):
             'branches': [4, 0, 5, 1, 4, 0, 2, 0],
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
-    def test_missing_file(self):
+    @staticmethod
+    def test_missing_file():
         sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
         sh.rm('-f', 'extra.py')
         assert Coveralls(repo_token='xxx').get_coverage() == []
 
-    def test_not_python(self):
+    @staticmethod
+    def test_not_python():
         sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
         sh.echo("<h1>This isn't python!</h1>", _out='extra.py')

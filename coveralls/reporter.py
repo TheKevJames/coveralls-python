@@ -60,7 +60,8 @@ class CoverallReporter(Reporter):
 
         return self.source_files
 
-    def get_hits(self, line_num, analysis):
+    @staticmethod
+    def get_hits(line_num, analysis):
         """ Source file stats for each line.
 
             * A positive integer if the line is covered,
@@ -71,11 +72,14 @@ class CoverallReporter(Reporter):
         """
         if line_num in analysis.missing:
             return 0
+
         if line_num not in analysis.statements:
             return None
+
         return 1
 
-    def get_arcs(self, analysis):
+    @staticmethod
+    def get_arcs(analysis):
         """ Hit stats for each branch.
 
             Returns a flat list where every four values represent a branch:
@@ -86,16 +90,18 @@ class CoverallReporter(Reporter):
         """
         if not analysis.has_arcs():
             return None
+
         branch_lines = analysis.branch_lines()
-        executed = analysis.arcs_executed()
-        missing = analysis.arcs_missing()
         branches = []
-        for l1, l2 in executed:
+
+        for l1, l2 in analysis.arcs_executed():
             if l1 in branch_lines:
                 branches.extend((l1, 0, abs(l2), 1))
-        for l1, l2 in missing:
+
+        for l1, l2 in analysis.arcs_missing():
             if l1 in branch_lines:
                 branches.extend((l1, 0, abs(l2), 0))
+
         return branches
 
     def parse_file(self, cu, analysis):

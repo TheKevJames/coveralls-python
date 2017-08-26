@@ -192,8 +192,10 @@ class Coveralls(object):
         reporter = CoverallReporter(workman, workman.config)
         return reporter.report()
 
-    def git_info(self):
-        """ A hash of Git data that can be used to display more information to users.
+    @staticmethod
+    def git_info():
+        """ A hash of Git data that can be used to display more information to
+            users.
 
             Example:
             "git": {
@@ -212,30 +214,32 @@ class Coveralls(object):
                 }]
             }
         """
-
         rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
-        git_info = {'git': {
-            'head': {
-                'id': gitlog('%H'),
-                'author_name': gitlog('%aN'),
-                'author_email': gitlog('%ae'),
-                'committer_name': gitlog('%cN'),
-                'committer_email': gitlog('%ce'),
-                'message': gitlog('%s'),
-            },
-            'branch': (os.environ.get('CIRCLE_BRANCH') or
-                       os.environ.get('APPVEYOR_REPO_BRANCH') or
-                       os.environ.get('BUILDKITE_BRANCH') or
-                       os.environ.get('CI_BRANCH') or
-                       os.environ.get('TRAVIS_BRANCH', rev)),
-            # origin	git@github.com:coagulant/coveralls-python.git (fetch)
-            'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                        for line in run_command('git', 'remote', '-v').splitlines() if '(fetch)' in line]
-        }}
-        return git_info
+        remotes = run_command('git', 'remote', '-v').splitlines()
 
-    def debug_bad_encoding(self, data):
-        """ Let's try to help user figure out what is at fault"""
+        return {
+            'git': {
+                'head': {
+                    'id': gitlog('%H'),
+                    'author_name': gitlog('%aN'),
+                    'author_email': gitlog('%ae'),
+                    'committer_name': gitlog('%cN'),
+                    'committer_email': gitlog('%ce'),
+                    'message': gitlog('%s'),
+                },
+                'branch': (os.environ.get('CIRCLE_BRANCH') or
+                           os.environ.get('APPVEYOR_REPO_BRANCH') or
+                           os.environ.get('BUILDKITE_BRANCH') or
+                           os.environ.get('CI_BRANCH') or
+                           os.environ.get('TRAVIS_BRANCH', rev)),
+                'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
+                            for line in remotes if '(fetch)' in line]
+            }
+        }
+
+    @staticmethod
+    def debug_bad_encoding(data):
+        """ Let's try to help user figure out what is at fault """
         at_fault_files = set()
         for source_file_data in data['source_files']:
             for value in source_file_data.values():
@@ -243,9 +247,11 @@ class Coveralls(object):
                     json.dumps(value)
                 except UnicodeDecodeError:
                     at_fault_files.add(source_file_data['name'])
+
         if at_fault_files:
-            log.error('HINT: Following files cannot be decoded properly into unicode.'
-                      'Check their content: %s', ', '.join(at_fault_files))
+            log.error('HINT: Following files cannot be decoded properly into '
+                      'unicode. Check their content: %s',
+                      ', '.join(at_fault_files))
 
 
 def gitlog(fmt):

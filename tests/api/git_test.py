@@ -38,7 +38,8 @@ class GitTest(unittest.TestCase):
         shutil.rmtree(self.dir)
 
     @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
-    def test_git(self):
+    @staticmethod
+    def test_git():
         cover = Coveralls(repo_token='xxx')
         git_info = cover.git_info()
         commit_id = git_info['git']['head'].pop('id')
