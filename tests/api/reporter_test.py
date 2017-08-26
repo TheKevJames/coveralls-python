@@ -1,4 +1,5 @@
 # coding: utf-8
+# pylint: disable=no-self-use
 import os
 import unittest
 
@@ -19,15 +20,13 @@ def assert_coverage(actual, expected):
 
 
 class ReporterTest(unittest.TestCase):
-    @staticmethod
-    def setUp():
+    def setUp(self):
         os.chdir(EXAMPLE_DIR)
 
         sh.rm('-f', '.coverage')
         sh.rm('-f', 'extra.py')
 
-    @staticmethod
-    def test_reporter():
+    def test_reporter(self):
         sh.coverage('run', 'runtests.py')
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -59,8 +58,7 @@ class ReporterTest(unittest.TestCase):
             'name': 'runtests.py',
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
-    @staticmethod
-    def test_reporter_with_branches():
+    def test_reporter_with_branches(self):
         sh.coverage('run', '--branch', 'runtests.py')
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -99,15 +97,13 @@ class ReporterTest(unittest.TestCase):
             'branches': [4, 0, 5, 1, 4, 0, 2, 0],
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
-    @staticmethod
-    def test_missing_file():
+    def test_missing_file(self):
         sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
         sh.rm('-f', 'extra.py')
         assert Coveralls(repo_token='xxx').get_coverage() == []
 
-    @staticmethod
-    def test_not_python():
+    def test_not_python(self):
         sh.echo('print("Python rocks!")', _out='extra.py')
         sh.coverage('run', 'extra.py')
         sh.echo("<h1>This isn't python!</h1>", _out='extra.py')

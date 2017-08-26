@@ -1,4 +1,5 @@
 # coding: utf-8
+# pylint: disable=no-self-use
 from __future__ import unicode_literals
 
 import os
@@ -38,8 +39,7 @@ class GitTest(unittest.TestCase):
         shutil.rmtree(self.dir)
 
     @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
-    @staticmethod
-    def test_git():
+    def test_git(self):
         cover = Coveralls(repo_token='xxx')
         git_info = cover.git_info()
         commit_id = git_info['git']['head'].pop('id')
