@@ -19,6 +19,7 @@ log = logging.getLogger('coveralls')
 class Coveralls(object):
     config_filename = '.coveralls.yml'
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
+    default_client = 'coveralls-python'
 
     def __init__(self, token_required=True, **kwargs):
         """ Coveralls!
@@ -39,53 +40,51 @@ class Coveralls(object):
         self._data = None
         self.config = kwargs
         file_config = self.load_config() or {}
-
-        if not self.config.get('repo_token'):
-            self.config['repo_token'] = file_config.get('repo_token')
+        repo_token = self.config.get('repo_token') or \
+                file_config.get('repo_token', None)
+        if repo_token:
+            self.config['repo_token'] = repo_token
 
         if os.environ.get('TRAVIS'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name',
-                                                          'travis-ci')
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'travis-ci'
             self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
         elif os.environ.get('CIRCLECI'):
             is_travis_or_circle = True
-            self.config['service_name'] = file_config.get('service_name',
-                                                          'circle-ci')
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'circle-ci'
             self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
-
-            pull_req = os.environ.get('CI_PULL_REQUEST')
-            if pull_req:
-                self.config['service_pull_request'] = pull_req.split('/')[-1]
+            if os.environ.get('CI_PULL_REQUEST', None):
+                self.config['service_pull_request'] = \
+                        os.environ.get('CI_PULL_REQUEST').split('/')[-1]
         elif os.environ.get('BUILDKITE'):
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name',
-                                                          'buildkite')
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'buildkite'
             self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
         elif os.environ.get('APPVEYOR'):
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name',
-                                                          'appveyor')
+            self.config['service_name'] = \
+                    file_config.get('service_name', None) or 'appveyor'
             self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
-
-            pull_req = os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER')
-            if pull_req:
-                self.config['service_pull_request'] = pull_req
+            if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
+                self.config['service_pull_request'] = \
+                        os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
         else:
             is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name',
-                                                          'coveralls-python')
+            self.config['service_name'] = file_config.get('service_name') \
+                    or self.default_client
 
-        if os.environ.get('COVERALLS_REPO_TOKEN'):
+        if os.environ.get('COVERALLS_REPO_TOKEN', None):
             self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
 
-        if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
+        parallel = os.environ.get('COVERALLS_PARALLEL', '')
+        if parallel.lower() == 'true':
             self.config['parallel'] = True
 
-        if is_travis_or_circle or not token_required:
-            return
-
-        if not self.config.get('repo_token'):
+        if token_required and not self.config.get('repo_token') \
+                and not is_travis_or_circle:
             raise CoverallsException(
                 'Not on Travis or CircleCI. You have to provide either '
                 'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
@@ -101,11 +100,11 @@ class Coveralls(object):
                 except ImportError as exc:
                     log.warning(
                         'Seems, like some modules are not installed: %s', exc)
+                    return {}
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.',
                       self.config_filename)
-
-        return {}
+            return {}
 
     def merge(self, path):
         reader = codecs.getreader('utf-8')
@@ -142,19 +141,17 @@ class Coveralls(object):
             log.exception(e)
             self.debug_bad_encoding(data)
             raise
-
-        log_string = re.sub(r'"repo_token": "(.+?)"',
-                            '"repo_token": "[secure]"', json_string)
-        log.debug(log_string)
-        log.debug('==\nReporting %s files\n==\n',
-                  len(data['source_files']))
-
-        for source_file in data['source_files']:
-            log.debug('%s - %s/%s', source_file['name'],
-                      sum(filter(None, source_file['coverage'])),
-                      len(source_file['coverage']))
-
-        return json_string
+        else:
+            log_string = re.sub(r'"repo_token": "(.+?)"',
+                                '"repo_token": "[secure]"', json_string)
+            log.debug(log_string)
+            log.debug('==\nReporting %s files\n==\n',
+                      len(data['source_files']))
+            for source_file in data['source_files']:
+                log.debug('%s - %s/%s', source_file['name'],
+                          sum(filter(None, source_file['coverage'])),
+                          len(source_file['coverage']))
+            return json_string
 
     def save_report(self, file_path):
         """Write coveralls report to file."""
@@ -188,32 +185,30 @@ class Coveralls(object):
                 "parallel": True
             }
         """
-        if self._data:
-            return self._data
+        if not self._data:
+            self._data = {'source_files': self.get_coverage()}
+            self._data.update(self.git_info())
+            self._data.update(self.config)
+            if extra:
+                if 'source_files' in extra:
+                    self._data['source_files'].extend(extra['source_files'])
+                else:
+                    log.warning(
+                        'No data to be merged; does the json file contain '
+                        '"source_files" data?')
 
-        self._data = {'source_files': self.get_coverage()}
-        self._data.update(self.git_info())
-        self._data.update(self.config)
-
-        if extra:
-            if 'source_files' in extra:
-                self._data['source_files'].extend(extra['source_files'])
-            else:
-                log.warning(
-                    'No data to be merged; does the json file contain '
-                    '"source_files" data?')
+        return self._data
 
     def get_coverage(self):
-        config_file = self.config.get('config_file', True)
-        workman = coverage.coverage(config_file=config_file)
+        workman = coverage.coverage(
+            config_file=self.config.get('config_file', True))
         workman.load()
-
         if hasattr(workman, '_harvest_data'):
             workman._harvest_data()  # pylint: disable=W0212
         else:
             workman.get_data()
-
-        return CoverallReporter(workman, workman.config).report()
+        reporter = CoverallReporter(workman, workman.config)
+        return reporter.report()
 
     @staticmethod
     def git_info():
@@ -292,10 +287,9 @@ def run_command(*args):
                            stderr=subprocess.PIPE)
     stdout, stderr = cmd.communicate()
 
-    if cmd.returncode != 0:
-        raise CoverallsException(
-            'command {} returned {}\nSTDOUT:\n{}\nSTDERR:\n{}'.format(
-                str(list(args)), cmd.returncode, stdout, stderr))
+    assert cmd.returncode == 0, ('command return code %d, STDOUT: "%s"\n'
+                                 'STDERR: "%s"' % (cmd.returncode, stdout,
+                                                   stderr))
 
     try:
         return stdout.decode()
