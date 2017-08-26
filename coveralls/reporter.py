@@ -28,15 +28,16 @@ class CoverallReporter(Reporter):
         `outfile` is a file object to write the json to.
         """
         units = None
-
         if hasattr(self, 'find_code_units'):
             self.find_code_units(morfs)
         else:
             units = self.find_file_reporters(morfs)
 
         if units is None:
-            units = self.code_units if hasattr(self, 'code_units') \
-                    else self.file_reporters
+            if hasattr(self, 'code_units'):
+                units = self.code_units
+            else:
+                units = self.file_reporters
 
         for cu in units:
             try:
@@ -51,15 +52,16 @@ class CoverallReporter(Reporter):
                 if cu.should_be_python() and not self.config.ignore_errors:
                     log.warning('Source file is not python %s', cu.filename)
             except KeyError:
-                if __version__[0] < 4 or \
-                        (__version__[0] == 4 and __version__[1] < 1):
+                cov3x = __version__[0] < 4
+                cov40 = __version__[0] == 4 and __version__[1] < 1
+                if cov3x or cov40:
                     raise CoverallsException(
                         'Old (<4.1) versions of coverage.py do not work '
                         'consistently on new versions of Python. Please '
                         'upgrade your coverage.py.'
                     )
-                raise
 
+                raise
 
         return self.source_files
 
@@ -115,6 +117,7 @@ class CoverallReporter(Reporter):
             source_lines = analysis.parser.lines
             with cu.source_file() as source_file:
                 source = source_file.read()
+
             try:
                 if sys.version_info < (3, 0):
                     encoding = source_encoding(source)
@@ -132,9 +135,11 @@ class CoverallReporter(Reporter):
             else:
                 filename = analysis.coverage.file_locator.relative_filename(
                     cu.filename)
-            source_lines = list(enumerate(
-                analysis.file_reporter.source_token_lines()))
+
+            token_lines = analysis.file_reporter.source_token_lines()
+            source_lines = list(enumerate(token_lines))
             source = analysis.file_reporter.source()
+
         coverage_lines = [self.get_hits(i, analysis)
                           for i in range(1, len(source_lines) + 1)]
 
@@ -143,6 +148,7 @@ class CoverallReporter(Reporter):
             'source': source,
             'coverage': coverage_lines,
         }
+
         branches = self.get_arcs(analysis)
         if branches:
             results['branches'] = branches
