@@ -1,6 +1,7 @@
 # coding: utf-8
 # pylint: disable=no-self-use
 import json
+import os
 import tempfile
 import unittest
 
@@ -103,3 +104,17 @@ class WearTest(unittest.TestCase):
         result = Coveralls(repo_token='xxx').wear()
         assert result == {
             'message': 'Failure to gather coverage: No data to report'}
+
+    @mock.patch.dict(
+        os.environ,
+        {'COVERALLS_HOST': 'https://coveralls.my-enterprise.info'}, clear=True)
+    def test_coveralls_host_env_var_overrides_api_url(self, mock_requests):
+        Coveralls(repo_token='xxx').wear(dry_run=False)
+        mock_requests.post.assert_called_once_with(
+            'https://coveralls.my-enterprise.info/api/v1/jobs', files=mock.ANY)
+
+    @mock.patch.dict(os.environ, {}, clear=True)
+    def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
+        Coveralls(repo_token='xxx').wear(dry_run=False)
+        mock_requests.post.assert_called_once_with(
+            'https://coveralls.io/api/v1/jobs', files=mock.ANY)

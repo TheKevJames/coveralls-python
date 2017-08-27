@@ -18,7 +18,6 @@ log = logging.getLogger('coveralls')
 
 class Coveralls(object):
     config_filename = '.coveralls.yml'
-    api_endpoint = 'https://coveralls.io/api/v1/jobs'
 
     def __init__(self, token_required=True, **kwargs):
         """ Coveralls!
@@ -37,10 +36,14 @@ class Coveralls(object):
           service_name.
         """
         self._data = None
+        self._coveralls_host = 'https://coveralls.io/'
         self._token_required = token_required
 
         self.config = self.load_config_from_file()
         self.config.update(kwargs)
+        if self.config.get('coveralls_host'):
+            self._coveralls_host = self.config['coveralls_host']
+            del self.config['coveralls_host']
 
         self.load_config_from_environment()
 
@@ -77,6 +80,10 @@ class Coveralls(object):
         return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), pr
 
     @staticmethod
+    def load_config_from_jenkins():
+        return 'jenkins', os.environ.get('BUILD_NUMBER'), None
+
+    @staticmethod
     def load_config_from_travis():
         pr = os.environ.get('TRAVIS_PULL_REQUEST')
         return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), pr
@@ -93,6 +100,8 @@ class Coveralls(object):
         if os.environ.get('CIRCLECI'):
             self._token_required = False
             return self.load_config_from_circle()
+        if os.environ.get('JENKINS_HOME'):
+            return self.load_config_from_jenkins()
         if os.environ.get('TRAVIS'):
             self._token_required = False
             return self.load_config_from_travis()
@@ -100,12 +109,17 @@ class Coveralls(object):
         return self.load_config_from_unknown()
 
     def load_config_from_environment(self):
+        coveralls_host = os.environ.get('COVERALLS_HOST')
+        if coveralls_host:
+            self._coveralls_host = coveralls_host
+
+        parallel = os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true'
+        if parallel:
+            self.config['parallel'] = parallel
+
         repo_token = os.environ.get('COVERALLS_REPO_TOKEN')
         if repo_token:
             self.config['repo_token'] = repo_token
-
-        if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
-            self.config['parallel'] = True
 
         service_name = os.environ.get('COVERALLS_SERVICE_NAME')
         if service_name:
@@ -143,8 +157,8 @@ class Coveralls(object):
         if dry_run:
             return {}
 
-        response = requests.post(self.api_endpoint,
-                                 files={'json_file': json_string})
+        endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
+        response = requests.post(endpoint, files={'json_file': json_string})
         try:
             return response.json()
         except ValueError:
@@ -268,10 +282,11 @@ class Coveralls(object):
                     'committer_email': gitlog('%ce'),
                     'message': gitlog('%s'),
                 },
-                'branch': (os.environ.get('CIRCLE_BRANCH') or
-                           os.environ.get('APPVEYOR_REPO_BRANCH') or
+                'branch': (os.environ.get('APPVEYOR_REPO_BRANCH') or
                            os.environ.get('BUILDKITE_BRANCH') or
                            os.environ.get('CI_BRANCH') or
+                           os.environ.get('CIRCLE_BRANCH') or
+                           os.environ.get('GIT_BRANCH') or
                            os.environ.get('TRAVIS_BRANCH', rev)),
                 'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                             for line in remotes if '(fetch)' in line]

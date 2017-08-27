@@ -45,14 +45,6 @@ class Configuration(unittest.TestCase):
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfiguration(unittest.TestCase):
     @mock.patch.dict(os.environ, {'TRAVIS': 'True',
-                                  'TRAVIS_JOB_ID': '777'}, clear=True)
-    def test_travis_no_config(self):
-        cover = Coveralls()
-        assert cover.config['service_name'] == 'travis-ci'
-        assert cover.config['service_job_id'] == '777'
-        assert 'repo_token' not in cover.config
-
-    @mock.patch.dict(os.environ, {'TRAVIS': 'True',
                                   'TRAVIS_JOB_ID': '777',
                                   'COVERALLS_REPO_TOKEN': 'yyy'}, clear=True)
     def test_repo_token_from_env(self):
@@ -69,18 +61,6 @@ class NoConfiguration(unittest.TestCase):
         assert str(excinfo.value) == (
             'Not on Travis or CircleCI. You have to provide either repo_token '
             'in .coveralls.mock or set the COVERALLS_REPO_TOKEN env var.')
-
-    @mock.patch.dict(
-        os.environ,
-        {'CIRCLECI': 'True',
-         'CIRCLE_BUILD_NUM': '888',
-         'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'},
-        clear=True)
-    def test_circleci_no_config(self):
-        cover = Coveralls()
-        assert cover.config['service_name'] == 'circle-ci'
-        assert cover.config['service_job_id'] == '888'
-        assert cover.config['service_pull_request'] == '9999'
 
     @mock.patch.dict(os.environ, {'APPVEYOR': 'True',
                                   'APPVEYOR_BUILD_ID': '1234567',
@@ -99,6 +79,33 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_name'] == 'buildkite'
         assert cover.config['service_job_id'] == '1234567'
 
+    @mock.patch.dict(
+        os.environ,
+        {'CIRCLECI': 'True',
+         'CIRCLE_BUILD_NUM': '888',
+         'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'},
+        clear=True)
+    def test_circleci_no_config(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'circle-ci'
+        assert cover.config['service_job_id'] == '888'
+        assert cover.config['service_pull_request'] == '9999'
+
+    @mock.patch.dict(os.environ, {'JENKINS_HOME': '/var/lib/jenkins',
+                                  'BUILD_NUMBER': '888'}, clear=True)
+    def test_jenkins_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'jenkins'
+        assert cover.config['service_job_id'] == '888'
+
+    @mock.patch.dict(os.environ, {'TRAVIS': 'True',
+                                  'TRAVIS_JOB_ID': '777'}, clear=True)
+    def test_travis_no_config(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'travis-ci'
+        assert cover.config['service_job_id'] == '777'
+        assert 'repo_token' not in cover.config
+        
     @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
     def test_service_name_from_env(self):
         cover = Coveralls(repo_token='yyy')

@@ -1,7 +1,7 @@
 Configuration
 =============
 
-coveralls-python often works without any outside configuration by examining the environment it is being run in. Special handling has been added for AppVeyor, BuildKite, CircleCI, and TravisCI to make coveralls-python as close to "plug and play" as possible.
+coveralls-python often works without any outside configuration by examining the environment it is being run in. Special handling has been added for AppVeyor, BuildKite, CircleCI, Jenkins, and TravisCI to make coveralls-python as close to "plug and play" as possible.
 
 Most often, you will simply need to run coveralls-python with no additional options after you have run your coverage suite::
 
@@ -23,9 +23,13 @@ If coveralls-python is being run on CircleCI or TravisCI, it will automatically 
 
     COVERALLS_REPO_TOKEN=mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy coveralls
 
-If you are running multiple jobs in parallel and want coveralls.io to merge those results, you should set ``COVERALLS_PARALLEL`` to ``true`` in your environment and run::
+If you are running multiple jobs in parallel and want coveralls.io to merge those results, you should set ``COVERALLS_PARALLEL`` to ``true`` in your environment::
 
     COVERALLS_PARALLEL=true coveralls
+
+If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set ``COVERALLS_HOST`` to the base URL of that insance::
+
+    COVERALLS_HOST="https://coveralls.aperture.com" coveralls
 
 You can also set any of these values in a ``.coveralls.yml`` file in the root of your project repository. If you are planning to use this method, please ensure you install ``coveralls[yaml]`` instead of just the base ``coveralls`` package.
 
@@ -34,3 +38,4 @@ Sample ``.coveralls.yml`` file::
     service_name: travis-pro
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
     parallel: true
+    coveralls_host: https://coveralls.aperture.com
