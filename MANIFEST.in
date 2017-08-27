@@ -1,1 +1,1 @@
-include *.md *.rst LICENSE.txt
+include CHANGELOG.md LICENSE.txt README.rst

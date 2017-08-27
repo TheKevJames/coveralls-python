@@ -82,7 +82,8 @@ class Coveralls(object):
 
     @staticmethod
     def load_config_from_travis():
-        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None
+        pr = os.environ.get('TRAVIS_PULL_REQUEST')
+        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), pr
 
     @staticmethod
     def load_config_from_unknown():
