@@ -77,6 +77,10 @@ class Coveralls(object):
         return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), pr
 
     @staticmethod
+    def load_config_from_jenkins():
+        return 'jenkins', os.environ.get('BUILD_NUMBER'), None
+
+    @staticmethod
     def load_config_from_travis():
         return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None
 
@@ -92,6 +96,8 @@ class Coveralls(object):
         if os.environ.get('CIRCLECI'):
             self._token_required = False
             return self.load_config_from_circle()
+        if os.environ.get('JENKINS_HOME'):
+            return self.load_config_from_jenkins()
         if os.environ.get('TRAVIS'):
             self._token_required = False
             return self.load_config_from_travis()
@@ -263,10 +269,11 @@ class Coveralls(object):
                     'committer_email': gitlog('%ce'),
                     'message': gitlog('%s'),
                 },
-                'branch': (os.environ.get('CIRCLE_BRANCH') or
-                           os.environ.get('APPVEYOR_REPO_BRANCH') or
+                'branch': (os.environ.get('APPVEYOR_REPO_BRANCH') or
                            os.environ.get('BUILDKITE_BRANCH') or
                            os.environ.get('CI_BRANCH') or
+                           os.environ.get('CIRCLE_BRANCH') or
+                           os.environ.get('GIT_BRANCH') or
                            os.environ.get('TRAVIS_BRANCH', rev)),
                 'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
                             for line in remotes if '(fetch)' in line]
