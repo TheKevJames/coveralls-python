@@ -24,5 +24,5 @@ NOTE: in the future, we may want to expand this to include other sources, such a
     .tox/py35/bin/python setup.py bdist_egg
     # etc
 
-.. _`coveralls`: https://pypi.org/project/coveralls/
-.. _`GitHub release`: https://github.com/coveralls-clients/coveralls-python/releases/new
+.. _coveralls: https://pypi.org/project/coveralls/
+.. _GitHub release: https://github.com/coveralls-clients/coveralls-python/releases/new
