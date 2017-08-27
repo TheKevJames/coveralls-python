@@ -19,7 +19,6 @@ log = logging.getLogger('coveralls')
 class Coveralls(object):
     config_filename = '.coveralls.yml'
     api_endpoint = 'https://coveralls.io/api/v1/jobs'
-    default_client = 'coveralls-python'
 
     def __init__(self, token_required=True, **kwargs):
         """ Coveralls!
@@ -38,59 +37,75 @@ class Coveralls(object):
           service_name.
         """
         self._data = None
-        self.config = kwargs
-        file_config = self.load_config() or {}
-        repo_token = self.config.get('repo_token') or \
-                file_config.get('repo_token', None)
+        self._token_required = token_required
+
+        self.config = self.load_config_from_file()
+        self.config.update(kwargs)
+
+        self.load_config_from_environment()
+
+        name, job, pr = self.load_config_from_ci_environment()
+        self.config['service_name'] = self.config.get('service_name', name)
+        self.config['service_job_id'] = job
+        if pr:
+            self.config['service_pull_request'] = pr
+
+        self.ensure_token()
+
+    def ensure_token(self):
+        if self.config.get('repo_token') or not self._token_required:
+            return
+
+        raise CoverallsException(
+            'Not on Travis or CircleCI. You have to provide either repo_token '
+            'in {} or set the COVERALLS_REPO_TOKEN env var.'.format(
+                self.config_filename))
+
+    @staticmethod
+    def load_config_from_appveyor():
+        pr = os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER')
+        return 'appveyor', os.environ.get('APPVEYOR_BUILD_ID'), pr
+
+    @staticmethod
+    def load_config_from_buildkite():
+        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), None
+
+    @staticmethod
+    def load_config_from_circle():
+        pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
+        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), pr
+
+    @staticmethod
+    def load_config_from_travis():
+        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None
+
+    @staticmethod
+    def load_config_from_unknown():
+        return 'coveralls-python', None, None
+
+    def load_config_from_ci_environment(self):
+        if os.environ.get('APPVEYOR'):
+            return self.load_config_from_appveyor()
+        if os.environ.get('BUILDKITE'):
+            return self.load_config_from_buildkite()
+        if os.environ.get('CIRCLECI'):
+            self._token_required = False
+            return self.load_config_from_circle()
+        if os.environ.get('TRAVIS'):
+            self._token_required = False
+            return self.load_config_from_travis()
+
+        return self.load_config_from_unknown()
+
+    def load_config_from_environment(self):
+        repo_token = os.environ.get('COVERALLS_REPO_TOKEN')
         if repo_token:
             self.config['repo_token'] = repo_token
 
-        if os.environ.get('TRAVIS'):
-            is_travis_or_circle = True
-            self.config['service_name'] = \
-                    file_config.get('service_name', None) or 'travis-ci'
-            self.config['service_job_id'] = os.environ.get('TRAVIS_JOB_ID')
-        elif os.environ.get('CIRCLECI'):
-            is_travis_or_circle = True
-            self.config['service_name'] = \
-                    file_config.get('service_name', None) or 'circle-ci'
-            self.config['service_job_id'] = os.environ.get('CIRCLE_BUILD_NUM')
-            if os.environ.get('CI_PULL_REQUEST', None):
-                self.config['service_pull_request'] = \
-                        os.environ.get('CI_PULL_REQUEST').split('/')[-1]
-        elif os.environ.get('BUILDKITE'):
-            is_travis_or_circle = False
-            self.config['service_name'] = \
-                    file_config.get('service_name', None) or 'buildkite'
-            self.config['service_job_id'] = os.environ.get('BUILDKITE_JOB_ID')
-        elif os.environ.get('APPVEYOR'):
-            is_travis_or_circle = False
-            self.config['service_name'] = \
-                    file_config.get('service_name', None) or 'appveyor'
-            self.config['service_job_id'] = os.environ.get('APPVEYOR_BUILD_ID')
-            if os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER'):
-                self.config['service_pull_request'] = \
-                        os.environ['APPVEYOR_PULL_REQUEST_NUMBER']
-        else:
-            is_travis_or_circle = False
-            self.config['service_name'] = file_config.get('service_name') \
-                    or self.default_client
-
-        if os.environ.get('COVERALLS_REPO_TOKEN', None):
-            self.config['repo_token'] = os.environ.get('COVERALLS_REPO_TOKEN')
-
-        parallel = os.environ.get('COVERALLS_PARALLEL', '')
-        if parallel.lower() == 'true':
+        if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
             self.config['parallel'] = True
 
-        if token_required and not self.config.get('repo_token') \
-                and not is_travis_or_circle:
-            raise CoverallsException(
-                'Not on Travis or CircleCI. You have to provide either '
-                'repo_token in {} or set the COVERALLS_REPO_TOKEN env '
-                'var.'.format(self.config_filename))
-
-    def load_config(self):
+    def load_config_from_file(self):
         try:
             with open(os.path.join(os.getcwd(),
                                    self.config_filename)) as config:
