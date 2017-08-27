@@ -101,5 +101,5 @@ class NoConfiguration(unittest.TestCase):
 
     @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
     def test_service_name_from_env(self):
-        cover = Coveralls()
+        cover = Coveralls(repo_token='yyy')
         assert cover.config['service_name'] == 'xxx'
