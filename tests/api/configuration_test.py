@@ -37,9 +37,9 @@ class Configuration(unittest.TestCase):
     @mock.patch.dict(os.environ, {'COVERALLS_REPO_TOKEN': 'xxx'}, clear=True)
     def test_local_with_config_without_yaml_module(self, mock_logger):
         """test local with config in yaml, but without yaml-installed"""
-        Coveralls()
+        cover = Coveralls()
         mock_logger.assert_called_once_with(
-            'Seems, like some modules are not installed: %s', mock.ANY)
+            'PyYAML is not installed, skipping %s.', cover.config_filename)
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')

@@ -112,9 +112,9 @@ class Coveralls(object):
                 try:
                     import yaml
                     return yaml.safe_load(config)
-                except ImportError as e:
-                    log.warning(
-                        'Seems, like some modules are not installed: %s', e)
+                except ImportError:
+                    log.warning('PyYAML is not installed, skipping %s.',
+                                self.config_filename)
         except (OSError, IOError):
             log.debug('Missing %s file. Using only env variables.',
                       self.config_filename)
