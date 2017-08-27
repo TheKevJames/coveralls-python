@@ -40,6 +40,6 @@ TravisCI
 --------
 ::
 
-    passenv = TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH
+    passenv = TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH TRAVIS_PULL_REQUEST
 
 .. _tox: https://tox.readthedocs.io/en/latest/
