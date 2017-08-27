@@ -51,7 +51,7 @@ def test_rcfile(mock_coveralls):
 @mock.patch('coveralls.cli.Coveralls')
 def test_service_name(mock_coveralls):
     coveralls.cli.main(argv=['--service=travis-pro'])
-    mock_coveralls.assert_called_with(True, config_file=None,
+    mock_coveralls.assert_called_with(True, config_file='.coveragerc',
                                       service_name='travis-pro')
 
 
