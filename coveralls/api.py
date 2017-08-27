@@ -46,7 +46,8 @@ class Coveralls(object):
 
         name, job, pr = self.load_config_from_ci_environment()
         self.config['service_name'] = self.config.get('service_name', name)
-        self.config['service_job_id'] = job
+        if job:
+            self.config['service_job_id'] = job
         if pr:
             self.config['service_pull_request'] = pr
 
