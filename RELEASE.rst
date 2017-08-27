@@ -5,7 +5,7 @@ This project is released on PyPI as `coveralls`_.
 
 To cut a new release, ensure the latest master passes all tests. Then, create a release commit:
 
-1. Update the :code:`CHANGELOG.md` with the new version.
+1. Update the :code:`CHANGELOG.md` with the new version (:code:`clog -C CHANGELOG.md -F --setversion x.y.z`).
 2. Bump the version number in :code:`version.py`.
 3. Tag that commit with the version number (:code:`git tag x.y.z`).
 4. Push the new tag to GitHub.
