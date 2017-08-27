@@ -16,6 +16,9 @@ Coveralls for python
 .. image:: https://img.shields.io/pypi/pyversions/coveralls.svg?style=flat-square
     :target: https://pypi.python.org/pypi/coveralls
 
+.. image:: https://img.shields.io/pypi/implementation/coveralls.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/coveralls
+
 coveralls.io is a service to publish your coverage stats online. This package provides seamless integration with ``coverage.py`` in your Python projects::
 
     pip install coveralls
