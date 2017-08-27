@@ -46,6 +46,13 @@ def test_rcfile(mock_coveralls):
     mock_coveralls.assert_called_with(True, config_file='coveragerc')
 
 
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_service_name(mock_coveralls):
+    coveralls.cli.main(argv=['--service=travis-pro'])
+    mock_coveralls.assert_called_with(True, service_name='travis-pro')
+
+
 @mock.patch.object(coveralls.cli.log, 'exception')
 @mock.patch.object(coveralls.Coveralls, 'wear', side_effect=EXC)
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)

@@ -16,6 +16,7 @@ Usage:
     forces verbose output. Please use debug mode when submitting bug reports.
 
 Global options:
+    --service=<name>  Provide an alternative service name to submit.
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --output=<file>   Write report to file. Doesn't send anything.
     --merge=<file>    Merge report from file when submitting.
@@ -53,7 +54,9 @@ def main(argv=None):
 
     try:
         token_required = not options['debug'] and not options['--output']
-        coverallz = Coveralls(token_required, config_file=options['--rcfile'])
+        coverallz = Coveralls(token_required,
+                              config_file=options['--rcfile'],
+                              service_name=options['--service'])
 
         if options['--merge']:
             coverallz.merge(options['--merge'])
