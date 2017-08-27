@@ -25,8 +25,6 @@ You can also set any of these values in a ``.coveralls.yml`` file in the root of
 
 Sample ``.coveralls.yml`` file::
 
-.. code-block:: yaml
-
     service_name: travis-pro
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
     parallel: true
