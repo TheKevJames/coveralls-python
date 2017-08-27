@@ -98,3 +98,8 @@ class NoConfiguration(unittest.TestCase):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'
         assert cover.config['service_job_id'] == '1234567'
+
+    @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
+    def test_service_name_from_env(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'xxx'

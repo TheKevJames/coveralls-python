@@ -14,6 +14,8 @@ If you have placed your ``.coveragerc`` in a non-standard location, you can run:
 If you would like to override the service name (auto-discovered on most CI systems, set to ``coveralls-python`` otherwise)::
 
     coveralls --service=travis-pro
+    # or, via env var:
+    COVERALLS_SERVICE_NAME=travis-pro coveralls
 
 If you are interested in merging the coverage results between multiple languages/projects, see our `multi-language <multilang.rst>`_ documentation.
 

@@ -107,6 +107,10 @@ class Coveralls(object):
         if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
             self.config['parallel'] = True
 
+        service_name = os.environ.get('COVERALLS_SERVICE_NAME')
+        if service_name:
+            self.config['service_name'] = service_name
+
     def load_config_from_file(self):
         try:
             with open(os.path.join(os.getcwd(),
