@@ -1,5 +1,5 @@
-Multiple Language Support (experimental)
-========================================
+Multiple Language Support
+=========================
 
 Tracking multi-language repo coverage requires an extra setup of merging coverage data for submission.
 

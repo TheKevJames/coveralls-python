@@ -1,7 +1,7 @@
 coveralls-python
 ================
 
-coveralls.io is a service to publish your coverage stats online. This package provides seamless integration with ``coverage.py`` in your Python projects.
+`coveralls.io`_ is a service for publishing your coverage stats online. This package provides seamless integration with `coverage.py`_ (and thus ``py.test``, ``nosetests``, etc...) in your Python projects.
 
 Getting Started
 ---------------
@@ -18,9 +18,19 @@ Getting Started
 
     troubleshooting
 
+About
+-----
+.. toctree::
+    :maxdepth: 2
+
+    authors
+
 Administration
 --------------
 .. toctree::
    :maxdepth: 2
 
    release
+
+.. _coveralls.io: https://coveralls.io/
+.. _coverage.py: https://coverage.readthedocs.io/en/coverage-4.4.1/

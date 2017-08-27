@@ -16,7 +16,7 @@ For example, on TravisCI::
         coverage run --source=yourpackagename setup.py test
         coveralls
 
-If you are configuring coveralls-python with environment variables, you should also pass those. See :ref:`configuration` for more details.
+If you are configuring coveralls-python with environment variables, you should also pass those. See `configuration <configuration.rst>`_ for more details.
 
 AppVeyor
 --------
@@ -42,4 +42,4 @@ TravisCI
 
     passenv = TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH
 
-.. _tox: https://testrun.org/tox/latest/
+.. _tox: https://tox.readthedocs.io/en/latest/
