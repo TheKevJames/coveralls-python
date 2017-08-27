@@ -36,6 +36,12 @@ CircleCI
 
     passenv = CIRCLECI CIRCLE_BUILD_NUM CIRCLE_BRANCH CI_PULL_REQUEST
 
+Jenkins
+-------
+::
+
+    passenv = JENKINS_HOME BUILD_NUMBER GIT_BRANCH
+
 TravisCI
 --------
 ::
