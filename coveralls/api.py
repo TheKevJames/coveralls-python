@@ -19,7 +19,7 @@ log = logging.getLogger('coveralls')
 class Coveralls(object):
     config_filename = '.coveralls.yml'
 
-    def __init__(self, token_required=True, **kwargs):
+    def __init__(self, token_required=True, service_name=None, **kwargs):
         """ Coveralls!
 
         * repo_token
@@ -41,6 +41,8 @@ class Coveralls(object):
 
         self.config = self.load_config_from_file()
         self.config.update(kwargs)
+        if service_name:
+            self.config['service_name'] = service_name
         if self.config.get('coveralls_host'):
             self._coveralls_host = self.config['coveralls_host']
             del self.config['coveralls_host']
