@@ -81,7 +81,8 @@ class Coveralls(object):
 
     @staticmethod
     def load_config_from_jenkins():
-        return 'jenkins', os.environ.get('BUILD_NUMBER'), None
+        pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
+        return 'jenkins', os.environ.get('BUILD_NUMBER'), pr
 
     @staticmethod
     def load_config_from_travis():
