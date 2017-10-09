@@ -40,7 +40,7 @@ Jenkins
 -------
 ::
 
-    passenv = JENKINS_HOME BUILD_NUMBER GIT_BRANCH
+    passenv = JENKINS_HOME BUILD_NUMBER GIT_BRANCH CI_PULL_REQUEST
 
 TravisCI
 --------
