@@ -11,6 +11,12 @@ If you have placed your ``.coveragerc`` in a non-standard location, you can run:
 
     coveralls --rcfile=/path/to/coveragerc
 
+If you would like to override the service name (auto-discovered on most CI systems, set to ``coveralls-python`` otherwise)::
+
+    coveralls --service=travis-pro
+    # or, via env var:
+    COVERALLS_SERVICE_NAME=travis-pro coveralls
+
 If you are interested in merging the coverage results between multiple languages/projects, see our `multi-language <multilang.rst>`_ documentation.
 
 If coveralls-python is being run on CircleCI or TravisCI, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::

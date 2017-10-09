@@ -109,3 +109,8 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_name'] == 'travis-ci'
         assert cover.config['service_job_id'] == '777'
         assert 'repo_token' not in cover.config
+
+    @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
+    def test_service_name_from_env(self):
+        cover = Coveralls(repo_token='yyy')
+        assert cover.config['service_name'] == 'xxx'
