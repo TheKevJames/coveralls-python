@@ -13,6 +13,6 @@ For example::
     coverage run --source=my_package setup.py test
     COVERALLS_REPO_TOKEN=tGSdG5Qcd2dcQa2oQN9GlJkL50wFZPv1j coveralls
 
-coveralls-python can be configured with several environment variables, as seen above. See `configuration <configuration.rst>`_ for more details.
+coveralls-python can be configured with several environment variables, as seen above. See :ref:`configuration` for more details.
 
 .. _add your repo: https://coveralls.io/repos/new
