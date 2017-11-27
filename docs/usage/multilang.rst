@@ -1,3 +1,5 @@
+.. _multilang:
+
 Multiple Language Support
 =========================
 
