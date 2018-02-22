@@ -272,6 +272,13 @@ class Coveralls(object):
                 }]
             }
         """
+        # silently omit the optional 'git' API argument if a simple git status
+        # command fails, suggesting git is unavailable
+        try:
+            run_command('git', 'status')
+        except CoverallsException:
+            return {}
+
         rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
         remotes = run_command('git', 'remote', '-v').splitlines()
 
