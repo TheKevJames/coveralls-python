@@ -272,17 +272,16 @@ class Coveralls(object):
                 }]
             }
         """
-        # omit the optional 'git' API argument if a simple git status command
-        # fails, suggesting git is unavailable
+        # omit the optional 'git' API argument if git commands fail
         try:
-            run_command('git', 'status')
-        except CoverallsException:
-            log.warning('Failed collecting git data; `git status` {}.\nAre '
-                        'you running coveralls inside a git repository?')
+            rev = run_command('git', 'rev-parse', '--abbrev-ref',
+                              'HEAD').strip()
+            remotes = run_command('git', 'remote', '-v').splitlines()
+        except CoverallsException as ex:
+            log.warning('Failed collecting git data. Are you running '
+                        'coveralls inside a git repository?', exc_info=ex)
             return {}
 
-        rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
-        remotes = run_command('git', 'remote', '-v').splitlines()
 
         return {
             'git': {
