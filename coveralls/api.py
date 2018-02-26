@@ -272,8 +272,16 @@ class Coveralls(object):
                 }]
             }
         """
-        rev = run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD').strip()
-        remotes = run_command('git', 'remote', '-v').splitlines()
+        # omit the optional 'git' API argument if git commands fail
+        try:
+            rev = run_command('git', 'rev-parse', '--abbrev-ref',
+                              'HEAD').strip()
+            remotes = run_command('git', 'remote', '-v').splitlines()
+        except CoverallsException as ex:
+            log.warning('Failed collecting git data. Are you running '
+                        'coveralls inside a git repository?', exc_info=ex)
+            return {}
+
 
         return {
             'git': {
