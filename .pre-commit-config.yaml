@@ -1,25 +1,27 @@
+repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: v0.9.2
+    sha: v1.2.3
     hooks:
+    -   id: check-ast
+    -   id: check-builtin-literals
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
     -   id: check-json
     -   id: check-merge-conflict
     -   id: check-symlinks
     -   id: check-xml
+    -   id: check-vcs-permalinks
     -   id: check-yaml
+    -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
         exclude: example/*
-    -   id: trailing-whitespace
-    -   id: check-ast
-    -   id: double-quote-string-fixer
-        exclude: nonunicode.py
-    -   id: debug-statements
+    -   id: mixed-line-ending
     -   id: name-tests-test
     -   id: requirements-txt-fixer
+    -   id: trailing-whitespace
 -   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: v1.7.2
+    sha: v1.8.2
     hooks:
     -   id: pylint
         args:
@@ -29,3 +31,12 @@
         - -d locally-disabled
         - -d missing-docstring
         exclude: example/*
+-   repo: git://github.com/Lucas-C/pre-commit-hooks
+    sha: v1.1.4
+    hooks:
+    -   id: remove-tabs
+-   repo: git://github.com/asottile/reorder_python_imports
+    sha: v1.0.1
+    hooks:
+    -   id: reorder-python-imports
+        files: coveralls/*
