@@ -1,3 +1,19 @@
+<a name="1.3.0"></a>
+## 1.3.0 (2018-03-02)
+
+
+#### Features
+
+* **ci:**  add Travis PR support (#162) ([baf683ee](baf683ee))
+* **cli:**  allow service_name override from cli flag or env var (#167) ([e8a98904](e8a98904))
+* **coveralls-enterprise:**  add support for coveralls enterprise (#166) ([7383f377](7383f377))
+* **git:**  silently omit git data when git is unavailable (#176) ([f9db83cd](f9db83cd))
+* **jenkins:**
+  *  add logic to parse CI_PULL_REQUEST env variable (#171) ([34a037f5](34a037f5))
+  *  add support for jenkins (#160) ([4e8cd9ec](4e8cd9ec))
+
+
+
 <a name="1.2.0"></a>
 ### 1.2.0 (2017-08-15)
 
