@@ -4,7 +4,8 @@ import os
 import sys
 
 from coverage import __version__
-from coverage.misc import NoSource, NotPython
+from coverage.misc import NoSource
+from coverage.misc import NotPython
 from coverage.phystokens import source_encoding
 from coverage.report import Reporter
 
