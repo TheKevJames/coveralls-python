@@ -4,12 +4,12 @@ import json
 import logging
 import os
 import re
-import subprocess
 
 import coverage
 import requests
 
 from .exception import CoverallsException
+from .git import git_info
 from .reporter import CoverallReporter
 
 
@@ -226,7 +226,7 @@ class Coveralls(object):
             return self._data
 
         self._data = {'source_files': self.get_coverage()}
-        self._data.update(self.git_info())
+        self._data.update(git_info())
         self._data.update(self.config)
         if extra:
             if 'source_files' in extra:
@@ -251,60 +251,6 @@ class Coveralls(object):
         return CoverallReporter(workman, workman.config).report()
 
     @staticmethod
-    def git_info():
-        """ A hash of Git data that can be used to display more information to
-            users.
-
-            Example:
-            "git": {
-                "head": {
-                    "id": "5e837ce92220be64821128a70f6093f836dd2c05",
-                    "author_name": "Wil Gieseler",
-                    "author_email": "wil@example.com",
-                    "committer_name": "Wil Gieseler",
-                    "committer_email": "wil@example.com",
-                    "message": "depend on simplecov >= 0.7"
-                },
-                "branch": "master",
-                "remotes": [{
-                    "name": "origin",
-                    "url": "https://github.com/lemurheavy/coveralls-ruby.git"
-                }]
-            }
-        """
-        # omit the optional 'git' API argument if git commands fail
-        try:
-            rev = run_command('git', 'rev-parse', '--abbrev-ref',
-                              'HEAD').strip()
-            remotes = run_command('git', 'remote', '-v').splitlines()
-        except CoverallsException as ex:
-            log.warning('Failed collecting git data. Are you running '
-                        'coveralls inside a git repository?', exc_info=ex)
-            return {}
-
-
-        return {
-            'git': {
-                'head': {
-                    'id': gitlog('%H'),
-                    'author_name': gitlog('%aN'),
-                    'author_email': gitlog('%ae'),
-                    'committer_name': gitlog('%cN'),
-                    'committer_email': gitlog('%ce'),
-                    'message': gitlog('%s'),
-                },
-                'branch': (os.environ.get('APPVEYOR_REPO_BRANCH') or
-                           os.environ.get('BUILDKITE_BRANCH') or
-                           os.environ.get('CI_BRANCH') or
-                           os.environ.get('CIRCLE_BRANCH') or
-                           os.environ.get('GIT_BRANCH') or
-                           os.environ.get('TRAVIS_BRANCH', rev)),
-                'remotes': [{'name': line.split()[0], 'url': line.split()[1]}
-                            for line in remotes if '(fetch)' in line]
-            }
-        }
-
-    @staticmethod
     def debug_bad_encoding(data):
         """ Let's try to help user figure out what is at fault """
         at_fault_files = set()
@@ -319,29 +265,3 @@ class Coveralls(object):
             log.error('HINT: Following files cannot be decoded properly into '
                       'unicode. Check their content: %s',
                       ', '.join(at_fault_files))
-
-
-def gitlog(fmt):
-    glog = run_command('git', '--no-pager', 'log', '-1',
-                       '--pretty=format:{}'.format(fmt))
-
-    try:
-        return str(glog)
-    except UnicodeEncodeError:
-        return unicode(glog)  # pylint: disable=undefined-variable
-
-
-def run_command(*args):
-    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE)
-    stdout, stderr = cmd.communicate()
-
-    if cmd.returncode != 0:
-        raise CoverallsException(
-            'command return code {}, STDOUT: "{}"\nSTDERR: "{}"'.format(
-                cmd.returncode, stdout, stderr))
-
-    try:
-        return stdout.decode()
-    except UnicodeDecodeError:
-        return stdout.decode('utf-8')

@@ -11,7 +11,7 @@ import unittest
 import mock
 import sh
 
-from coveralls import Coveralls
+import coveralls.git
 
 
 GIT_COMMIT_MSG = 'first commit'
@@ -40,8 +40,7 @@ class GitTest(unittest.TestCase):
 
     @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
     def test_git(self):
-        cover = Coveralls(repo_token='xxx')
-        git_info = cover.git_info()
+        git_info = coveralls.git.git_info()
         commit_id = git_info['git']['head'].pop('id')
 
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
