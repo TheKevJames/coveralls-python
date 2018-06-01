@@ -12,7 +12,7 @@ from coverage.report import Reporter
 from .exception import CoverallsException
 
 
-log = logging.getLogger('coveralls')
+log = logging.getLogger(__name__)
 
 
 class CoverallReporter(Reporter):

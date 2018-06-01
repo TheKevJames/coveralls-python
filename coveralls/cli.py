@@ -40,7 +40,7 @@ from .exception import CoverallsException
 from .version import __version__
 
 
-log = logging.getLogger('coveralls')
+log = logging.getLogger(__name__)
 
 
 def main(argv=None):
@@ -71,9 +71,9 @@ def main(argv=None):
             log.info('Submitting coverage to coveralls.io...')
             result = coverallz.wear()
             log.info('Coverage submitted!')
+            log.debug(result)
             log.info(result['message'])
             log.info(result['url'])
-            log.debug(result)
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
     except CoverallsException as e:

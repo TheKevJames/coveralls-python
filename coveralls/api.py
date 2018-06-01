@@ -13,7 +13,7 @@ from .git import git_info
 from .reporter import CoverallReporter
 
 
-log = logging.getLogger('coveralls')
+log = logging.getLogger(__name__)
 
 
 class Coveralls(object):
@@ -175,8 +175,7 @@ class Coveralls(object):
         try:
             json_string = json.dumps(data)
         except UnicodeDecodeError as e:
-            log.error('ERROR: While preparing JSON:')
-            log.exception(e)
+            log.error('ERROR: While preparing JSON:', exc_info=e)
             self.debug_bad_encoding(data)
             raise
 
@@ -192,13 +191,12 @@ class Coveralls(object):
 
     def save_report(self, file_path):
         """Write coveralls report to file."""
-        with open(file_path, 'w') as report_file:
-            try:
-                report = self.create_report()
-            except coverage.CoverageException as e:
-                logging.error('Failure to gather coverage:')
-                logging.exception(e)
-            else:
+        try:
+            report = self.create_report()
+        except coverage.CoverageException as e:
+            log.error('Failure to gather coverage:', exc_info=e)
+        else:
+            with open(file_path, 'w') as report_file:
                 report_file.write(report)
 
     def create_data(self, extra=None):
@@ -232,9 +230,8 @@ class Coveralls(object):
             if 'source_files' in extra:
                 self._data['source_files'].extend(extra['source_files'])
             else:
-                log.warning(
-                    'No data to be merged; does the json file contain '
-                    '"source_files" data?')
+                log.warning('No data to be merged; does the json file contain '
+                            '"source_files" data?')
 
         return self._data
 

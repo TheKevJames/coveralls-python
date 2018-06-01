@@ -5,7 +5,7 @@ import subprocess
 from .exception import CoverallsException
 
 
-log = logging.getLogger('coveralls')
+log = logging.getLogger(__name__)
 
 
 def run_command(*args):
