@@ -1,4 +1,4 @@
-.cache/*
+.pytest_cache/*
 venv/*
 *.py[cod]
 

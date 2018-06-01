@@ -1,10 +1,13 @@
 # coding: utf-8
 # pylint: disable=no-self-use
 import os
+import shutil
+import tempfile
 import unittest
 
 import mock
 import pytest
+import sh
 try:
     import yaml
 except ImportError:
@@ -17,12 +20,15 @@ from coveralls.api import log
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configuration(unittest.TestCase):
     def setUp(self):
+        self.dir = tempfile.mkdtemp()
+
+        sh.cd(self.dir)
         with open('.coveralls.mock', 'w+') as fp:
             fp.write('repo_token: xxx\n')
             fp.write('service_name: jenkins\n')
 
     def tearDown(self):
-        os.remove('.coveralls.mock')
+        shutil.rmtree(self.dir)
 
     @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
     @mock.patch.dict(os.environ, {}, clear=True)
