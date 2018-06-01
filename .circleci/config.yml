@@ -18,15 +18,6 @@ jobs:
       - run: pip install tox
       - run: tox -e "py27-cov{3,4,41}-{default,pyyaml}"
 
-  test-py33:
-    docker:
-      - image: python:3.3-alpine
-    steps:
-      - run: apk add --no-cache git openssh-client
-      - checkout
-      - run: pip install tox
-      - run: tox -e "py33-cov{3,4,41}-{default,pyyaml}"
-
   test-py34:
     docker:
       - image: python:3.4-alpine
