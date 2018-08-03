@@ -45,7 +45,7 @@ jobs:
       - run: pip install tox
       - run: tox -e "py36-cov41-{default,pyyaml}"
 
-  test-pypy2:
+  test-pypy2-5:
     docker:
       - image: pypy:2-5.8.0
     steps:
@@ -53,9 +53,25 @@ jobs:
       - run: pip install tox
       - run: tox -e "pypy-cov{3,4,41}-{default,pyyaml}"
 
-  test-pypy3:
+  test-pypy2-6:
+    docker:
+      - image: pypy:2-6.0.0
+    steps:
+      - checkout
+      - run: pip install tox
+      - run: tox -e "pypy-cov{3,4,41}-{default,pyyaml}"
+
+  test-pypy3-5:
     docker:
       - image: pypy:3-5.8.0
+    steps:
+      - checkout
+      - run: pip install tox
+      - run: tox -e "pypy3-cov{3,4,41}-{default,pyyaml}"
+
+  test-pypy3-6:
+    docker:
+      - image: pypy:3-6.0.0
     steps:
       - checkout
       - run: pip install tox
@@ -70,5 +86,7 @@ workflows:
       - test-py34
       - test-py35
       - test-py36
-      - test-pypy2
-      - test-pypy3
+      - test-pypy2-5
+      - test-pypy2-6
+      - test-pypy3-5
+      - test-pypy3-6
