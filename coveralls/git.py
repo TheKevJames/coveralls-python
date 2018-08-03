@@ -100,7 +100,9 @@ def git_info():
             'name': env('GIT_REMOTE',)
             }]
         if not all(head.values()):
-            raise CoverallsException("Status must be available either from Git or environmental variables")
+            log.warning('Failed collecting git data. Are you running '
+                        'coveralls inside a git repository?', exc_info=ex)
+            return {}
         return {
             'git': {
                 'branch': branch,
@@ -108,6 +110,3 @@ def git_info():
                 'remotes': remotes,
             },
         }
-        log.warning('Failed collecting git data. Are you running '
-                    'coveralls inside a git repository?', exc_info=ex)
-        return {}
