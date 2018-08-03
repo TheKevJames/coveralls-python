@@ -60,3 +60,18 @@ class GitTest(unittest.TestCase):
                 'branch': 'master'
             }
         }
+
+
+class GitLogTest(GitTest):
+
+    def test_gitlog_git(self):
+        gitlog = coveralls.git.gitlog
+        
+        git_info = gitlog('%H')
+        assert re.match(r'^[a-f0-9]{40}$', git_info)
+
+        assert gitlog('%aN') == GIT_NAME
+        assert gitlog('%ae') == GIT_EMAIL
+        assert gitlog('%cN') == GIT_NAME
+        assert gitlog('%ce')== GIT_EMAIL
+        assert gitlog('%s') == GIT_COMMIT_MSG
