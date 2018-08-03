@@ -96,11 +96,11 @@ def git_info():
             'message': env('GIT_MESSAGE'),
         }
         remotes = [{
-                'url': env('GIT_URL'),
-                'name': env('GIT_REMOTE',)
+            'url': env('GIT_URL'),
+            'name': env('GIT_REMOTE',)
             }]
-        # if not all(head.values()):
-        #     raise CoverallsException("Status must be available either from Git or environmental variables")
+        if not all(head.values()):
+            raise CoverallsException("Status must be available either from Git or environmental variables")
         return {
             'git': {
                 'branch': branch,
