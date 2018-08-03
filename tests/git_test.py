@@ -64,7 +64,7 @@ class GitTest(unittest.TestCase):
 
 class GitLogTest(GitTest):
 
-    def test_gitlog_git(self):
+    def test_gitlog(self):
         gitlog = coveralls.git.gitlog
         
         git_info = gitlog('%H')
@@ -75,3 +75,40 @@ class GitLogTest(GitTest):
         assert gitlog('%cN') == GIT_NAME
         assert gitlog('%ce')== GIT_EMAIL
         assert gitlog('%s') == GIT_COMMIT_MSG
+
+
+class GitInfoTestEnvVars(unittest.TestCase):
+
+    @mock.patch.dict(os.environ, {
+        'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
+        'GIT_BRANCH': 'master',
+        'GIT_AUTHOR_NAME': GIT_NAME,
+        'GIT_AUTHOR_EMAIL': GIT_EMAIL,
+        'GIT_COMMITTER_NAME':GIT_NAME,
+        'GIT_COMMITTER_EMAIL':GIT_EMAIL,
+        'GIT_MESSAGE': GIT_COMMIT_MSG,
+        'GIT_URL': GIT_URL,
+        'GIT_REMOTE': GIT_REMOTE, 
+    }, 
+    clear=True)
+    def test_gitlog_envvars(self):
+        git_info = coveralls.git.git_info()
+        commit_id = git_info['git']['head'].pop('id')
+        assert re.match(r'^[a-f0-9]{40}$', commit_id)
+
+        assert git_info == {
+            'git': {
+                'head': {
+                    'committer_email': GIT_EMAIL,
+                    'author_email': GIT_EMAIL,
+                    'author_name': GIT_NAME,
+                    'message': GIT_COMMIT_MSG,
+                    'committer_name': GIT_NAME,
+                },
+                'remotes': [{
+                    'url': GIT_URL,
+                    'name': GIT_REMOTE
+                }],
+                'branch': 'master'
+            }
+        }

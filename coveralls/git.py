@@ -75,7 +75,6 @@ def git_info():
         remotes = [{'name': line.split()[0], 'url': line.split()[1]}
                    for line in run_command('git', 'remote', '-v').splitlines()
                    if '(fetch)' in line]
-
         return {
             'git': {
                 'branch': branch,
@@ -83,7 +82,32 @@ def git_info():
                 'remotes': remotes,
             },
         }
-    except CoverallsException as ex:
+    except CoverallsException:
+        # git not available try env vars as per https://docs.coveralls.io/mercurial-support
+        # optionally extended by GIT_URL and GIT_REMOTE
+        env = os.environ.get
+        branch = env('GIT_BRANCH')
+        head = {
+            'id':env('GIT_ID'),
+            'author_name': env('GIT_AUTHOR_NAME'),
+            'author_email': env('GIT_AUTHOR_EMAIL'),
+            'committer_name': env('GIT_COMMITTER_NAME'),
+            'committer_email': env('GIT_COMMITTER_EMAIL'),
+            'message': env('GIT_MESSAGE'),
+        }
+        remotes = [{
+                'url': env('GIT_URL'),
+                'name': env('GIT_REMOTE',)
+            }]
+        # if not all(head.values()):
+        #     raise CoverallsException("Status must be available either from Git or environmental variables")
+        return {
+            'git': {
+                'branch': branch,
+                'head': head,
+                'remotes': remotes,
+            },
+        }
         log.warning('Failed collecting git data. Are you running '
                     'coveralls inside a git repository?', exc_info=ex)
         return {}
