@@ -82,7 +82,7 @@ def git_info():
                 'remotes': remotes,
             },
         }
-    except CoverallsException:
+    except CoverallsException as ex:
         # git not available try env vars as per https://docs.coveralls.io/mercurial-support
         # optionally extended by GIT_URL and GIT_REMOTE
         env = os.environ.get
