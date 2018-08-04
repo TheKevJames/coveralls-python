@@ -128,6 +128,10 @@ class Coveralls(object):
         if service_name:
             self.config['service_name'] = service_name
 
+        flag_name = os.environ.get('COVERALLS_FLAG_NAME')
+        if flag_name:
+            self.config['flag_name'] = flag_name
+
     def load_config_from_file(self):
         try:
             with open(os.path.join(os.getcwd(),
