@@ -10,6 +10,7 @@ Getting Started
 
     usage/index
     usage/configuration
+    usage/vcsconfig
     usage/tox
     usage/multilang
 

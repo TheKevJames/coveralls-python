@@ -63,18 +63,15 @@ class GitTest(unittest.TestCase):
 
 
 class GitLogTest(GitTest):
-
     def test_gitlog(self):
-        gitlog = coveralls.git.gitlog
-
-        git_info = gitlog('%H')
+        git_info = coveralls.git.gitlog('%H')
         assert re.match(r'^[a-f0-9]{40}$', git_info)
 
-        assert gitlog('%aN') == GIT_NAME
-        assert gitlog('%ae') == GIT_EMAIL
-        assert gitlog('%cN') == GIT_NAME
-        assert gitlog('%ce') == GIT_EMAIL
-        assert gitlog('%s') == GIT_COMMIT_MSG
+        assert coveralls.git.gitlog('%aN') == GIT_NAME
+        assert coveralls.git.gitlog('%ae') == GIT_EMAIL
+        assert coveralls.git.gitlog('%cN') == GIT_NAME
+        assert coveralls.git.gitlog('%ce') == GIT_EMAIL
+        assert coveralls.git.gitlog('%s') == GIT_COMMIT_MSG
 
 
 def correct_encoding_for_envvars(value):
@@ -89,7 +86,6 @@ def correct_encoding_for_envvars(value):
 
 
 class GitInfoTestEnvVars(unittest.TestCase):
-
     @mock.patch.dict(os.environ, {
         'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
         'GIT_BRANCH': 'master',
@@ -119,6 +115,6 @@ class GitInfoTestEnvVars(unittest.TestCase):
                     'url': correct_encoding_for_envvars(GIT_URL),
                     'name': correct_encoding_for_envvars(GIT_REMOTE),
                 }],
-                'branch': 'master'
-            }
+                'branch': 'master',
+            },
         }

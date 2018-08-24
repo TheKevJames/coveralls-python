@@ -75,38 +75,33 @@ def git_info():
         remotes = [{'name': line.split()[0], 'url': line.split()[1]}
                    for line in run_command('git', 'remote', '-v').splitlines()
                    if '(fetch)' in line]
-        return {
-            'git': {
-                'branch': branch,
-                'head': head,
-                'remotes': remotes,
-            },
-        }
     except CoverallsException as ex:
-        # git not available try env vars as per https://docs.coveralls.io/mercurial-support
-        # optionally extended by GIT_URL and GIT_REMOTE
-        env = os.environ.get
-        branch = env('GIT_BRANCH')
+        # When git is not available, try env vars as per Coveralls docs:
+        # https://docs.coveralls.io/mercurial-support
+        # Additionally, these variables have been extended by GIT_URL and
+        # GIT_REMOTE
+        branch = os.environ.get('GIT_BRANCH')
         head = {
-            'id':env('GIT_ID'),
-            'author_name': env('GIT_AUTHOR_NAME'),
-            'author_email': env('GIT_AUTHOR_EMAIL'),
-            'committer_name': env('GIT_COMMITTER_NAME'),
-            'committer_email': env('GIT_COMMITTER_EMAIL'),
-            'message': env('GIT_MESSAGE'),
+            'id': os.environ.get('GIT_ID'),
+            'author_name': os.environ.get('GIT_AUTHOR_NAME'),
+            'author_email': os.environ.get('GIT_AUTHOR_EMAIL'),
+            'committer_name': os.environ.get('GIT_COMMITTER_NAME'),
+            'committer_email': os.environ.get('GIT_COMMITTER_EMAIL'),
+            'message': os.environ.get('GIT_MESSAGE'),
         }
         remotes = [{
-            'url': env('GIT_URL'),
-            'name': env('GIT_REMOTE',)
-            }]
+            'name': os.environ.get('GIT_REMOTE'),
+            'url': os.environ.get('GIT_URL'),
+        }]
         if not all(head.values()):
             log.warning('Failed collecting git data. Are you running '
                         'coveralls inside a git repository?', exc_info=ex)
             return {}
-        return {
-            'git': {
-                'branch': branch,
-                'head': head,
-                'remotes': remotes,
-            },
-        }
+
+    return {
+        'git': {
+            'branch': branch,
+            'head': head,
+            'remotes': remotes,
+        },
+    }
