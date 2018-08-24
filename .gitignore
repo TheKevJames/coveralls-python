@@ -40,3 +40,6 @@ nosetests.xml
 .coveralls.yml
 
 *~
+bin
+.Python
+include
