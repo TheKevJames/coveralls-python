@@ -1,3 +1,22 @@
+<a name="1.4.0"></a>
+## 1.4.0 (2018-08-24)
+
+
+#### Performance
+
+* **git:**  call fallback git commands in fallback cases only ([e42095b4](e42095b4))
+
+#### Features
+
+* **env:**  support git env vars (#182) ([a1918e89](a1918e89))
+  * This change also adds support for non-git repos.
+* **flags:**  add ability to add named job (#181) ([f7ba07bf](f7ba07bf))
+
+#### Compatibility
+
+* **python:**  drop support for Python 3.3 ([dcb06fc1](dcb06fc1))
+
+
 <a name="1.3.0"></a>
 ## 1.3.0 (2018-03-02)
 

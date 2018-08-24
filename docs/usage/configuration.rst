@@ -33,6 +33,10 @@ If you are using a non-public coveralls.io instance (for example: self-hosted Co
 
     COVERALLS_HOST="https://coveralls.aperture.com" coveralls
 
+If you are using named jobs, you can set::
+
+    COVERALLS_FLAG_NAME="insert-name-here"
+
 You can also set any of these values in a ``.coveralls.yml`` file in the root of your project repository. If you are planning to use this method, please ensure you install ``coveralls[yaml]`` instead of just the base ``coveralls`` package.
 
 Sample ``.coveralls.yml`` file::
