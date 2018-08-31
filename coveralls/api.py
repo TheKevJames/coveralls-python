@@ -13,7 +13,7 @@ from .git import git_info
 from .reporter import CoverallReporter
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('coveralls.api')
 
 
 class Coveralls(object):

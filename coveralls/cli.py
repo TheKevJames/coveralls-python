@@ -40,7 +40,7 @@ from .exception import CoverallsException
 from .version import __version__
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('coveralls')
 
 
 def main(argv=None):

@@ -12,7 +12,7 @@ from coverage.report import Reporter
 from .exception import CoverallsException
 
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('coveralls.reporter')
 
 
 class CoverallReporter(Reporter):
@@ -144,8 +144,11 @@ class CoverallReporter(Reporter):
         coverage_lines = [self.get_hits(i, analysis)
                           for i in range(1, len(source_lines) + 1)]
 
+        # ensure results are properly merged between platforms
+        posix_filename = filename.replace(os.path.sep, '/')
+
         results = {
-            'name': filename,
+            'name': posix_filename,
             'source': source,
             'coverage': coverage_lines,
         }
