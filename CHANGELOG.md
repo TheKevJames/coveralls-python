@@ -1,3 +1,17 @@
+<a name="1.5.0"></a>
+## 1.5.0 (2018-08-31)
+
+
+#### Features
+
+* **cli:**  allow execution as a module (#184) ([b261a853](b261a853), closes [#183](183))
+
+#### Bug Fixes
+
+* **paths:**  ensure windows paths are normalized to posix ([661e0f54](661e0f54), closes [#153](153))
+
+
+
 <a name="1.4.0"></a>
 ## 1.4.0 (2018-08-24)
 
