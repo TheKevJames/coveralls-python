@@ -20,7 +20,7 @@ setup(
     url='http://github.com/coveralls-clients/coveralls-python',
     project_urls={
         'Changelog': ('https://github.com/coveralls-clients/coveralls-python/'
-                      'blob/master/CHANGELOG.md')
+                      'blob/master/CHANGELOG.md'),
         'Docs': 'https://coveralls-python.rtfd.io/',
     },
     license='MIT',
