@@ -18,12 +18,6 @@ To create a new PyPI release, do the following:
 1. Build the sources (``python setup.py sdist bdist_wheel``).
 2. Register & upload the sources. (``twine upload dist/*``).
 
-NOTE: in the future, we may want to expand this to include other sources, such as eggs for various Python versions. Since we already test with :code:`tox`, this could be as simple as::
-
-    .tox/py34/bin/python setup.py bdist_egg
-    .tox/py35/bin/python setup.py bdist_egg
-    # etc
-
 To create a new Conda Forge release, do the following:
 
 1. Fork `coveralls-feedstock`_.
