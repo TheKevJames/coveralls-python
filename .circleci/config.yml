@@ -45,6 +45,15 @@ jobs:
       - run: pip install tox
       - run: tox -e "py36-cov41-{default,pyyaml}"
 
+  test-py37:
+    docker:
+      - image: python:3.7-alpine
+    steps:
+      - run: apk add --no-cache git openssh-client
+      - checkout
+      - run: pip install tox
+      - run: tox -e "py37-cov41-{default,pyyaml}"
+
   test-pypy2-5:
     docker:
       - image: pypy:2-5.8.0
@@ -86,6 +95,7 @@ workflows:
       - test-py34
       - test-py35
       - test-py36
+      - test-py37
       - test-pypy2-5
       - test-pypy2-6
       - test-pypy3-5
