@@ -24,7 +24,6 @@ def run_command(*args):
         return stdout.decode('utf-8').strip()
 
 
-
 def gitlog(fmt):
     glog = run_command('git', '--no-pager', 'log', '-1',
                        '--pretty=format:{}'.format(fmt))
