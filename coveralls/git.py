@@ -74,7 +74,7 @@ def git_info():
         remotes = [{'name': line.split()[0], 'url': line.split()[1]}
                    for line in run_command('git', 'remote', '-v').splitlines()
                    if '(fetch)' in line]
-    except CoverallsException as ex:
+    except (CoverallsException, EnvironmentError):
         # When git is not available, try env vars as per Coveralls docs:
         # https://docs.coveralls.io/mercurial-support
         # Additionally, these variables have been extended by GIT_URL and
@@ -94,7 +94,8 @@ def git_info():
         }]
         if not all(head.values()):
             log.warning('Failed collecting git data. Are you running '
-                        'coveralls inside a git repository?', exc_info=ex)
+                        'coveralls inside a git repository? Is git installed?',
+                        exc_info=True)
             return {}
 
     return {
