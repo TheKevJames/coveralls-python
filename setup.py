@@ -33,7 +33,7 @@ setup(
         ],
     },
     install_requires=['docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0'],
-    tests_require=['mock', 'pytest', 'pytest-cov>=2.5.0', 'sh>=1.08'],
+    tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
         'yaml': ['PyYAML>=3.10'],
         ':python_version < "3"': ['urllib3[secure]'],
