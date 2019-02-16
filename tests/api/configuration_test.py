@@ -116,6 +116,17 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '777'
         assert 'repo_token' not in cover.config
 
+    @mock.patch.dict(os.environ,
+                     {'SEMAPHORE': 'True',
+                      'SEMAPHORE_BUILD_NUMBER': '888',
+                      'PULL_REQUEST_NUMBER': '9999'},
+                     clear=True)
+    def test_semaphore_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'semaphore-ci'
+        assert cover.config['service_job_id'] == '888'
+        assert cover.config['service_pull_request'] == '9999'
+
     @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
     def test_service_name_from_env(self):
         cover = Coveralls(repo_token='yyy')

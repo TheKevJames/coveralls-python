@@ -83,4 +83,17 @@ All variables:
 - ``TRAVIS_BRANCH``
 - ``TRAVIS_PULL_REQUEST``
 
+
+SemaphoreCI
+-------
+::
+
+    passenv = SEMAPHORE SEMAPHORE_BUILD_NUMBER BRANCH_NAME PULL_REQUEST_NUMBER
+
+All variables:
+
+- ``SEMAPHORE``
+- ``SEMAPHORE_BUILD_NUMBER``
+- ``BRANCH_NAME``
+- ``PULL_REQUEST_NUMBER``
 .. _tox: https://tox.readthedocs.io/en/latest/
