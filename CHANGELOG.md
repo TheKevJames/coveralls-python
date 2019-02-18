@@ -1,3 +1,10 @@
+<a name="1.6.0"></a>
+## 1.6.0 (2019-02-18)
+
+#### Features
+
+* **support:**  add support for SemaphoreCI (#193) ([4e09918a](4e09918a))
+
 <a name="1.5.1"></a>
 ## 1.5.1 (2018-09-28)
 
