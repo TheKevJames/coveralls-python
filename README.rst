@@ -13,6 +13,9 @@ Coveralls for python
 .. image:: https://img.shields.io/pypi/dm/coveralls.svg?style=flat-square
     :target: https://pypi.org/project/coveralls/
 
+.. image:: https://anaconda.org/conda-forge/coveralls/badges/version.svg
+    :target: https://anaconda.org/conda-forge/coveralls
+
 .. image:: https://img.shields.io/pypi/v/coveralls.svg?style=flat-square
     :target: https://pypi.org/project/coveralls/
 
