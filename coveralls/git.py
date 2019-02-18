@@ -62,6 +62,7 @@ def git_info():
                   os.environ.get('CIRCLE_BRANCH') or
                   os.environ.get('GIT_BRANCH') or
                   os.environ.get('TRAVIS_BRANCH') or
+                  os.environ.get('BRANCH_NAME') or
                   run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
         head = {
             'id': gitlog('%H'),

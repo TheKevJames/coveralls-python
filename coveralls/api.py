@@ -92,24 +92,32 @@ class Coveralls(object):
         return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), pr
 
     @staticmethod
+    def load_config_from_semaphore():
+        pr = os.environ.get('PULL_REQUEST_NUMBER')
+        return 'semaphore-ci', os.environ.get('SEMAPHORE_BUILD_NUMBER'), pr
+
+    @staticmethod
     def load_config_from_unknown():
         return 'coveralls-python', None, None
 
     def load_config_from_ci_environment(self):
         if os.environ.get('APPVEYOR'):
-            return self.load_config_from_appveyor()
-        if os.environ.get('BUILDKITE'):
-            return self.load_config_from_buildkite()
-        if os.environ.get('CIRCLECI'):
+            name, job, pr = self.load_config_from_appveyor()
+        elif os.environ.get('BUILDKITE'):
+            name, job, pr = self.load_config_from_buildkite()
+        elif os.environ.get('CIRCLECI'):
             self._token_required = False
-            return self.load_config_from_circle()
-        if os.environ.get('JENKINS_HOME'):
-            return self.load_config_from_jenkins()
-        if os.environ.get('TRAVIS'):
+            name, job, pr = self.load_config_from_circle()
+        elif os.environ.get('JENKINS_HOME'):
+            name, job, pr = self.load_config_from_jenkins()
+        elif os.environ.get('TRAVIS'):
             self._token_required = False
-            return self.load_config_from_travis()
-
-        return self.load_config_from_unknown()
+            name, job, pr = self.load_config_from_travis()
+        elif os.environ.get('SEMAPHORE'):
+            name, job, pr = self.load_config_from_semaphore()
+        else:
+            name, job, pr = self.load_config_from_unknown()
+        return (name, job, pr)
 
     def load_config_from_environment(self):
         coveralls_host = os.environ.get('COVERALLS_HOST')
