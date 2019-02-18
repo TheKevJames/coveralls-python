@@ -10,14 +10,17 @@ Coveralls for python
 .. image:: https://img.shields.io/coveralls/coveralls-clients/coveralls-python/master.svg?style=flat-square
     :target: https://coveralls.io/r/coveralls-clients/coveralls-python
 
+.. image:: https://img.shields.io/pypi/dm/coveralls.svg?style=flat-square
+    :target: https://pypi.org/project/coveralls/
+
 .. image:: https://img.shields.io/pypi/v/coveralls.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/coveralls
+    :target: https://pypi.org/project/coveralls/
 
 .. image:: https://img.shields.io/pypi/pyversions/coveralls.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/coveralls
+    :target: https://pypi.org/project/coveralls/
 
 .. image:: https://img.shields.io/pypi/implementation/coveralls.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/coveralls
+    :target: https://pypi.org/project/coveralls/
 
 `coveralls.io`_ is a service for publishing your coverage stats online. This package provides seamless integration with `coverage.py`_ (and thus ``pytest``, ``nosetests``, etc...) in your Python projects::
 
