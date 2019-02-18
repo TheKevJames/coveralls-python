@@ -4,6 +4,9 @@ Coveralls for python
 .. image:: https://img.shields.io/circleci/project/github/coveralls-clients/coveralls-python/master.svg?style=flat-square
     :target: https://circleci.com/gh/coveralls-clients/coveralls-python
 
+.. image:: https://img.shields.io/travis/coveralls-clients/coveralls-python/master.svg?style=flat-square
+    :target: https://travis-ci.org/coveralls-clients/coveralls-python
+
 .. image:: https://img.shields.io/coveralls/coveralls-clients/coveralls-python/master.svg?style=flat-square
     :target: https://coveralls.io/r/coveralls-clients/coveralls-python
 
