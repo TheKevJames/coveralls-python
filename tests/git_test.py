@@ -81,7 +81,7 @@ def correct_encoding_for_envvars(value):
     try:
         str(value)
     except UnicodeEncodeError:
-        value = value.encode("utf8")
+        value = value.encode('utf8')
     return value
 
 
@@ -91,8 +91,8 @@ class GitInfoTestEnvVars(unittest.TestCase):
         'GIT_BRANCH': 'master',
         'GIT_AUTHOR_NAME': correct_encoding_for_envvars(GIT_NAME),
         'GIT_AUTHOR_EMAIL': correct_encoding_for_envvars(GIT_EMAIL),
-        'GIT_COMMITTER_NAME':correct_encoding_for_envvars(GIT_NAME),
-        'GIT_COMMITTER_EMAIL':correct_encoding_for_envvars(GIT_EMAIL),
+        'GIT_COMMITTER_NAME': correct_encoding_for_envvars(GIT_NAME),
+        'GIT_COMMITTER_EMAIL': correct_encoding_for_envvars(GIT_EMAIL),
         'GIT_MESSAGE': correct_encoding_for_envvars(GIT_COMMIT_MSG),
         'GIT_URL': correct_encoding_for_envvars(GIT_URL),
         'GIT_REMOTE': correct_encoding_for_envvars(GIT_REMOTE),

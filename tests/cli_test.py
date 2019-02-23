@@ -3,7 +3,6 @@ import os
 
 import mock
 
-import coveralls
 import coveralls.cli
 from coveralls.exception import CoverallsException
 

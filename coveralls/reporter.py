@@ -18,6 +18,7 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter(Reporter):
     """ Custom coverage.py reporter for coveralls.io
     """
+
     def __init__(self, *args, **kwargs):
         self.source_files = []
         super(CoverallReporter, self).__init__(*args, **kwargs)

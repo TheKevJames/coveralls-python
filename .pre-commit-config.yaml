@@ -1,6 +1,6 @@
 repos:
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: v1.2.3
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.1.0
     hooks:
     -   id: check-ast
     -   id: check-builtin-literals
@@ -9,34 +9,59 @@ repos:
     -   id: check-json
     -   id: check-merge-conflict
     -   id: check-symlinks
-    -   id: check-xml
     -   id: check-vcs-permalinks
+    -   id: check-xml
     -   id: check-yaml
+        args: [--allow-multiple-documents]
     -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
         exclude: example/*
+    -   id: file-contents-sorter
+        files: .dockerignore .gitignore
     -   id: mixed-line-ending
+        args: [--fix=lf]
     -   id: name-tests-test
     -   id: requirements-txt-fixer
     -   id: trailing-whitespace
--   repo: git://github.com/pre-commit/mirrors-pylint
-    sha: v1.8.2
+-   repo: https://github.com/pre-commit/mirrors-pylint
+    rev: v2.2.2
     hooks:
     -   id: pylint
         args:
+        - --max-line-length=79
+        - --ignore-imports=yes
         - -d fixme
         - -d import-error
         - -d invalid-name
         - -d locally-disabled
         - -d missing-docstring
+        - -d too-few-public-methods
+        - -d useless-object-inheritance
         exclude: example/*
--   repo: git://github.com/Lucas-C/pre-commit-hooks
-    sha: v1.1.4
+-   repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.1.6
     hooks:
     -   id: remove-tabs
--   repo: git://github.com/asottile/reorder_python_imports
-    sha: v1.0.1
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v1.3.5
     hooks:
     -   id: reorder-python-imports
+        args: [--py26-plus]
         files: coveralls/*
+-   repo: https://github.com/asottile/yesqa
+    rev: v0.0.9
+    hooks:
+    -   id: yesqa
+        files: coveralls/*
+-   repo: https://github.com/pre-commit/mirrors-autopep8
+    rev: v1.4.3
+    hooks:
+    -   id: autopep8
+        files: coveralls/*
+-   repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.2.0
+    hooks:
+    -   id: python-no-log-warn
+    -   id: python-use-type-annotations
+    -   id: rst-backticks
