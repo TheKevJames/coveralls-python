@@ -16,7 +16,7 @@ repos:
     -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
-        exclude: example/*
+        exclude: example/.*
     -   id: file-contents-sorter
         files: .dockerignore .gitignore
     -   id: mixed-line-ending
@@ -38,7 +38,7 @@ repos:
         - -d missing-docstring
         - -d too-few-public-methods
         - -d useless-object-inheritance
-        exclude: example/*
+        exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.6
     hooks:
@@ -48,17 +48,17 @@ repos:
     hooks:
     -   id: reorder-python-imports
         args: [--py26-plus]
-        files: coveralls/*
+        files: coveralls/.*
 -   repo: https://github.com/asottile/yesqa
     rev: v0.0.9
     hooks:
     -   id: yesqa
-        files: coveralls/*
+        files: coveralls/.*
 -   repo: https://github.com/pre-commit/mirrors-autopep8
     rev: v1.4.3
     hooks:
     -   id: autopep8
-        files: coveralls/*
+        files: coveralls/.*
 -   repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.2.0
     hooks:
