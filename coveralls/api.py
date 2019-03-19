@@ -74,7 +74,10 @@ class Coveralls(object):
 
     @staticmethod
     def load_config_from_buildkite():
-        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), None
+        pr = os.environ.get('BUILDKITE_PULL_REQUEST')
+        if pr == 'false':
+            pr = None
+        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), pr
 
     @staticmethod
     def load_config_from_circle():

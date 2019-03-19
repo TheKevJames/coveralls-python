@@ -79,11 +79,22 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_pull_request'] == '1234'
 
     @mock.patch.dict(os.environ, {'BUILDKITE': 'True',
-                                  'BUILDKITE_JOB_ID': '1234567'}, clear=True)
+                                  'BUILDKITE_JOB_ID': '1234567',
+                                  'BUILDKITE_PULL_REQUEST': '1234'}, clear=True)
     def test_buildkite_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'
         assert cover.config['service_job_id'] == '1234567'
+        assert cover.config['service_pull_request'] == '1234'
+
+    @mock.patch.dict(os.environ, {'BUILDKITE': 'True',
+                                  'BUILDKITE_JOB_ID': '1234567',
+                                  'BUILDKITE_PULL_REQUEST': 'false'}, clear=True)
+    def test_buildkite_no_config_no_pr(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'buildkite'
+        assert cover.config['service_job_id'] == '1234567'
+        assert 'service_pull_request' not in cover.config
 
     @mock.patch.dict(
         os.environ,
