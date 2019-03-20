@@ -165,22 +165,17 @@ class Coveralls(object):
             self.create_data(extra)
 
     def wear(self, dry_run=False):
-        try:
-            json_string = self.create_report()
-        except coverage.CoverageException as e:
-            return {'message': 'Failure to gather coverage: {}'.format(e)}
-
+        json_string = self.create_report()
         if dry_run:
             return {}
 
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
         response = requests.post(endpoint, files={'json_file': json_string})
         try:
+            response.raise_for_status()
             return response.json()
-        except ValueError:
-            return {
-                'message': 'Failure to submit data. Response [{}]: {}'.format(
-                    response.status_code, response.text)}
+        except Exception as e:
+            raise CoverallsException('Could not submit coverage: {}'.format(e))
 
     def create_report(self):
         """Generate json dumped report for coveralls api."""

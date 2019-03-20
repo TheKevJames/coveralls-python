@@ -75,6 +75,7 @@ def main(argv=None):
 
         log.info('Submitting coverage to coveralls.io...')
         result = coverallz.wear()
+
         log.info('Coverage submitted!')
         log.debug(result)
         log.info(result['message'])
