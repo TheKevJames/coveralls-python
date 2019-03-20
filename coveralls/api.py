@@ -20,8 +20,7 @@ class Coveralls(object):
     config_filename = '.coveralls.yml'
 
     def __init__(self, token_required=True, service_name=None, **kwargs):
-        """ Coveralls!
-
+        """
         * repo_token
           The secret token for your repository, found at the bottom of your
           repository's page on Coveralls.
@@ -166,7 +165,6 @@ class Coveralls(object):
             self.create_data(extra)
 
     def wear(self, dry_run=False):
-        """ run! """
         try:
             json_string = self.create_report()
         except coverage.CoverageException as e:
@@ -215,8 +213,10 @@ class Coveralls(object):
                 report_file.write(report)
 
     def create_data(self, extra=None):
-        """ Generate object for api.
-            Example json:
+        r"""
+        Generate object for api.
+
+        Example json:
             {
                 "service_job_id": "1234567890",
                 "service_name": "travis-ci",
@@ -264,7 +264,7 @@ class Coveralls(object):
 
     @staticmethod
     def debug_bad_encoding(data):
-        """ Let's try to help user figure out what is at fault """
+        """Let's try to help user figure out what is at fault."""
         at_fault_files = set()
         for source_file_data in data['source_files']:
             for value in source_file_data.values():

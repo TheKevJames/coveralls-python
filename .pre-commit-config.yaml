@@ -25,7 +25,7 @@ repos:
     -   id: requirements-txt-fixer
     -   id: trailing-whitespace
 -   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.2.2
+    rev: v2.3.1
     hooks:
     -   id: pylint
         args:
@@ -44,13 +44,13 @@ repos:
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v1.3.5
+    rev: v1.4.0
     hooks:
     -   id: reorder-python-imports
         args: [--py26-plus]
         files: coveralls/.*
 -   repo: https://github.com/asottile/yesqa
-    rev: v0.0.9
+    rev: v0.0.10
     hooks:
     -   id: yesqa
         files: coveralls/.*
@@ -58,6 +58,20 @@ repos:
     rev: v1.4.3
     hooks:
     -   id: autopep8
+        files: coveralls/.*
+-   repo: https://github.com/PyCQA/pydocstyle
+    rev: 792b8d92  # TODO: >3.0.0
+    hooks:
+    -   id: pydocstyle
+        args:
+        - --ignore=D1,D203,D205,D212,D400,D401,D404
+        files: coveralls/.*
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.7.7
+    hooks:
+    -   id: flake8
+        args:
+        - --ignore=E501,W503,F811,F821
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.2.0

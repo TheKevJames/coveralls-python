@@ -80,7 +80,8 @@ class NoConfiguration(unittest.TestCase):
 
     @mock.patch.dict(os.environ, {'BUILDKITE': 'True',
                                   'BUILDKITE_JOB_ID': '1234567',
-                                  'BUILDKITE_PULL_REQUEST': '1234'}, clear=True)
+                                  'BUILDKITE_PULL_REQUEST': '1234'},
+                     clear=True)
     def test_buildkite_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'
@@ -89,7 +90,8 @@ class NoConfiguration(unittest.TestCase):
 
     @mock.patch.dict(os.environ, {'BUILDKITE': 'True',
                                   'BUILDKITE_JOB_ID': '1234567',
-                                  'BUILDKITE_PULL_REQUEST': 'false'}, clear=True)
+                                  'BUILDKITE_PULL_REQUEST': 'false'},
+                     clear=True)
     def test_buildkite_no_config_no_pr(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'buildkite'

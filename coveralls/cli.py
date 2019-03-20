@@ -1,4 +1,5 @@
-"""Publish coverage results online via coveralls.io
+"""
+Publish coverage results online via coveralls.io
 
 Puts your coverage results on coveralls.io for everyone to see.
 

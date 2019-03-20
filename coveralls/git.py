@@ -35,10 +35,10 @@ def gitlog(fmt):
 
 
 def git_info():
-    """ A hash of Git data that can be used to display more information to
-        users.
+    """
+    A hash of Git data that can be used to display more information to users.
 
-        Example:
+    Example:
         "git": {
             "head": {
                 "id": "5e837ce92220be64821128a70f6093f836dd2c05",
@@ -56,14 +56,14 @@ def git_info():
         }
     """
     try:
-        branch = (os.environ.get('APPVEYOR_REPO_BRANCH') or
-                  os.environ.get('BUILDKITE_BRANCH') or
-                  os.environ.get('CI_BRANCH') or
-                  os.environ.get('CIRCLE_BRANCH') or
-                  os.environ.get('GIT_BRANCH') or
-                  os.environ.get('TRAVIS_BRANCH') or
-                  os.environ.get('BRANCH_NAME') or
-                  run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
+        branch = (os.environ.get('APPVEYOR_REPO_BRANCH')
+                  or os.environ.get('BUILDKITE_BRANCH')
+                  or os.environ.get('CI_BRANCH')
+                  or os.environ.get('CIRCLE_BRANCH')
+                  or os.environ.get('GIT_BRANCH')
+                  or os.environ.get('TRAVIS_BRANCH')
+                  or os.environ.get('BRANCH_NAME')
+                  or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
         head = {
             'id': gitlog('%H'),
             'author_name': gitlog('%aN'),

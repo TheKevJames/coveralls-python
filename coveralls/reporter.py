@@ -16,15 +16,15 @@ log = logging.getLogger('coveralls.reporter')
 
 
 class CoverallReporter(Reporter):
-    """ Custom coverage.py reporter for coveralls.io
-    """
+    """Custom coverage.py reporter for coveralls.io"""
 
     def __init__(self, *args, **kwargs):
         self.source_files = []
         super(CoverallReporter, self).__init__(*args, **kwargs)
 
     def report(self, morfs=None):
-        """ Generate a part of json report for coveralls
+        """
+        Generate a part of json report for coveralls
 
         `morfs` is a list of modules or filenames.
         `outfile` is a file object to write the json to.
@@ -69,14 +69,14 @@ class CoverallReporter(Reporter):
 
     @staticmethod
     def get_hits(line_num, analysis):
-        """ Source file stats for each line.
+        """
+        Source file stats for each line.
 
-            * A positive integer if the line is covered,
-            representing the number of times the line is hit during the test
-            suite.
-            * 0 if the line is not covered by the test suite.
-            * null to indicate the line is not relevant to code coverage
-              (it may be whitespace or a comment).
+        * A positive integer if the line is covered, representing the number
+          of times the line is hit during the test suite.
+        * 0 if the line is not covered by the test suite.
+        * null to indicate the line is not relevant to code coverage (it may
+          be whitespace or a comment).
         """
         if line_num in analysis.missing:
             return 0
@@ -88,13 +88,14 @@ class CoverallReporter(Reporter):
 
     @staticmethod
     def get_arcs(analysis):
-        """ Hit stats for each branch.
+        """
+        Hit stats for each branch.
 
-            Returns a flat list where every four values represent a branch:
-            1. line-number
-            2. block-number (not used)
-            3. branch-number
-            4. hits (we only get 1/0 from coverage.py)
+        Returns a flat list where every four values represent a branch:
+        1. line-number
+        2. block-number (not used)
+        3. branch-number
+        4. hits (we only get 1/0 from coverage.py)
         """
         if not analysis.has_arcs():
             return None
@@ -113,7 +114,7 @@ class CoverallReporter(Reporter):
         return branches
 
     def parse_file(self, cu, analysis):
-        """ Generate data for single file """
+        """Generate data for single file"""
         if hasattr(analysis, 'parser'):
             filename = cu.file_locator.relative_filename(cu.filename)
             source_lines = analysis.parser.lines
