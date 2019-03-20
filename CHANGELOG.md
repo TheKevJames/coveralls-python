@@ -1,3 +1,14 @@
+<a name="1.7.0"></a>
+## 1.7.0 (2019-03-20)
+
+#### Features
+
+* **api:**  support pull requests on buildkite (#197) ([2700e3e2](2700e3e2))
+
+#### Bug Fixes
+
+* **cli:**  ensure upload failures trigger cli failures ([16192b84](16192b84))
+
 <a name="1.6.0"></a>
 ## 1.6.0 (2019-02-18)
 
