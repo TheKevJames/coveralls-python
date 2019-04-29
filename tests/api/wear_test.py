@@ -106,14 +106,14 @@ class WearTest(unittest.TestCase):
 
     @mock.patch.dict(
         os.environ,
-        {'COVERALLS_HOST': 'https://coveralls.my-enterprise.info'}, clear=True)
+        {'COVERALLS_HOST': 'https://coveralls.my-enterprise.info', 'COVERALLS_SKIP_SSL_VERIFY': '1'}, clear=True)
     def test_coveralls_host_env_var_overrides_api_url(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
-            'https://coveralls.my-enterprise.info/api/v1/jobs', files=mock.ANY)
+            'https://coveralls.my-enterprise.info/api/v1/jobs', files=mock.ANY, verify=False)
 
     @mock.patch.dict(os.environ, {}, clear=True)
     def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
-            'https://coveralls.io/api/v1/jobs', files=mock.ANY)
+            'https://coveralls.io/api/v1/jobs', files=mock.ANY, verify=True)
