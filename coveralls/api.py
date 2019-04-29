@@ -170,7 +170,8 @@ class Coveralls(object):
             return {}
 
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
-        response = requests.post(endpoint, files={'json_file': json_string})
+        verify = bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        response = requests.post(endpoint, files={'json_file': json_string}, verify=verify)
         try:
             response.raise_for_status()
             return response.json()
