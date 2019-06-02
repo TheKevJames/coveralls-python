@@ -1,3 +1,14 @@
+<a name="1.8.0"></a>
+## 1.8.0 (2019-06-02)
+
+#### Features
+
+* **flag:**  allow disabling SSL verification ([2e3b5c61](2e3b5c61))
+
+#### Bug Fixes
+
+* **git:**  fix support for case where git binary is missing ([5bbceaae](5bbceaae))
+
 <a name="1.7.0"></a>
 ## 1.7.0 (2019-03-20)
 
