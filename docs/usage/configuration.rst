@@ -33,6 +33,10 @@ If you are using a non-public coveralls.io instance (for example: self-hosted Co
 
     COVERALLS_HOST="https://coveralls.aperture.com" coveralls
 
+In that case, you may also be interested in disabling SSL verification::
+
+    COVERALLS_SKIP_SSL_VERIFY='1' coveralls
+
 If you are using named jobs, you can set::
 
     COVERALLS_FLAG_NAME="insert-name-here"
