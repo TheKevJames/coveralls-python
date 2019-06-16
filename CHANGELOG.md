@@ -1,3 +1,12 @@
+<a name="1.8.1"></a>
+## 1.8.1 (2019-06-16)
+
+#### Bug Fixes
+
+* **dependencies:**  pin `coverage` to `< 5.0`, since the current `5.0` alphas are
+                     introducing breaking changes. Once `5.0` is stable, we'll
+                     remove the pin.
+
 <a name="1.8.0"></a>
 ## 1.8.0 (2019-06-02)
 
