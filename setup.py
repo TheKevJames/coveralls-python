@@ -32,7 +32,11 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
-    install_requires=['docopt>=0.6.1', 'coverage>=3.6', 'requests>=1.0.0'],
+    install_requires=[
+        'coverage>=3.6,<5.0',
+        'docopt>=0.6.1',
+        'requests>=1.0.0',
+    ],
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
         'yaml': ['PyYAML>=3.10'],
