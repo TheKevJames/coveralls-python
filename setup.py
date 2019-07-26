@@ -40,11 +40,7 @@ setup(
     tests_require=['mock', 'pytest', 'sh>=1.08'],
     extras_require={
         'yaml': ['PyYAML>=3.10'],
-        # See https://github.com/kennethreitz/requests/issues/5067
-        # We need to stay aligned with requests' pin to ensure urllib3 updates
-        # don't break pip installation.
-        # See https://github.com/kennethreitz/requests/blob/master/setup.py
-        ':python_version < "3"': ['urllib3[secure]>=1.21.1,<1.25'],
+        ':python_version < "3"': ['urllib3[secure]'],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
