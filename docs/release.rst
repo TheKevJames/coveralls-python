@@ -7,11 +7,10 @@ To cut a new release, ensure the latest master passes all tests. Then, create a 
 
 1. Update the ``CHANGELOG.md`` with the new version (``clog -C CHANGELOG.md -F --setversion x.y.z``).
 2. Bump the version number in ``version.py``.
-3. Tag that commit with the version number (``git tag x.y.z``).
-4. Push the new tag to GitHub.
-5. Create a new `GitHub release`_.
-
-Make sure to push the release commit to GitHub.
+3. Commit and push (``git commit -am 'chore(release): bump version' && git push``)
+4. Tag that commit with the version number (``git tag x.y.z``).
+5. Push the new tag to GitHub.
+6. Create a new `GitHub release`_.
 
 To create a new PyPI release, do the following:
 
@@ -22,7 +21,9 @@ To create a new Conda Forge release, do the following:
 
 1. Fork `coveralls-feedstock`_.
 2. Update ``recipe/meta.yaml`` with the new version number and `sha`_.
-3. Create a PR. A conda-forge maintainer will get to it eventually.
+3. Create a PR.
+4. Comment on your own PR with: "@conda-forge-admin, please rerender".
+5. Merge along with the automated commit from Conda.
 
 .. _coveralls: https://pypi.org/project/coveralls/
 .. _coveralls-feedstock: https://github.com/conda-forge/coveralls-feedstock
