@@ -1,3 +1,10 @@
+<a name="1.8.2"></a>
+## 1.8.2 (2019-07-29)
+
+### Internal
+
+* **dependencies**: update pass urllib3<1.25 pin, now that that's fixed.
+
 <a name="1.8.1"></a>
 ## 1.8.1 (2019-06-16)
 
