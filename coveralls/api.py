@@ -84,6 +84,13 @@ class Coveralls(object):
         return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), pr
 
     @staticmethod
+    def load_config_from_github():
+        pr = None
+        if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
+            pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
+        return 'github', None, pr
+
+    @staticmethod
     def load_config_from_jenkins():
         pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
         return 'jenkins', os.environ.get('BUILD_NUMBER'), pr
@@ -110,6 +117,8 @@ class Coveralls(object):
         elif os.environ.get('CIRCLECI'):
             self._token_required = False
             name, job, pr = self.load_config_from_circle()
+        elif os.environ.get('GITHUB_ACTIONS'):
+            name, job, pr = self.load_config_from_github()
         elif os.environ.get('JENKINS_HOME'):
             name, job, pr = self.load_config_from_jenkins()
         elif os.environ.get('TRAVIS'):

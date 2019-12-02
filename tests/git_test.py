@@ -118,3 +118,24 @@ class GitInfoTestEnvVars(unittest.TestCase):
                 'branch': 'master',
             },
         }
+
+
+class GitInfoTestBranch(GitTest):
+    @mock.patch.dict(os.environ, {
+        'GITHUB_ACTIONS': 'true',
+        'GITHUB_REF': 'refs/pull/1234/merge',
+        'GITHUB_HEAD_REF': 'fixup-branch'
+    }, clear=True)
+    def test_gitinfo_github_pr(self):
+        git_info = coveralls.git.git_info()
+        print('git_info', git_info)
+        assert git_info['git']['branch'] == 'fixup-branch'
+
+    @mock.patch.dict(os.environ, {
+        'GITHUB_ACTIONS': 'true',
+        'GITHUB_REF': 'refs/heads/master',
+        'GITHUB_HEAD_REF': ''
+    }, clear=True)
+    def test_gitinfo_github_nopr(self):
+        git_info = coveralls.git.git_info()
+        assert git_info['git']['branch'] == 'master'
