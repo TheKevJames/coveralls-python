@@ -54,8 +54,9 @@ class CoverallReporter(Reporter):
                 if cu.should_be_python() and not self.config.ignore_errors:
                     log.warning('Source file is not python %s', cu.filename)
             except KeyError:
-                cov3x = __version__[0] < 4
-                cov40 = __version__[0] == 4 and __version__[1] < 1
+                version = [int(x) for x in __version__.split('.')]
+                cov3x = version[0] < 4
+                cov40 = version[0] == 4 and version[1] < 1
                 if cov3x or cov40:
                     raise CoverallsException(
                         'Old (<4.1) versions of coverage.py do not work '
