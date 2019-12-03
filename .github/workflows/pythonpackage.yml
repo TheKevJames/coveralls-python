@@ -1,6 +1,6 @@
 name: coveralls
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -12,6 +12,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1  # no history, just HEAD
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
