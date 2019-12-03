@@ -56,6 +56,18 @@ All variables:
 - ``CIRCLE_BRANCH``
 - ``CI_PULL_REQUEST``
 
+Github
+---------
+::
+
+    passenv = GITHUB_*
+
+All variables:
+
+- ``GITHUB_ACTIONS``
+- ``GITHUB_REF``
+- ``GITHUB_HEAD_REF``
+
 Jenkins
 -------
 ::

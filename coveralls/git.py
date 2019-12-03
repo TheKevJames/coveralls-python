@@ -34,6 +34,29 @@ def gitlog(fmt):
         return unicode(glog)  # pylint: disable=undefined-variable
 
 
+def git_branch():
+    branch = None
+    if os.environ.get('GITHUB_ACTIONS'):
+        github_ref = os.environ.get('GITHUB_REF')
+        if github_ref.startswith('refs/heads/'):
+            # E.g. in push events.
+            branch = github_ref.split('/', 2)[-1]
+        else:
+            # E.g. in pull_request events.
+            branch = os.environ.get('GITHUB_HEAD_REF')
+    else:
+        branch = (os.environ.get('APPVEYOR_REPO_BRANCH')
+                  or os.environ.get('BUILDKITE_BRANCH')
+                  or os.environ.get('CI_BRANCH')
+                  or os.environ.get('CIRCLE_BRANCH')
+                  or os.environ.get('GIT_BRANCH')
+                  or os.environ.get('TRAVIS_BRANCH')
+                  or os.environ.get('BRANCH_NAME')
+                  or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
+
+    return branch
+
+
 def git_info():
     """
     A hash of Git data that can be used to display more information to users.
@@ -56,14 +79,7 @@ def git_info():
         }
     """
     try:
-        branch = (os.environ.get('APPVEYOR_REPO_BRANCH')
-                  or os.environ.get('BUILDKITE_BRANCH')
-                  or os.environ.get('CI_BRANCH')
-                  or os.environ.get('CIRCLE_BRANCH')
-                  or os.environ.get('GIT_BRANCH')
-                  or os.environ.get('TRAVIS_BRANCH')
-                  or os.environ.get('BRANCH_NAME')
-                  or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
+        branch = git_branch()
         head = {
             'id': gitlog('%H'),
             'author_name': gitlog('%aN'),
