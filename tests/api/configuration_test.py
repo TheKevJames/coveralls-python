@@ -105,7 +105,7 @@ class NoConfiguration(unittest.TestCase):
          'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'},
         clear=True)
     def test_circleci_no_config(self):
-        cover = Coveralls()
+        cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'circle-ci'
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
