@@ -62,8 +62,8 @@ class Coveralls(object):
             return
 
         raise CoverallsException(
-            'Not on Travis or CircleCI. You have to provide either repo_token '
-            'in {} or set the COVERALLS_REPO_TOKEN env var.'.format(
+            'Not on TravisCI. You have to provide either repo_token in {} or '
+            'set the COVERALLS_REPO_TOKEN env var.'.format(
                 self.config_filename))
 
     @staticmethod
@@ -115,7 +115,6 @@ class Coveralls(object):
         elif os.environ.get('BUILDKITE'):
             name, job, pr = self.load_config_from_buildkite()
         elif os.environ.get('CIRCLECI'):
-            self._token_required = False
             name, job, pr = self.load_config_from_circle()
         elif os.environ.get('GITHUB_ACTIONS'):
             name, job, pr = self.load_config_from_github()

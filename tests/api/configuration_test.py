@@ -65,8 +65,8 @@ class NoConfiguration(unittest.TestCase):
             Coveralls()
 
         assert str(excinfo.value) == (
-            'Not on Travis or CircleCI. You have to provide either repo_token '
-            'in .coveralls.mock or set the COVERALLS_REPO_TOKEN env var.')
+            'Not on TravisCI. You have to provide either repo_token in '
+            '.coveralls.mock or set the COVERALLS_REPO_TOKEN env var.')
 
     @mock.patch.dict(os.environ, {'APPVEYOR': 'True',
                                   'APPVEYOR_BUILD_ID': '1234567',

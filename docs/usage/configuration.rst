@@ -21,7 +21,7 @@ If you would like to override the service name (auto-discovered on most CI syste
 
 If you are interested in merging the coverage results between multiple languages/projects, see our :ref:`multi-language <multilang>` documentation.
 
-If coveralls-python is being run on CircleCI or TravisCI, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::
+If coveralls-python is being run on TravisCI, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::
 
     COVERALLS_REPO_TOKEN=mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy coveralls
 

@@ -3,7 +3,7 @@ Usage
 
 This package works with any CI environment. Special handling has been included for some CI service providers, but coveralls-python can run anywhere.
 
-To get started with coveralls-python, make sure to `add your repo`_ on the coveralls.io website. If you will be using coveralls-python on CircleCI or TravisCI, you're done here -- otherwise, take note of the "repo token" in the coveralls.io dashboard.
+To get started with coveralls-python, make sure to `add your repo`_ on the coveralls.io website. If you will be using coveralls-python on TravisCI, you're done here -- otherwise, take note of the "repo token" in the coveralls.io dashboard.
 
 After that, its as simple as installing coveralls-python, collecting coverage results, and sending them to coveralls.io.
 
