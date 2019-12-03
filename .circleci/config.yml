@@ -30,6 +30,7 @@ jobs:
       tox_environment:
         type: string
     steps:
+      - run: apt-get update -qy && apt-get install -qy git
       - checkout
       - run: pip install tox tox-factor
       - run: tox -f <<parameters.tox_environment>>
