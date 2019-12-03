@@ -1,25 +1,18 @@
 sudo: false
+
 language: python
 python:
   - 2.7
   - 3.4
   - 3.5
+  - 3.6
+  - 3.7
+  - 3.8
   - pypy
-env:
-  - $COVPYYAML=cov3-default,coveralls3
-  - $COVPYYAML=cov4-pyyaml,coveralls4
-  - $COVPYYAML=cov41-pyyaml,coveralls41
-matrix:
-  include:
-    - python: 3.6
-      env: $COVPYYAML=cov41-pyyaml,coveralls41
-    - python: 3.7
-      dist: xenial  # https://github.com/travis-ci/travis-ci/issues/9815
-      sudo: true
-      env: $COVPYYAML=cov41-pyyaml,coveralls41
-    - python: pypy3
-      env: $COVPYYAML=cov41-pyyaml,coveralls41
+  - pypy3
+
 install:
   - pip install tox
+
 script:
-  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML
+  - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-cov41-pyyaml

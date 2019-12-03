@@ -18,10 +18,11 @@ jobs:
       - checkout
       - run: pip install tox tox-factor
       - run: tox -f <<parameters.tox_environment>>
+      - run: tox -e coveralls
 
   toxpypy:
     docker:
-      - image: pypy:<<parameters.docker_image>>
+      - image: pypy:<<parameters.docker_image>>-slim
     parameters:
       docker_image:
         type: string
@@ -32,6 +33,7 @@ jobs:
       - checkout
       - run: pip install tox tox-factor
       - run: tox -f <<parameters.tox_environment>>
+      - run: tox -e coveralls
 
 workflows:
   run-jobs:
@@ -40,30 +42,52 @@ workflows:
           python_version: 3.7.5
 
       - toxpy:
+          name: test-py2.7
           docker_image: '2.7'
           tox_environment: py27
       - toxpy:
+          name: test-py3.4
           docker_image: '3.4'
           tox_environment: py34
       - toxpy:
+          name: test-py3.5
           docker_image: '3.5'
           tox_environment: py35
       - toxpy:
+          name: test-py3.6
           docker_image: '3.6'
           tox_environment: py36
       - toxpy:
+          name: test-py3.7
           docker_image: '3.7'
           tox_environment: py37
+      - toxpy:
+          name: test-py3.8
+          docker_image: '3.8'
+          tox_environment: py38
 
       - toxpypy:
-          docker_image: 2-5.8.0
+          name: test-pypy2-5
+          docker_image: 2-5
           tox_environment: pypy
       - toxpypy:
-          docker_image: 2-6.0.0
+          name: test-pypy2-6
+          docker_image: 2-6
           tox_environment: pypy
       - toxpypy:
-          docker_image: 3-5.8.0
+          name: test-pypy2-7
+          docker_image: 2-7
+          tox_environment: pypy
+
+      - toxpypy:
+          name: test-pypy3-5
+          docker_image: 3-5
           tox_environment: pypy3
       - toxpypy:
-          docker_image: 3-6.0.0
+          name: test-pypy3-6
+          docker_image: 3-6
+          tox_environment: pypy3
+      - toxpypy:
+          name: test-pypy3-7
+          docker_image: 3-7
           tox_environment: pypy3
