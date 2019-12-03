@@ -1,3 +1,10 @@
+<a name="1.9.2"></a>
+## 1.9.2 (2019-12-03)
+
+#### Bug Fixes
+
+* **github:**  fixup incorrect API usage (#209) ([c338cab4](c338cab4))
+
 <a name="1.9.1"></a>
 ## 1.9.1 (2019-12-03)
 
