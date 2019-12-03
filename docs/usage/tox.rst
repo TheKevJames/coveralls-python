@@ -56,8 +56,8 @@ All variables:
 - ``CIRCLE_BRANCH``
 - ``CI_PULL_REQUEST``
 
-Github
----------
+Github Actions
+--------------
 ::
 
     passenv = GITHUB_*

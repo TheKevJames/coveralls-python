@@ -3,7 +3,7 @@
 Configuration
 =============
 
-coveralls-python often works without any outside configuration by examining the environment it is being run in. Special handling has been added for AppVeyor, BuildKite, CircleCI, Github, Jenkins, and TravisCI to make coveralls-python as close to "plug and play" as possible.
+coveralls-python often works without any outside configuration by examining the environment it is being run in. Special handling has been added for AppVeyor, BuildKite, CircleCI, Github Actions, Jenkins, and TravisCI to make coveralls-python as close to "plug and play" as possible.
 
 Most often, you will simply need to run coveralls-python with no additional options after you have run your coverage suite::
 
