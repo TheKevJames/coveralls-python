@@ -90,4 +90,4 @@ workflows:
       - toxpypy:
           name: test-pypy3-7
           docker_image: 3-7
-          tox_environment: pypy3
+          tox_environment: pypy37
