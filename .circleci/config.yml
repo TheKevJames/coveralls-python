@@ -40,19 +40,19 @@ workflows:
           python_version: 3.7.5
 
       - toxpy:
-          docker_image: 2.7
+          docker_image: '2.7'
           tox_environment: py27
       - toxpy:
-          docker_image: 3.4
+          docker_image: '3.4'
           tox_environment: py34
       - toxpy:
-          docker_image: 3.5
+          docker_image: '3.5'
           tox_environment: py35
       - toxpy:
-          docker_image: 3.6
+          docker_image: '3.6'
           tox_environment: py36
       - toxpy:
-          docker_image: 3.7
+          docker_image: '3.7'
           tox_environment: py37
 
       - toxpypy:
