@@ -1,4 +1,4 @@
-Coveralls for python
+Coveralls for Python
 ====================
 
 .. image:: https://img.shields.io/circleci/project/github/coveralls-clients/coveralls-python/master.svg?style=flat-square
@@ -7,8 +7,13 @@ Coveralls for python
 .. image:: https://img.shields.io/travis/coveralls-clients/coveralls-python/master.svg?style=flat-square
     :target: https://travis-ci.org/coveralls-clients/coveralls-python
 
+.. image:: https://img.shields.io/github/workflow/status/coveralls-clients/coveralls-python/coveralls/master?style=flat-square
+    :target: https://github.com/coveralls-clients/coveralls-python/actions
+
 .. image:: https://img.shields.io/coveralls/coveralls-clients/coveralls-python/master.svg?style=flat-square
     :target: https://coveralls.io/r/coveralls-clients/coveralls-python
+
+:raw-html:`<br />`
 
 .. image:: https://img.shields.io/pypi/dm/coveralls.svg?style=flat-square
     :target: https://pypi.org/project/coveralls/
@@ -18,6 +23,8 @@ Coveralls for python
 
 .. image:: https://img.shields.io/pypi/v/coveralls.svg?style=flat-square
     :target: https://pypi.org/project/coveralls/
+
+:raw-html:`<br />`
 
 .. image:: https://img.shields.io/pypi/pyversions/coveralls.svg?style=flat-square
     :target: https://pypi.org/project/coveralls/

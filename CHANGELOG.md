@@ -1,3 +1,11 @@
+<a name="1.9.1"></a>
+## 1.9.1 (2019-12-03)
+
+#### Compatibility
+
+*  this release marks Python 3.8 as officially supported. Earlier versions probably
+   supported Python 3.8 too, but now we're *sure*.
+
 <a name="1.9.0"></a>
 ## 1.9.0 (2019-12-03)
 
