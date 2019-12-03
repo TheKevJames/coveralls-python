@@ -88,7 +88,7 @@ class Coveralls(object):
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-        return 'github', None, pr
+        return 'github-actions', None, pr
 
     @staticmethod
     def load_config_from_jenkins():
