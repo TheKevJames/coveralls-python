@@ -19,6 +19,6 @@ matrix:
       sudo: true
       env: $COVPYYAML=cov41-pyyaml,coveralls41
 install:
-  - pip install tox
+  - pip install tox tox-factor
 script:
   - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML

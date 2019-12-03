@@ -1,102 +1,69 @@
-version: 2
+version: 2.1
+
+orbs:
+  linter: talkiq/linter@1
 
 jobs:
-  check:
+  toxpy:
     docker:
-      - image: python:3.6
-    steps:
-      - checkout
-      - run: pip install pre-commit
-      - run: pre-commit run --all-files
-
-  test-py27:
-    docker:
-      - image: python:2.7-alpine
+      - image: python:<<parameters.docker_image>>-alpine
+    parameters:
+      docker_image:
+        type: string
+      # TODO: figure out `<<parameters.docker_image>>.replace('.','')`
+      tox_environment:
+        type: string
     steps:
       - run: apk add --no-cache gcc git libffi-dev musl-dev openssh-client openssl-dev
       - checkout
-      - run: pip install tox
-      - run: tox -e "py27-cov{3,4,41}-{default,pyyaml}"
+      - run: pip install tox tox-factor
+      - run: tox -f <<parameters.tox_environment>>
 
-  test-py34:
+  toxpypy:
     docker:
-      - image: python:3.4-alpine
-    steps:
-      - run: apk add --no-cache git openssh-client
-      - checkout
-      - run: pip install tox
-      - run: tox -e "py34-cov{3,4,41}-{default,pyyaml}"
-
-  test-py35:
-    docker:
-      - image: python:3.5-alpine
-    steps:
-      - run: apk add --no-cache git openssh-client
-      - checkout
-      - run: pip install tox
-      - run: tox -e "py35-cov{3,4,41}-{default,pyyaml}"
-
-  test-py36:
-    docker:
-      - image: python:3.6-alpine
-    steps:
-      - run: apk add --no-cache git openssh-client
-      - checkout
-      - run: pip install tox
-      - run: tox -e "py36-cov41-{default,pyyaml}"
-
-  test-py37:
-    docker:
-      - image: python:3.7-alpine
-    steps:
-      - run: apk add --no-cache git openssh-client
-      - checkout
-      - run: pip install tox
-      - run: tox -e "py37-cov41-{default,pyyaml}"
-
-  test-pypy2-5:
-    docker:
-      - image: pypy:2-5.8.0
+      - image: pypy:<<parameters.docker_image>>
+    parameters:
+      docker_image:
+        type: string
+      # TODO: figure out `<<parameters.docker_image>>.replace('.','')`
+      tox_environment:
+        type: string
     steps:
       - checkout
-      - run: pip install tox
-      - run: tox -e "pypy-cov{3,4,41}-{default,pyyaml}"
-
-  test-pypy2-6:
-    docker:
-      - image: pypy:2-6.0.0
-    steps:
-      - checkout
-      - run: pip install tox
-      - run: tox -e "pypy-cov{3,4,41}-{default,pyyaml}"
-
-  test-pypy3-5:
-    docker:
-      - image: pypy:3-5.8.0
-    steps:
-      - checkout
-      - run: pip install tox
-      - run: tox -e "pypy3-cov{3,4,41}-{default,pyyaml}"
-
-  test-pypy3-6:
-    docker:
-      - image: pypy:3-6.0.0
-    steps:
-      - checkout
-      - run: pip install tox
-      - run: tox -e "pypy3-cov{3,4,41}-{default,pyyaml}"
+      - run: pip install tox tox-factor
+      - run: tox -f <<parameters.tox_environment>>
 
 workflows:
-  version: 2
-  test-all-envs:
+  run-jobs:
     jobs:
-      - check
-      - test-py27
-      - test-py34
-      - test-py35
-      - test-py36
-      - test-py37
-      - test-pypy2-5
-      - test-pypy2-6
-      - test-pypy3-5
-      - test-pypy3-6
+      - linter/pre-commit:
+          python_version: 3.7.5
+
+      - toxpy:
+          docker_image: 2.7
+          tox_environment: py27
+      - toxpy:
+          docker_image: 3.4
+          tox_environment: py34
+      - toxpy:
+          docker_image: 3.5
+          tox_environment: py35
+      - toxpy:
+          docker_image: 3.6
+          tox_environment: py36
+      - toxpy:
+          docker_image: 3.7
+          tox_environment: py37
+
+      - toxpypy:
+          docker_image: 2-5.8.0
+          tox_environment: pypy
+      - toxpypy:
+          docker_image: 2-6.0.0
+          tox_environment: pypy
+      - toxpypy:
+          docker_image: 3-5.8.0
+          tox_environment: pypy3
+      - toxpypy:
+          docker_image: 3-6.0.0
+          tox_environment: pypy3
