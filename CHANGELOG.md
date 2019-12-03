@@ -1,3 +1,14 @@
+<a name="1.9.0"></a>
+## 1.9.0 (2019-12-03)
+
+#### Features
+
+* **support:**  support Github Actions CI (#207) ([817119c3](817119c3))
+
+#### Bug Fixes
+
+* **compatibility:**  fixup coverage.__version__ comparisons (#208) ([03a57a9a](03a57a9a))
+
 <a name="1.8.2"></a>
 ## 1.8.2 (2019-07-29)
 
