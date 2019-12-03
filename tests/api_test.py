@@ -1,9 +1,12 @@
 # coding: utf-8
 import json
+import os
 
+import mock
 from coveralls import Coveralls
 
 
+@mock.patch.dict(os.environ, {}, clear=True)
 def test_output_to_file(tmpdir):
     """Check we can write coveralls report into the file."""
     test_log = tmpdir.join('test.log')
