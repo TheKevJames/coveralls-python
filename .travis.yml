@@ -5,7 +5,6 @@ python:
   - 3.4
   - 3.5
   - pypy
-  - pypy3
 env:
   - $COVPYYAML=cov3-default,coveralls3
   - $COVPYYAML=cov4-pyyaml,coveralls4
@@ -18,7 +17,9 @@ matrix:
       dist: xenial  # https://github.com/travis-ci/travis-ci/issues/9815
       sudo: true
       env: $COVPYYAML=cov41-pyyaml,coveralls41
+    - python: pypy3
+      env: $COVPYYAML=cov41-pyyaml,coveralls41
 install:
-  - pip install tox tox-factor
+  - pip install tox
 script:
   - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d . | sed -e 's/pypypy/pypy/')-$COVPYYAML
