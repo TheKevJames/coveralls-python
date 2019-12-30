@@ -15,12 +15,12 @@ from .exception import CoverallsException
 log = logging.getLogger('coveralls.reporter')
 
 
-class CoverallReporter(Reporter):
+class CoverallReporter(object):
     """Custom coverage.py reporter for coveralls.io"""
 
     def __init__(self, *args, **kwargs):
         self.source_files = []
-        super(CoverallReporter, self).__init__(*args, **kwargs)
+        self.reporter = Reporter(*args, **kwargs)
 
     def report(self, morfs=None):
         """
@@ -30,28 +30,30 @@ class CoverallReporter(Reporter):
         `outfile` is a file object to write the json to.
         """
         units = None
-        if hasattr(self, 'find_code_units'):
-            self.find_code_units(morfs)
+        if hasattr(self.reporter, 'find_code_units'):
+            self.reporter.find_code_units(morfs)
         else:
-            units = self.find_file_reporters(morfs)
+            units = self.reporter.find_file_reporters(morfs)
 
         if units is None:
-            if hasattr(self, 'code_units'):
-                units = self.code_units
+            if hasattr(self.reporter, 'code_units'):
+                units = self.reporter.code_units
             else:
-                units = self.file_reporters
+                units = self.reporter.file_reporters
 
         for cu in units:
             try:
-                analyzed = self.coverage._analyze(cu)  # pylint: disable=W0212
+                _fn = self.reporter.coverage._analyze  # pylint: disable=W0212
+                analyzed = _fn(cu)
                 self.parse_file(cu, analyzed)
             except NoSource:
-                if not self.config.ignore_errors:
+                if not self.reporter.config.ignore_errors:
                     log.warning('No source for %s', cu.filename)
             except NotPython:
                 # Only report errors for .py files, and only if we didn't
                 # explicitly suppress those errors.
-                if cu.should_be_python() and not self.config.ignore_errors:
+                if (cu.should_be_python()
+                        and not self.reporter.config.ignore_errors):
                     log.warning('Source file is not python %s', cu.filename)
             except KeyError:
                 version = [int(x) for x in __version__.split('.')]
