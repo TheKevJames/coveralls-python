@@ -265,7 +265,7 @@ class Coveralls(object):
         else:
             workman.get_data()
 
-        return CoverallReporter(workman, workman.config).report()
+        return CoverallReporter(workman, workman.config).coverage
 
     @staticmethod
     def debug_bad_encoding(data):

@@ -7,7 +7,6 @@ from coverage import __version__
 from coverage.misc import NoSource
 from coverage.misc import NotPython
 from coverage.phystokens import source_encoding
-from coverage.report import Reporter
 
 from .exception import CoverallsException
 
@@ -18,17 +17,23 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter(object):
     """Custom coverage.py reporter for coveralls.io"""
 
-    def __init__(self, *args, **kwargs):
-        self.source_files = []
-        self.reporter = Reporter(*args, **kwargs)
+    def __init__(self, cov, conf):
+        self.coverage = []
+        self.report(cov, conf)
 
-    def report(self, morfs=None):
+    def report(self, cov, conf, morfs=None):
         """
         Generate a part of json report for coveralls
 
         `morfs` is a list of modules or filenames.
         `outfile` is a file object to write the json to.
         """
+        try:
+            from coverage.report import Reporter
+            self.reporter = Reporter(cov, conf)
+        except ImportError:  # coverage >= 5.0
+            raise Exception('TODO: coverage v5 compatibility')
+
         units = None
         if hasattr(self.reporter, 'find_code_units'):
             self.reporter.find_code_units(morfs)
@@ -68,7 +73,7 @@ class CoverallReporter(object):
 
                 raise
 
-        return self.source_files
+        return self.coverage
 
     @staticmethod
     def get_hits(line_num, analysis):
@@ -162,4 +167,4 @@ class CoverallReporter(object):
         if branches:
             results['branches'] = branches
 
-        self.source_files.append(results)
+        self.coverage.append(results)
