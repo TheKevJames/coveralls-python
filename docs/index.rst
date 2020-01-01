@@ -34,4 +34,4 @@ Administration
    release
 
 .. _coveralls.io: https://coveralls.io/
-.. _coverage.py: https://coverage.readthedocs.io/en/coverage-4.4.1/
+.. _coverage.py: https://coverage.readthedocs.io/en/latest/
