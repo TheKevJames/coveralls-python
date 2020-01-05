@@ -50,6 +50,13 @@ class Coveralls(object):
 
         name, job, pr = self.load_config_from_ci_environment()
         self.config['service_name'] = self.config.get('service_name', name)
+
+        service_number = None
+        if isinstance(job, tuple):
+            service_number, job = job
+
+        if service_number:
+            self.config['service_number'] = service_number
         if job:
             self.config['service_job_id'] = job
         if pr:
@@ -85,10 +92,12 @@ class Coveralls(object):
 
     @staticmethod
     def load_config_from_github():
+        service_number = os.environ.get('GITHUB_SHA')
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-        return 'github-actions', None, pr
+            service_number += "-PR-{0}".format(pr)
+        return 'github', (service_number, None), pr
 
     @staticmethod
     def load_config_from_jenkins():
