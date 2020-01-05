@@ -110,23 +110,29 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
-    @mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true',
-                                  'GITHUB_REF': 'refs/pull/1234/merge',
-                                  'GITHUB_HEAD_REF': 'fixup-branch'},
-                     clear=True)
+    @mock.patch.dict(
+        os.environ,
+        {'GITHUB_ACTIONS': 'true',
+         'GITHUB_REF': 'refs/pull/1234/merge',
+         'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+         'GITHUB_HEAD_REF': 'fixup-branch'},
+        clear=True)
     def test_github_no_config(self):
         cover = Coveralls(repo_token='xxx')
-        assert cover.config['service_name'] == 'github-actions'
+        assert cover.config['service_name'] == 'github'
         assert cover.config['service_pull_request'] == '1234'
         assert 'service_job_id' not in cover.config
 
-    @mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true',
-                                  'GITHUB_REF': 'refs/heads/master',
-                                  'GITHUB_HEAD_REF': ''},
-                     clear=True)
+    @mock.patch.dict(
+        os.environ,
+        {'GITHUB_ACTIONS': 'true',
+         'GITHUB_REF': 'refs/heads/master',
+         'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+         'GITHUB_HEAD_REF': ''},
+        clear=True)
     def test_github_no_config_no_pr(self):
         cover = Coveralls(repo_token='xxx')
-        assert cover.config['service_name'] == 'github-actions'
+        assert cover.config['service_name'] == 'github'
         assert 'service_pull_request' not in cover.config
         assert 'service_job_id' not in cover.config
 

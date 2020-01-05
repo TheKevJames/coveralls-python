@@ -51,7 +51,13 @@ class Coveralls(object):
         name, job, pr = self.load_config_from_ci_environment()
         self.config['service_name'] = self.config.get('service_name', name)
         if job:
-            self.config['service_job_id'] = job
+            # N.B. Github Actions uses a different chunk of the Coveralls
+            # config when running parallel builds, ie. `service_number` instead
+            # of `service_job_id`.
+            if name.startswith('github'):
+                self.config['service_number'] = job
+            else:
+                self.config['service_job_id'] = job
         if pr:
             self.config['service_pull_request'] = pr
 
@@ -85,10 +91,12 @@ class Coveralls(object):
 
     @staticmethod
     def load_config_from_github():
+        service_number = os.environ.get('GITHUB_SHA')
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-        return 'github-actions', None, pr
+            service_number += "-PR-{0}".format(pr)
+        return 'github', service_number, pr
 
     @staticmethod
     def load_config_from_jenkins():

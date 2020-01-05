@@ -66,6 +66,7 @@ All variables:
 
 - ``GITHUB_ACTIONS``
 - ``GITHUB_REF``
+- ``GITHUB_SHA``
 - ``GITHUB_HEAD_REF``
 
 Jenkins
