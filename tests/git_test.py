@@ -5,11 +5,11 @@ from __future__ import unicode_literals
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 
 import mock
-import sh
 
 import coveralls.git
 
@@ -25,15 +25,18 @@ class GitTest(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp()
 
-        sh.cd(self.dir)
-        sh.touch('README')
+        os.chdir(self.dir)
+        open('README', 'a').close()
 
-        sh.git.init()
-        sh.git.config('user.name', '"{}"'.format(GIT_NAME))
-        sh.git.config('user.email', '"{}"'.format(GIT_EMAIL))
-        sh.git.add('README')
-        sh.git.commit('-m', GIT_COMMIT_MSG)
-        sh.git.remote('add', GIT_REMOTE, GIT_URL)
+        subprocess.call(['git', 'init'], cwd=self.dir)
+        subprocess.call(['git', 'config', 'user.name',
+                         '"{}"'.format(GIT_NAME)], cwd=self.dir)
+        subprocess.call(['git', 'config', 'user.email',
+                         '"{}"'.format(GIT_EMAIL)], cwd=self.dir)
+        subprocess.call(['git', 'add', 'README'], cwd=self.dir)
+        subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=self.dir)
+        subprocess.call(['git', 'remote', 'add', GIT_REMOTE, GIT_URL],
+                        cwd=self.dir)
 
     def tearDown(self):
         shutil.rmtree(self.dir)

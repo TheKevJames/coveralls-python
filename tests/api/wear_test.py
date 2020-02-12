@@ -8,7 +8,6 @@ import unittest
 import coverage
 import mock
 import pytest
-import sh
 
 import coveralls
 from coveralls.api import log
@@ -23,7 +22,10 @@ EXPECTED = {
 @mock.patch('coveralls.api.requests')
 class WearTest(unittest.TestCase):
     def setUp(self):
-        sh.rm('-f', '.coverage')
+        try:
+            os.remove('.coverage')
+        except Exception:
+            pass
 
     def test_wet_run(self, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED

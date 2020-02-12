@@ -37,7 +37,7 @@ setup(
         'docopt>=0.6.1',
         'requests>=1.0.0',
     ],
-    tests_require=['mock', 'pytest', 'sh>=1.08'],
+    tests_require=['mock', 'pytest'],
     extras_require={
         'yaml': ['PyYAML>=3.10'],
         ':python_version < "3"': ['urllib3[secure]'],

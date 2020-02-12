@@ -1,9 +1,8 @@
 # coding: utf-8
 # pylint: disable=no-self-use
 import os
+import subprocess
 import unittest
-
-import sh
 
 from coveralls import Coveralls
 
@@ -23,11 +22,17 @@ class ReporterTest(unittest.TestCase):
     def setUp(self):
         os.chdir(EXAMPLE_DIR)
 
-        sh.rm('-f', '.coverage')
-        sh.rm('-f', 'extra.py')
+        try:
+            os.remove('.coverage')
+        except Exception:
+            pass
+        try:
+            os.remove('extra.py')
+        except Exception:
+            pass
 
     def test_reporter(self):
-        sh.coverage('run', 'runtests.py')
+        subprocess.call(['coverage', 'run', 'runtests.py'], cwd=EXAMPLE_DIR)
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
@@ -59,7 +64,8 @@ class ReporterTest(unittest.TestCase):
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
     def test_reporter_with_branches(self):
-        sh.coverage('run', '--branch', 'runtests.py')
+        subprocess.call(['coverage', 'run', '--branch', 'runtests.py'],
+                        cwd=EXAMPLE_DIR)
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
@@ -98,13 +104,19 @@ class ReporterTest(unittest.TestCase):
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
     def test_missing_file(self):
-        sh.echo('print("Python rocks!")', _out='extra.py')
-        sh.coverage('run', 'extra.py')
-        sh.rm('-f', 'extra.py')
+        with open('extra.py', 'w') as f:
+            f.write('print("Python rocks!")\n')
+        subprocess.call(['coverage', 'run', 'extra.py'], cwd=EXAMPLE_DIR)
+        try:
+            os.remove('extra.py')
+        except Exception:
+            pass
         assert Coveralls(repo_token='xxx').get_coverage() == []
 
     def test_not_python(self):
-        sh.echo('print("Python rocks!")', _out='extra.py')
-        sh.coverage('run', 'extra.py')
-        sh.echo("<h1>This isn't python!</h1>", _out='extra.py')
+        with open('extra.py', 'w') as f:
+            f.write('print("Python rocks!")\n')
+        subprocess.call(['coverage', 'run', 'extra.py'], cwd=EXAMPLE_DIR)
+        with open('extra.py', 'w') as f:
+            f.write("<h1>This isn't python!</h1>\n")
         assert Coveralls(repo_token='xxx').get_coverage() == []
