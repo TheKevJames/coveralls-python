@@ -1,3 +1,18 @@
+<a name="1.11.0"></a>
+## 1.11.0 (2020-02-12)
+
+#### Fixes
+
+* **github:**  add service_number for github actions ([9f93bd8e](9f93bd8e))
+    This should fix support for parallel builds.
+
+#### Compatibility
+
+*  Python 2.7 and 3.4 are now officially End-Of-Life'd. Consider them deprecated
+   from the perspective of this package -- we'll remove them in an upcoming
+   release (likely the first one which requires non-trivial work to continue
+   supporting them!).
+
 <a name="1.10.0"></a>
 ## 1.10.0 (2019-12-31)
 
