@@ -7,7 +7,6 @@ import unittest
 
 import mock
 import pytest
-import sh
 try:
     import yaml
 except ImportError:
@@ -22,7 +21,7 @@ class Configuration(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp()
 
-        sh.cd(self.dir)
+        os.chdir(self.dir)
         with open('.coveralls.mock', 'w+') as fp:
             fp.write('repo_token: xxx\n')
             fp.write('service_name: jenkins\n')

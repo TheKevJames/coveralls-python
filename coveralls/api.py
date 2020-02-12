@@ -95,7 +95,7 @@ class Coveralls(object):
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-            service_number += "-PR-{0}".format(pr)
+            service_number += '-PR-{0}'.format(pr)
         return 'github', service_number, pr
 
     @staticmethod

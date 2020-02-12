@@ -2,11 +2,11 @@
 import json
 import logging
 import os
+import subprocess
 import sys
 
 import coverage
 import pytest
-import sh
 
 from coveralls import Coveralls
 
@@ -17,7 +17,7 @@ NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
 
 def test_non_unicode():
     os.chdir(NONUNICODE_DIR)
-    sh.coverage('run', 'nonunicode.py')
+    subprocess.call(['coverage', 'run', 'nonunicode.py'], cwd=NONUNICODE_DIR)
 
     actual_json = json.dumps(Coveralls(repo_token='xxx').get_coverage())
     expected_json_part = (
@@ -32,7 +32,7 @@ def test_non_unicode():
                     reason='coverage 4 not affected')
 def test_malformed_encoding_declaration(capfd):
     os.chdir(NONUNICODE_DIR)
-    sh.coverage('run', 'malformed.py')
+    subprocess.call(['coverage', 'run', 'malformed.py'], cwd=NONUNICODE_DIR)
 
     logging.getLogger('coveralls').addHandler(logging.StreamHandler())
     assert Coveralls(repo_token='xxx').get_coverage() == []
@@ -46,7 +46,7 @@ def test_malformed_encoding_declaration(capfd):
                     reason='coverage 3 fails')
 def test_malformed_encoding_declaration_py3_or_coverage4():
     os.chdir(NONUNICODE_DIR)
-    sh.coverage('run', 'malformed.py')
+    subprocess.call(['coverage', 'run', 'malformed.py'], cwd=NONUNICODE_DIR)
 
     result = Coveralls(repo_token='xxx').get_coverage()
     assert len(result) == 1
