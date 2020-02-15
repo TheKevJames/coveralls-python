@@ -1,3 +1,12 @@
+<a name="1.11.1"></a>
+## 1.11.1 (2020-02-15)
+
+#### Bug Fixes
+
+* **github:**  rename to github-actions ([9e65a059](9e65a059))
+    This fixes a regression introduced with v1.11.0, which may have prevented
+    usage of this library on Github Actions.
+
 <a name="1.11.0"></a>
 ## 1.11.0 (2020-02-12)
 
