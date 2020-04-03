@@ -1,4 +1,5 @@
-from project import hello, branch
+from project import branch
+from project import hello
 
 if __name__ == '__main__':
     hello()

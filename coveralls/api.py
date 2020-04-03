@@ -15,11 +15,13 @@ from .reporter import CoverallReporter
 log = logging.getLogger('coveralls.api')
 
 
-class Coveralls(object):
+class Coveralls:
     config_filename = '.coveralls.yml'
 
     def __init__(self, token_required=True, service_name=None, **kwargs):
         """
+        Initialize the main Coveralls collection entrypoint.
+
         * repo_token
           The secret token for your repository, found at the bottom of your
           repository's page on Coveralls.
@@ -94,7 +96,7 @@ class Coveralls(object):
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-            service_number += '-PR-{0}'.format(pr)
+            service_number += '-PR-{}'.format(pr)
         return 'github-actions', service_number, pr
 
     @staticmethod
@@ -162,12 +164,12 @@ class Coveralls(object):
             with open(os.path.join(os.getcwd(),
                                    self.config_filename)) as config:
                 try:
-                    import yaml
+                    import yaml  # pylint: disable=import-outside-toplevel
                     return yaml.safe_load(config)
                 except ImportError:
                     log.warning('PyYAML is not installed, skipping %s.',
                                 self.config_filename)
-        except (OSError, IOError):
+        except OSError:
             log.debug('Missing %s file. Using only env variables.',
                       self.config_filename)
 

@@ -2,7 +2,7 @@ def hello():
     print('world')
 
 
-class Foo(object):
+class Foo:
     """ Bar """
 
 

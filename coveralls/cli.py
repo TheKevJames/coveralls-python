@@ -1,5 +1,5 @@
 """
-Publish coverage results online via coveralls.io
+Publish coverage results online via coveralls.io.
 
 Puts your coverage results on coveralls.io for everyone to see.
 
@@ -25,6 +25,7 @@ Global options:
     -v --verbose      Print extra info, always enabled when debugging.
 
 Example:
+-------
     $ coveralls
     Submitting coverage to coveralls.io...
     Coverage submitted!

@@ -11,8 +11,8 @@ from .exception import CoverallsException
 log = logging.getLogger('coveralls.reporter')
 
 
-class CoverallReporter(object):
-    """Custom coverage.py reporter for coveralls.io"""
+class CoverallReporter:
+    """Custom coverage.py reporter for coveralls.io."""
 
     def __init__(self, cov, conf):
         self.coverage = []
@@ -49,7 +49,7 @@ class CoverallReporter(object):
         #     if str(e) != 'No data to report.':
         #         raise
 
-        from coverage.files import FnmatchMatcher, prep_patterns
+        from coverage.files import FnmatchMatcher, prep_patterns  # pylint: disable=import-outside-toplevel
 
         # get_analysis_to_report starts here; changes marked with TODOs
         file_reporters = cov._get_file_reporters(None)  # pylint: disable=W0212
@@ -87,7 +87,7 @@ class CoverallReporter(object):
                         msg = "Couldn't parse Python file '{}'".format(
                             fr.filename)
                         cov._warn(msg,  # pylint: disable=W0212
-                                  slug="couldnt-parse")
+                                  slug='couldnt-parse')
                     else:
                         # TODO: deprecate changes
                         # raise
@@ -100,14 +100,14 @@ class CoverallReporter(object):
 
     def report(self, cov, conf, morfs=None):
         """
-        Generate a part of json report for coveralls
+        Generate a part of json report for coveralls.
 
         `morfs` is a list of modules or filenames.
         `outfile` is a file object to write the json to.
         """
         # pylint: disable=too-many-branches
         try:
-            from coverage.report import Reporter
+            from coverage.report import Reporter  # pylint: disable=import-outside-toplevel
             self.reporter = Reporter(cov, conf)
         except ImportError:  # coverage >= 5.0
             return self.report5(cov)
@@ -206,7 +206,7 @@ class CoverallReporter(object):
         return branches
 
     def parse_file(self, cu, analysis):
-        """Generate data for single file"""
+        """Generate data for single file."""
         if hasattr(analysis, 'parser'):
             filename = cu.file_locator.relative_filename(cu.filename)
             source_lines = analysis.parser.lines

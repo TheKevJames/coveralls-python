@@ -9,7 +9,7 @@ VERSION_FILE = os.path.join(os.path.abspath(os.path.dirname(__file__)),
 DESCRIPTION = open('README.rst').read()
 
 VERSION = None
-with open(VERSION_FILE, 'r') as f:
+with open(VERSION_FILE) as f:
     VERSION = f.read().split()[2][1:-1]
 
 
