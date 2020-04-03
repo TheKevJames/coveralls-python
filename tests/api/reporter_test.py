@@ -32,7 +32,8 @@ class ReporterTest(unittest.TestCase):
             pass
 
     def test_reporter(self):
-        subprocess.call(['coverage', 'run', 'runtests.py'], cwd=EXAMPLE_DIR)
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'runtests.py'], cwd=EXAMPLE_DIR)
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
@@ -64,8 +65,8 @@ class ReporterTest(unittest.TestCase):
             'coverage': [None, 1, None, 1, 1, 1, 1]})
 
     def test_reporter_with_branches(self):
-        subprocess.call(['coverage', 'run', '--branch', 'runtests.py'],
-                        cwd=EXAMPLE_DIR)
+        subprocess.call(['coverage', 'run', '--branch', '--omit=**/.tox/*',
+                         'runtests.py'], cwd=EXAMPLE_DIR)
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
