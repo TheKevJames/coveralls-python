@@ -33,7 +33,7 @@ setup(
         ],
     },
     install_requires=[
-        'coverage>=3.6,<6.0',
+        'coverage>=4.0,<6.0',
         'docopt>=0.6.1',
         'requests>=1.0.0',
     ],

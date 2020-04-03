@@ -2,9 +2,6 @@ import json
 import os
 import subprocess
 
-import coverage
-import pytest
-
 from coveralls import Coveralls
 
 
@@ -24,8 +21,6 @@ def test_non_unicode():
     assert expected_json_part in actual_json
 
 
-@pytest.mark.skipif(coverage.__version__.startswith('3.'),
-                    reason='coverage 3 fails')
 def test_malformed_encoding_declaration_py3_or_coverage4():
     os.chdir(NONUNICODE_DIR)
     subprocess.call(['coverage', 'run', 'malformed.py'], cwd=NONUNICODE_DIR)
