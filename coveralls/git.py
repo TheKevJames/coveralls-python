@@ -18,10 +18,7 @@ def run_command(*args):
             'command return code {}, STDOUT: "{}"\nSTDERR: "{}"'.format(
                 cmd.returncode, stdout, stderr))
 
-    try:
-        return stdout.decode().strip()
-    except UnicodeDecodeError:
-        return stdout.decode('utf-8').strip()
+    return stdout.decode().strip()
 
 
 def gitlog(fmt):

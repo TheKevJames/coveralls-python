@@ -268,11 +268,7 @@ class Coveralls:
         config_file = self.config.get('config_file', True)
         workman = coverage.coverage(config_file=config_file)
         workman.load()
-
-        if hasattr(workman, '_harvest_data'):
-            workman._harvest_data()  # pylint: disable=W0212
-        else:
-            workman.get_data()
+        workman.get_data()
 
         return CoverallReporter(workman, workman.config).coverage
 
