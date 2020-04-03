@@ -5,8 +5,6 @@ from coverage import __version__
 from coverage.misc import NoSource
 from coverage.misc import NotPython
 
-from .exception import CoverallsException
-
 
 log = logging.getLogger('coveralls.reporter')
 
@@ -112,19 +110,7 @@ class CoverallReporter:
         except ImportError:  # coverage >= 5.0
             return self.report5(cov)
 
-        units = None
-        if hasattr(self.reporter, 'find_code_units'):
-            self.reporter.find_code_units(morfs)
-        else:
-            units = self.reporter.find_file_reporters(morfs)
-
-        if units is None:
-            if hasattr(self.reporter, 'code_units'):
-                units = self.reporter.code_units
-            else:
-                units = self.reporter.file_reporters
-
-        for cu in units:
+        for cu in self.reporter.find_file_reporters(morfs):
             try:
                 _fn = self.reporter.coverage._analyze  # pylint: disable=W0212
                 analyzed = _fn(cu)
@@ -138,17 +124,6 @@ class CoverallReporter:
                 if (cu.should_be_python()
                         and not self.reporter.config.ignore_errors):
                     log.warning('Source file is not python %s', cu.filename)
-            except KeyError:
-                version = [int(x) for x in __version__.split('.')]
-                cov40 = version[0] == 4 and version[1] < 1
-                if cov40:
-                    raise CoverallsException(
-                        'Old (<4.1) versions of coverage.py do not work '
-                        'consistently on new versions of Python. Please '
-                        'upgrade your coverage.py.'
-                    )
-
-                raise
 
         return self.coverage
 
@@ -207,27 +182,15 @@ class CoverallReporter:
 
     def parse_file(self, cu, analysis):
         """Generate data for single file."""
-        if hasattr(analysis, 'parser'):
-            filename = cu.file_locator.relative_filename(cu.filename)
-            source_lines = analysis.parser.lines
-            with cu.source_file() as source_file:
-                source = source_file.read()
-        else:
-            if hasattr(cu, 'relative_filename'):
-                filename = cu.relative_filename()
-            else:
-                filename = analysis.coverage.file_locator.relative_filename(
-                    cu.filename)
-
-            token_lines = analysis.file_reporter.source_token_lines()
-            source_lines = list(enumerate(token_lines))
-            source = analysis.file_reporter.source()
-
-        coverage_lines = [self.get_hits(i, analysis)
-                          for i in range(1, len(source_lines) + 1)]
-
+        filename = cu.relative_filename()
         # ensure results are properly merged between platforms
         posix_filename = filename.replace(os.path.sep, '/')
+
+        source = analysis.file_reporter.source()
+
+        token_lines = analysis.file_reporter.source_token_lines()
+        coverage_lines = [self.get_hits(i, analysis)
+                          for i, _ in enumerate(token_lines, 1)]
 
         results = {
             'name': posix_filename,
