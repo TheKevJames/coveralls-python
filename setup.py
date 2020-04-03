@@ -32,6 +32,7 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
+    python_requires='>= 3.5',
     install_requires=[
         'coverage>=4.1,<6.0',
         'docopt>=0.6.1',
