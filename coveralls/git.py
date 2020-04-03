@@ -28,10 +28,7 @@ def gitlog(fmt):
     glog = run_command('git', '--no-pager', 'log', '-1',
                        '--pretty=format:{}'.format(fmt))
 
-    try:
-        return str(glog)
-    except UnicodeEncodeError:
-        return unicode(glog)  # pylint: disable=undefined-variable
+    return str(glog)
 
 
 def git_branch():
@@ -62,6 +59,7 @@ def git_info():
     A hash of Git data that can be used to display more information to users.
 
     Example:
+    -------
         "git": {
             "head": {
                 "id": "5e837ce92220be64821128a70f6093f836dd2c05",

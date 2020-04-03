@@ -39,7 +39,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], {
             'source': ('def hello():\n'
                        '    print(\'world\')\n\n\n'
-                       'class Foo(object):\n'
+                       'class Foo:\n'
                        '    """ Bar """\n\n\n'
                        'def baz():\n'
                        '    print(\'this is not tested\')\n\n'
@@ -53,13 +53,14 @@ class ReporterTest(unittest.TestCase):
                          None, 1, 0, None, 1, 1, 1, 1, 1]})
 
         assert_coverage(results[1], {
-            'source': ('from project import hello, branch\n\n'
+            'source': ('from project import branch\n'
+                       'from project import hello\n\n'
                        "if __name__ == '__main__':\n"
                        '    hello()\n'
                        '    branch(False, True)\n'
                        '    branch(True, True)\n'),
             'name': 'runtests.py',
-            'coverage': [1, None, 1, 1, 1, 1]})
+            'coverage': [1, 1, None, 1, 1, 1, 1]})
 
     def test_reporter_with_branches(self):
         subprocess.call(['coverage', 'run', '--branch', '--omit=**/.tox/*',
@@ -74,7 +75,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], {
             'source': ('def hello():\n'
                        '    print(\'world\')\n\n\n'
-                       'class Foo(object):\n'
+                       'class Foo:\n'
                        '    """ Bar """\n\n\n'
                        'def baz():\n'
                        '    print(\'this is not tested\')\n\n'
@@ -90,14 +91,15 @@ class ReporterTest(unittest.TestCase):
                          None, 1, 0, None, 1, 1, 1, 1, 1]})
 
         assert_coverage(results[1], {
-            'source': ('from project import hello, branch\n\n'
+            'source': ('from project import branch\n'
+                       'from project import hello\n\n'
                        "if __name__ == '__main__':\n"
                        '    hello()\n'
                        '    branch(False, True)\n'
                        '    branch(True, True)\n'),
             'name': 'runtests.py',
-            'branches': [3, 0, 4, 1, 3, 0, 1, 0],
-            'coverage': [1, None, 1, 1, 1, 1]})
+            'branches': [4, 0, 5, 1, 4, 0, 1, 0],
+            'coverage': [1, 1, None, 1, 1, 1, 1]})
 
     def test_missing_file(self):
         with open('extra.py', 'w') as f:

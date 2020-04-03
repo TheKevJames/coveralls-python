@@ -1,82 +1,103 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.1.0
+    rev: v2.5.0
     hooks:
-    -   id: check-ast
-    -   id: check-builtin-literals
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
     -   id: check-json
     -   id: check-merge-conflict
     -   id: check-symlinks
+    -   id: check-toml
     -   id: check-vcs-permalinks
     -   id: check-xml
     -   id: check-yaml
         args: [--allow-multiple-documents]
-    -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
         exclude: example/.*
     -   id: file-contents-sorter
-        files: .dockerignore .gitignore
+        files: .(docker|git)ignore
     -   id: mixed-line-ending
         args: [--fix=lf]
+    -   id: trailing-whitespace
+
+# python
+    -   id: check-ast
+    -   id: check-builtin-literals
+    -   id: check-docstring-first
+    -   id: debug-statements
+    -   id: double-quote-string-fixer
+        exclude: nonunicode/.*
     -   id: name-tests-test
     -   id: requirements-txt-fixer
-    -   id: trailing-whitespace
 -   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.3.1
+    rev: v2.4.4
     hooks:
     -   id: pylint
+        additional_dependencies:
+        # TODO: >0.2.0
+        - git+https://github.com/bayesimpact/pylint_import_modules@016f79e4d2
         args:
+        - --allowed-direct-imports="typing.*"
+        - --load-plugins=pylint_import_modules
         - --max-line-length=79
         - --ignore-imports=yes
         - -d broad-except
         - -d fixme
         - -d import-error
+        - -d import-only-modules
         - -d invalid-name
         - -d locally-disabled
         - -d missing-docstring
         - -d too-few-public-methods
-        - -d useless-object-inheritance
+        - -d ungrouped-imports
         exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.6
+    rev: v1.1.7
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v1.4.0
+    rev: v2.0.0
     hooks:
     -   id: reorder-python-imports
-        args: [--py26-plus]
-        files: coveralls/.*
+        args: [--py3-plus]
+        exclude: nonunicode/.*
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v2.1.0
+    hooks:
+    -   id: pyupgrade
+        args: [--py3-plus]
+        exclude: nonunicode/.*
 -   repo: https://github.com/asottile/yesqa
-    rev: v0.0.10
+    rev: v1.1.0
     hooks:
     -   id: yesqa
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.4.3
+    rev: v1.5
     hooks:
     -   id: autopep8
         files: coveralls/.*
 -   repo: https://github.com/PyCQA/pydocstyle
-    rev: 792b8d92  # TODO: >3.0.0
+    rev: 5.0.2
     hooks:
     -   id: pydocstyle
         args:
-        - --ignore=D1,D203,D205,D212,D400,D401,D404
+        - --ignore=D1,D203,D205,D212,D400,D401,D404,D413
         files: coveralls/.*
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.7.7
+    rev: 3.7.9
     hooks:
     -   id: flake8
         args:
-        - --ignore=E501,W503,F811,F821
+        - --ignore=E501,W503,F401,F811
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.2.0
+    rev: v1.5.1
     hooks:
+    -   id: python-no-eval
     -   id: python-no-log-warn
     -   id: python-use-type-annotations
+
+# rst
     -   id: rst-backticks
