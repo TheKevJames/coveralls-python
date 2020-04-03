@@ -107,7 +107,8 @@ class ReporterTest(unittest.TestCase):
     def test_missing_file(self):
         with open('extra.py', 'w') as f:
             f.write('print("Python rocks!")\n')
-        subprocess.call(['coverage', 'run', 'extra.py'], cwd=EXAMPLE_DIR)
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'extra.py'], cwd=EXAMPLE_DIR)
         try:
             os.remove('extra.py')
         except Exception:
@@ -117,7 +118,8 @@ class ReporterTest(unittest.TestCase):
     def test_not_python(self):
         with open('extra.py', 'w') as f:
             f.write('print("Python rocks!")\n')
-        subprocess.call(['coverage', 'run', 'extra.py'], cwd=EXAMPLE_DIR)
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'extra.py'], cwd=EXAMPLE_DIR)
         with open('extra.py', 'w') as f:
             f.write("<h1>This isn't python!</h1>\n")
         assert Coveralls(repo_token='xxx').get_coverage() == []
