@@ -39,9 +39,7 @@ setup(
     ],
     tests_require=['mock', 'pytest'],
     extras_require={
-        # N.B. PyYAML 5.3 dropped support for Python 3.4... which we should
-        # also do...
-        'yaml': ['PyYAML>=3.10,<5.3'],
+        'yaml': ['PyYAML>=3.10'],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -50,7 +48,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

@@ -66,10 +66,6 @@ workflows:
           python_version: 3.7.5
 
       - toxpy:
-          name: test-py3.4
-          docker_image: '3.4'
-          tox_environment: py34
-      - toxpy:
           name: test-py3.5
           docker_image: '3.5'
           tox_environment: py35
