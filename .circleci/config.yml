@@ -8,13 +8,13 @@ jobs:
     docker:
       - image: python:<<parameters.docker_image>>-alpine
     parameters:
+      cov_version:
+        default: ""
+        type: string
       docker_image:
         type: string
       # TODO: figure out `<<parameters.docker_image>>.replace('.','')`
       tox_environment:
-        type: string
-      cov_version:
-        default: ""
         type: string
     steps:
       - run: apk add --no-cache gcc git libffi-dev musl-dev openssh-client openssl-dev
@@ -31,33 +31,19 @@ jobs:
             - run: tox -f <<parameters.tox_environment>>-cov<<parameters.cov_version>>
             - run: tox -e coveralls<<parameters.cov_version>>
 
-  # TODO: by introspecting `docker_image` (or `tox_environment`), we could
-  # these job definitions
   toxpypy:
     docker:
       - image: pypy:<<parameters.docker_image>>
     parameters:
-      docker_image:
-        type: string
-      # TODO: figure out `<<parameters.docker_image>>.replace('.','')`
-      tox_environment:
-        type: string
       cov_version:
-        default: ""
+        type: string
+      docker_image:
         type: string
     steps:
       - checkout
       - run: pip install tox tox-factor
-      - unless:
-          condition: <<parameters.cov_version>>
-          steps:
-            - run: tox -f <<parameters.tox_environment>>
-            - run: tox -e coveralls41
-      - when:
-          condition: <<parameters.cov_version>>
-          steps:
-            - run: tox -f <<parameters.tox_environment>>-cov<<parameters.cov_version>>
-            - run: tox -e coveralls<<parameters.cov_version>>
+      - run: tox -f pypy3-cov<<parameters.cov_version>>
+      - run: tox -e coveralls<<parameters.cov_version>>
 
 workflows:
   run-jobs:
@@ -70,63 +56,30 @@ workflows:
           docker_image: '3.5'
           tox_environment: py35
       - toxpy:
-          name: test-py3.6-cov4
+          name: test-py3.6-cov<<matrix.cov_version>>
           docker_image: '3.6'
           tox_environment: py36
-          cov_version: '41'
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
       - toxpy:
-          name: test-py3.6-cov5
-          docker_image: '3.6'
-          tox_environment: py36
-          cov_version: '5'
-      - toxpy:
-          name: test-py3.7-cov4
+          name: test-py3.7-cov<<matrix.cov_version>>
           docker_image: '3.7'
           tox_environment: py37
-          cov_version: '41'
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
       - toxpy:
-          name: test-py3.7-cov5
-          docker_image: '3.7'
-          tox_environment: py37
-          cov_version: '5'
-      - toxpy:
-          name: test-py3.8-cov4
+          name: test-py3.8-cov<<matrix.cov_version>>
           docker_image: '3.8'
           tox_environment: py38
-          cov_version: '41'
-      - toxpy:
-          name: test-py3.8-cov5
-          docker_image: '3.8'
-          tox_environment: py38
-          cov_version: '5'
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
 
       - toxpypy:
-          name: test-pypy3-5-cov4
-          docker_image: 3-5
-          tox_environment: pypy3
-          cov_version: '41'
-      - toxpypy:
-          name: test-pypy3-5-cov5
-          docker_image: 3-5
-          tox_environment: pypy3
-          cov_version: '5'
-      - toxpypy:
-          name: test-pypy3-6-cov4
-          docker_image: 3-6
-          tox_environment: pypy3
-          cov_version: '41'
-      - toxpypy:
-          name: test-pypy3-6-cov5
-          docker_image: 3-6
-          tox_environment: pypy3
-          cov_version: '5'
-      - toxpypy:
-          name: test-pypy3-7-cov4
-          docker_image: 3-7
-          tox_environment: pypy3
-          cov_version: '41'
-      - toxpypy:
-          name: test-pypy3-7-cov5
-          docker_image: 3-7
-          tox_environment: pypy3
-          cov_version: '5'
+          name: test-pypy<<matrix.docker_image>>-cov<<matrix.cov_version>>
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
+              docker_image: ['3-5', '3-6', '3-7']
