@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 from coveralls import __version__
 
 
-# -- General configuration ------------------------------------------------
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.githubpages',

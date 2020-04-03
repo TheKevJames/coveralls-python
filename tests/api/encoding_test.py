@@ -1,9 +1,6 @@
-# coding: utf-8
 import json
-import logging
 import os
 import subprocess
-import sys
 
 import coverage
 import pytest
@@ -27,21 +24,6 @@ def test_non_unicode():
     assert expected_json_part in actual_json
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 0), reason='python 3 not affected')
-@pytest.mark.skipif(coverage.__version__.startswith('4.'),
-                    reason='coverage 4 not affected')
-def test_malformed_encoding_declaration(capfd):
-    os.chdir(NONUNICODE_DIR)
-    subprocess.call(['coverage', 'run', 'malformed.py'], cwd=NONUNICODE_DIR)
-
-    logging.getLogger('coveralls').addHandler(logging.StreamHandler())
-    assert Coveralls(repo_token='xxx').get_coverage() == []
-
-    _, err = capfd.readouterr()
-    assert 'Source file malformed.py can not be properly decoded' in err
-
-
-@pytest.mark.skipif(sys.version_info < (3, 0), reason='python 2 fails')
 @pytest.mark.skipif(coverage.__version__.startswith('3.'),
                     reason='coverage 3 fails')
 def test_malformed_encoding_declaration_py3_or_coverage4():

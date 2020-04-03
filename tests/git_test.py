@@ -1,7 +1,4 @@
-# coding: utf-8
 # pylint: disable=no-self-use
-from __future__ import unicode_literals
-
 import os
 import re
 import shutil
@@ -77,28 +74,17 @@ class GitLogTest(GitTest):
         assert coveralls.git.gitlog('%s') == GIT_COMMIT_MSG
 
 
-def correct_encoding_for_envvars(value):
-    """
-    Env vars are unicode in Python 3 but bytes in Python 2
-    """
-    try:
-        str(value)
-    except UnicodeEncodeError:
-        value = value.encode('utf8')
-    return value
-
-
 class GitInfoTestEnvVars(unittest.TestCase):
     @mock.patch.dict(os.environ, {
         'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
         'GIT_BRANCH': 'master',
-        'GIT_AUTHOR_NAME': correct_encoding_for_envvars(GIT_NAME),
-        'GIT_AUTHOR_EMAIL': correct_encoding_for_envvars(GIT_EMAIL),
-        'GIT_COMMITTER_NAME': correct_encoding_for_envvars(GIT_NAME),
-        'GIT_COMMITTER_EMAIL': correct_encoding_for_envvars(GIT_EMAIL),
-        'GIT_MESSAGE': correct_encoding_for_envvars(GIT_COMMIT_MSG),
-        'GIT_URL': correct_encoding_for_envvars(GIT_URL),
-        'GIT_REMOTE': correct_encoding_for_envvars(GIT_REMOTE),
+        'GIT_AUTHOR_NAME': GIT_NAME,
+        'GIT_AUTHOR_EMAIL': GIT_EMAIL,
+        'GIT_COMMITTER_NAME': GIT_NAME,
+        'GIT_COMMITTER_EMAIL': GIT_EMAIL,
+        'GIT_MESSAGE': GIT_COMMIT_MSG,
+        'GIT_URL': GIT_URL,
+        'GIT_REMOTE': GIT_REMOTE,
     }, clear=True)
     def test_gitlog_envvars(self):
         git_info = coveralls.git.git_info()
@@ -108,15 +94,15 @@ class GitInfoTestEnvVars(unittest.TestCase):
         assert git_info == {
             'git': {
                 'head': {
-                    'committer_email': correct_encoding_for_envvars(GIT_EMAIL),
-                    'author_email': correct_encoding_for_envvars(GIT_EMAIL),
-                    'author_name': correct_encoding_for_envvars(GIT_NAME),
-                    'message': correct_encoding_for_envvars(GIT_COMMIT_MSG),
-                    'committer_name': correct_encoding_for_envvars(GIT_NAME),
+                    'committer_email': GIT_EMAIL,
+                    'author_email': GIT_EMAIL,
+                    'author_name': GIT_NAME,
+                    'message': GIT_COMMIT_MSG,
+                    'committer_name': GIT_NAME,
                 },
                 'remotes': [{
-                    'url': correct_encoding_for_envvars(GIT_URL),
-                    'name': correct_encoding_for_envvars(GIT_REMOTE),
+                    'url': GIT_URL,
+                    'name': GIT_REMOTE,
                 }],
                 'branch': 'master',
             },

@@ -1,12 +1,9 @@
-# coding: utf-8
 import logging
 import os
-import sys
 
 from coverage import __version__
 from coverage.misc import NoSource
 from coverage.misc import NotPython
-from coverage.phystokens import source_encoding
 
 from .exception import CoverallsException
 
@@ -216,18 +213,6 @@ class CoverallReporter(object):
             source_lines = analysis.parser.lines
             with cu.source_file() as source_file:
                 source = source_file.read()
-
-            try:
-                if sys.version_info < (3, 0):
-                    encoding = source_encoding(source)
-                    if encoding != 'utf-8':
-                        source = source.decode(encoding).encode('utf-8')
-            except UnicodeDecodeError:
-                log.warning(
-                    'Source file %s can not be properly decoded, skipping. '
-                    'Please check if encoding declaration is ok',
-                    os.path.basename(cu.filename))
-                return
         else:
             if hasattr(cu, 'relative_filename'):
                 filename = cu.relative_filename()
