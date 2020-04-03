@@ -1,4 +1,3 @@
-# coding: utf-8
 from .api import Coveralls
 from .version import __version__
 

@@ -1,4 +1,3 @@
-# coding: utf-8
 from project import hello, branch
 
 if __name__ == '__main__':

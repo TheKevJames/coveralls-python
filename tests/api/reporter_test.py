@@ -1,4 +1,3 @@
-# coding: utf-8
 # pylint: disable=no-self-use
 import os
 import subprocess
@@ -38,8 +37,7 @@ class ReporterTest(unittest.TestCase):
         assert len(results) == 2
 
         assert_coverage(results[0], {
-            'source': ('# coding: utf-8\n\n\n'
-                       'def hello():\n'
+            'source': ('def hello():\n'
                        '    print(\'world\')\n\n\n'
                        'class Foo(object):\n'
                        '    """ Bar """\n\n\n'
@@ -49,20 +47,19 @@ class ReporterTest(unittest.TestCase):
                        '    if cond1:\n'
                        '        print(\'condition tested both ways\')\n'
                        '    if cond2:\n'
-                       '        print(\'condition not tested both ways\')'),
+                       '        print(\'condition not tested both ways\')\n'),
             'name': 'project.py',
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None,
+            'coverage': [1, 1, None, None, 1, None, None,
                          None, 1, 0, None, 1, 1, 1, 1, 1]})
 
         assert_coverage(results[1], {
-            'source': ('# coding: utf-8\n'
-                       'from project import hello, branch\n\n'
+            'source': ('from project import hello, branch\n\n'
                        "if __name__ == '__main__':\n"
                        '    hello()\n'
                        '    branch(False, True)\n'
-                       '    branch(True, True)'),
+                       '    branch(True, True)\n'),
             'name': 'runtests.py',
-            'coverage': [None, 1, None, 1, 1, 1, 1]})
+            'coverage': [1, None, 1, 1, 1, 1]})
 
     def test_reporter_with_branches(self):
         subprocess.call(['coverage', 'run', '--branch', '--omit=**/.tox/*',
@@ -75,8 +72,7 @@ class ReporterTest(unittest.TestCase):
         assert not len(results[1]['branches']) % 4
 
         assert_coverage(results[0], {
-            'source': ('# coding: utf-8\n\n\n'
-                       'def hello():\n'
+            'source': ('def hello():\n'
                        '    print(\'world\')\n\n\n'
                        'class Foo(object):\n'
                        '    """ Bar """\n\n\n'
@@ -86,23 +82,22 @@ class ReporterTest(unittest.TestCase):
                        '    if cond1:\n'
                        '        print(\'condition tested both ways\')\n'
                        '    if cond2:\n'
-                       '        print(\'condition not tested both ways\')'),
+                       '        print(\'condition not tested both ways\')\n'),
             'name': 'project.py',
-            'branches': [16, 0, 17, 1, 16, 0, 18, 1, 18, 0, 19, 1, 18, 0, 15,
+            'branches': [13, 0, 14, 1, 13, 0, 15, 1, 15, 0, 16, 1, 15, 0, 12,
                          0],
-            'coverage': [None, None, None, 1, 1, None, None, 1, None, None,
+            'coverage': [1, 1, None, None, 1, None, None,
                          None, 1, 0, None, 1, 1, 1, 1, 1]})
 
         assert_coverage(results[1], {
-            'source': ('# coding: utf-8\n'
-                       'from project import hello, branch\n\n'
+            'source': ('from project import hello, branch\n\n'
                        "if __name__ == '__main__':\n"
                        '    hello()\n'
                        '    branch(False, True)\n'
-                       '    branch(True, True)'),
+                       '    branch(True, True)\n'),
             'name': 'runtests.py',
-            'branches': [4, 0, 5, 1, 4, 0, 2, 0],
-            'coverage': [None, 1, None, 1, 1, 1, 1]})
+            'branches': [3, 0, 4, 1, 3, 0, 1, 0],
+            'coverage': [1, None, 1, 1, 1, 1]})
 
     def test_missing_file(self):
         with open('extra.py', 'w') as f:
