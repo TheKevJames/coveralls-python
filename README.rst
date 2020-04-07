@@ -14,6 +14,9 @@ Coveralls for Python (Docs)
     .. image:: https://img.shields.io/coveralls/coveralls-clients/coveralls-python/master.svg?style=flat-square&label=Coverage
         :target: https://coveralls.io/r/coveralls-clients/coveralls-python
 
+    .. image:: https://readthedocs.org/projects/coveralls-python/badge/?version=latest
+        :target: https://coveralls-python.readthedocs.io/en/latest/?badge=latest
+
 :Version Info:
     .. image:: https://img.shields.io/conda/v/conda-forge/coveralls?style=flat-square&label=Conda
         :target: https://anaconda.org/conda-forge/coveralls
@@ -41,6 +44,24 @@ package provides seamless integration with `coverage.py`_ (and thus ``pytest``,
     pip install coveralls
     coverage run --source=mypkg -m pytest tests/
     coveralls
+    
+A common use case is to perform the above steps in a `tox`_ environment.
+Since coveralls-python relies on environment variables to function, you’ll need to configure tox to capture those variables using the passenv configuration option in your tox.ini.
+
+For example, on TravisCI:
+
+```ini
+[tox]
+envlist = py34,py35,py36,py37,py38
+
+[testenv]
+passenv = TRAVIS TRAVIS_*
+deps =
+    coveralls
+commands =
+    coverage run --source=yourpackagename setup.py test
+    coveralls
+```
 
 For more information and usage instructions, see our `documentation`_.
 
@@ -66,3 +87,4 @@ fixes to the 1.x branch if need be.
 .. _coveralls.io: https://coveralls.io/
 .. _documentation: http://coveralls-python.readthedocs.io/en/latest/
 .. _the PyPA docs: https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
+.. _tox: https://tox.readthedocs.io/en/latest/
