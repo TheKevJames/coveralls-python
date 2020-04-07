@@ -48,20 +48,18 @@ package provides seamless integration with `coverage.py`_ (and thus ``pytest``,
 A common use case is to perform the above steps in a `tox`_ environment.
 Since coveralls-python relies on environment variables to function, you’ll need to configure tox to capture those variables using the passenv configuration option in your tox.ini.
 
-For example, on TravisCI:
+For example, on TravisCI::
 
-```ini
-[tox]
-envlist = py34,py35,py36,py37,py38
+    [tox]
+    envlist = py34,py35,py36,py37,py38
 
-[testenv]
-passenv = TRAVIS TRAVIS_*
-deps =
-    coveralls
-commands =
-    coverage run --source=yourpackagename setup.py test
-    coveralls
-```
+    [testenv]
+    passenv = TRAVIS TRAVIS_*
+    deps =
+        coveralls
+    commands =
+        coverage run --source=yourpackagename setup.py test
+        coveralls
 
 For more information and usage instructions, see our `documentation`_.
 
