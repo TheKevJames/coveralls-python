@@ -1,5 +1,5 @@
-Coveralls for Python (Docs)
-===========================
+Coveralls for Python
+====================
 
 :Test Status:
     .. image:: https://img.shields.io/circleci/project/github/coveralls-clients/coveralls-python/master.svg?style=flat-square&label=CircleCI
@@ -60,7 +60,7 @@ For example, on TravisCI:
     deps =
         coveralls
     commands =
-        coverage run --source=yourpackagename setup.py test
+        coverage run --source=mypkg -m pytest tests
         coveralls
 
 For more information and usage instructions, see our `documentation`_.
