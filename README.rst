@@ -1,5 +1,5 @@
-Coveralls for Python
-====================
+Coveralls for Python (Docs)
+===========================
 
 :Test Status:
     .. image:: https://img.shields.io/circleci/project/github/coveralls-clients/coveralls-python/master.svg?style=flat-square&label=CircleCI
@@ -39,7 +39,7 @@ package provides seamless integration with `coverage.py`_ (and thus ``pytest``,
 ``nosetests``, etc...) in your Python projects::
 
     pip install coveralls
-    coverage run --source=mypkg setup.py test
+    coverage run --source=mypkg -m pytest tests/
     coveralls
 
 For more information and usage instructions, see our `documentation`_.
@@ -61,7 +61,8 @@ If you're in an outdated environment and experiencing an issue, feel free to
 open a ticket -- but please mention your environment! I'm willing to backport
 fixes to the 1.x branch if need be.
 
-.. _coveralls.io: https://coveralls.io/
+.. _Docs: http://coveralls-python.readthedocs.io/en/latest/
 .. _coverage.py: https://coverage.readthedocs.io/en/latest/
+.. _coveralls.io: https://coveralls.io/
 .. _documentation: http://coveralls-python.readthedocs.io/en/latest/
 .. _the PyPA docs: https://packaging.python.org/guides/distributing-packages-using-setuptools/#python-requires
