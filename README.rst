@@ -50,7 +50,7 @@ Since coveralls-python relies on environment variables to function, you’ll nee
 
 For example, on TravisCI:
 
-.. highlight:: ini
+.. code-block:: ini
 
     [tox]
     envlist = py34,py35,py36,py37,py38
