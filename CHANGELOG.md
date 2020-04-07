@@ -1,3 +1,14 @@
+<a name="2.0.0"></a>
+## 2.0.0 (2020-04-07)
+
+#### Compatiblity (BREAKING CHANGES)
+
+*  We have now dropped support for End-Of-Life'd versions of Python and
+   particularly old versions of the `coverage` library; if you are still using
+   Python v2.7 or v3.4, or you are using `coverage<4.1`, this library will no
+   longer be compatible starting from this release -- please pin to
+   `coveralls<2.0.0`.
+
 <a name="1.11.1"></a>
 ## 1.11.1 (2020-02-15)
 
@@ -12,7 +23,7 @@
 
 #### Fixes
 
-* **github:**  add service_number for github actions ([9f93bd8e](9f93bd8e))
+* **github:**  add `service_number` for github actions ([9f93bd8e](9f93bd8e))
     This should fix support for parallel builds.
 
 #### Compatibility
