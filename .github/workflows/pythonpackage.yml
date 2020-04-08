@@ -11,6 +11,9 @@ jobs:
         python-version: [3.5, 3.6, 3.7, 3.8]
 
     steps:
+    - name: Print event type
+      run: |
+        echo $GITHUB_EVENT_NAME
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1  # no history, just HEAD
