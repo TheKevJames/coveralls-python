@@ -98,7 +98,7 @@ All variables:
 
 
 SemaphoreCI
--------
+-----------
 ::
 
     passenv = SEMAPHORE SEMAPHORE_BUILD_NUMBER BRANCH_NAME PULL_REQUEST_NUMBER
@@ -109,4 +109,5 @@ All variables:
 - ``SEMAPHORE_BUILD_NUMBER``
 - ``BRANCH_NAME``
 - ``PULL_REQUEST_NUMBER``
+
 .. _tox: https://tox.readthedocs.io/en/latest/

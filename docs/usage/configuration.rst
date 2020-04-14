@@ -49,3 +49,17 @@ Sample ``.coveralls.yml`` file::
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
     parallel: true
     coveralls_host: https://coveralls.aperture.com
+
+Github Actions Gotcha
+---------------------
+
+There's something weird with using Github Actions that we've not yet been able to entirely sort out -- if you find you're getting a 422 error on Github Actions which looks like this::
+
+    Could not submit coverage: 422 Client Error: Unprocessable Entity for url: https://coveralls.io/api/v1/jobs
+
+Then you may be able to solve it by ensuring your ``secret`` is named ``COVERALLS_REPO_TOKEN``; it seems like Github Actions may do Magic(tm) to some environment variables based on their name. The following config block seems to work properly::
+
+    env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+    run: |
+        coveralls
