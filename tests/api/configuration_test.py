@@ -66,6 +66,14 @@ class NoConfiguration(unittest.TestCase):
             'Not on TravisCI. You have to provide either repo_token in '
             '.coveralls.mock or set the COVERALLS_REPO_TOKEN env var.')
 
+    @mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}, clear=True)
+    def test_misconfigured_github(self):
+        with pytest.raises(Exception) as excinfo:
+            Coveralls()
+
+        assert str(excinfo.value).startswith(
+            'Running on Github Actions but GITHUB_TOKEN is not set.')
+
     @mock.patch.dict(os.environ, {'APPVEYOR': 'True',
                                   'APPVEYOR_BUILD_ID': '1234567',
                                   'APPVEYOR_PULL_REQUEST_NUMBER': '1234'},
@@ -113,26 +121,34 @@ class NoConfiguration(unittest.TestCase):
         {'GITHUB_ACTIONS': 'true',
          'GITHUB_REF': 'refs/pull/1234/merge',
          'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
-         'GITHUB_HEAD_REF': 'fixup-branch'},
+         'GITHUB_RUN_ID': '123456789',
+         'GITHUB_RUN_NUMBER': '12',
+         'GITHUB_HEAD_REF': 'fixup-branch',
+         'COVERALLS_REPO_TOKEN': 'xxx'},
         clear=True)
     def test_github_no_config(self):
-        cover = Coveralls(repo_token='xxx')
+        cover = Coveralls()
         assert cover.config['service_name'] == 'github-actions'
         assert cover.config['service_pull_request'] == '1234'
+        assert cover.config['service_number'] == '123456789'
         assert 'service_job_id' not in cover.config
 
     @mock.patch.dict(
         os.environ,
         {'GITHUB_ACTIONS': 'true',
+         'GITHUB_TOKEN': 'xxx',
          'GITHUB_REF': 'refs/heads/master',
          'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+         'GITHUB_RUN_ID': '987654321',
+         'GITHUB_RUN_NUMBER': '21',
          'GITHUB_HEAD_REF': ''},
         clear=True)
     def test_github_no_config_no_pr(self):
-        cover = Coveralls(repo_token='xxx')
-        assert cover.config['service_name'] == 'github-actions'
-        assert 'service_pull_request' not in cover.config
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'github'
+        assert cover.config['service_number'] == '987654321'
         assert 'service_job_id' not in cover.config
+        assert 'service_pull_request' not in cover.config
 
     @mock.patch.dict(
         os.environ,

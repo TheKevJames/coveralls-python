@@ -53,13 +53,41 @@ Sample ``.coveralls.yml`` file::
 Github Actions Gotcha
 ---------------------
 
-There's something weird with using Github Actions that we've not yet been able to entirely sort out -- if you find you're getting a 422 error on Github Actions which looks like this::
-
-    Could not submit coverage: 422 Client Error: Unprocessable Entity for url: https://coveralls.io/api/v1/jobs
-
-Then you may be able to solve it by ensuring your ``secret`` is named ``COVERALLS_REPO_TOKEN``; it seems like Github Actions may do Magic(tm) to some environment variables based on their name. The following config block seems to work properly::
+Coveralls natively supports jobs running on Github Actions. You can directly pass the default-provided secret GITHUB_TOKEN::
 
     env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     run: |
         coveralls
+
+For parallel builds you have to specify a unique flag-name for every step/job. You can use the official coveralls action to finalize the build::
+
+    jobs:
+      test:
+        strategy:
+          matrix:
+            test-name:
+              - test1
+              - test2
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v2
+          - name: Test
+            run: |
+              ./run_tests.sh ${{ matrix.test-name }}
+              coveralls
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              COVERALLS_PARALLEL: true
+              COVERALLS_FLAG_NAME: test-${{ matrix.test-env }}
+      coveralls:
+        name: Coveralls
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+        - name: Finished
+          uses: coverallsapp/github-action@master
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            parallel-finished: true
