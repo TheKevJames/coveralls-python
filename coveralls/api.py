@@ -92,11 +92,10 @@ class Coveralls:
 
     @staticmethod
     def load_config_from_github():
-        service_number = os.environ.get('GITHUB_SHA')
+        service_number = os.environ.get('GITHUB_RUN_ID')
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-            service_number += '-PR-{}'.format(pr)
         return 'github-actions', service_number, pr
 
     @staticmethod
