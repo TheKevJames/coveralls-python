@@ -18,7 +18,7 @@ def test_output_to_file(tmpdir):
 
 @mock.patch.dict(os.environ, {}, clear=True)
 def test_load_config_from_github():
-    """Check getting config from GH actions works when not in a PR."""
+    """Check getting config during a GH action works."""
     os.environ['GITHUB_RUN_ID'] = 'run_id'
     os.environ['GITHUB_REF'] = 'refs/push/somehash'
     assert Coveralls.load_config_from_github() == (
