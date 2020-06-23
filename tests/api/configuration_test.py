@@ -112,7 +112,7 @@ class NoConfiguration(unittest.TestCase):
         os.environ,
         {'GITHUB_ACTIONS': 'true',
          'GITHUB_REF': 'refs/pull/1234/merge',
-         'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+         'GITHUB_RUN_ID': '100',
          'GITHUB_HEAD_REF': 'fixup-branch'},
         clear=True)
     def test_github_no_config(self):
@@ -125,7 +125,7 @@ class NoConfiguration(unittest.TestCase):
         os.environ,
         {'GITHUB_ACTIONS': 'true',
          'GITHUB_REF': 'refs/heads/master',
-         'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+         'GITHUB_RUN_ID': '100',
          'GITHUB_HEAD_REF': ''},
         clear=True)
     def test_github_no_config_no_pr(self):

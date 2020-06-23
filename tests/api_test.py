@@ -14,17 +14,3 @@ def test_output_to_file(tmpdir):
     report = test_log.read()
 
     assert json.loads(report)['repo_token'] == 'xxx'
-
-
-@mock.patch.dict(os.environ, {}, clear=True)
-def test_load_config_from_github():
-    """Check getting config during a GH action works."""
-    os.environ['GITHUB_RUN_ID'] = 'run_id'
-    os.environ['GITHUB_REF'] = 'refs/push/somehash'
-    assert Coveralls.load_config_from_github() == (
-        'github-actions', 'run_id', None)
-
-    os.environ['GITHUB_RUN_ID'] = 'run_id'
-    os.environ['GITHUB_REF'] = 'refs/pull/123'
-    assert Coveralls.load_config_from_github() == (
-        'github-actions', 'run_id', '123')
