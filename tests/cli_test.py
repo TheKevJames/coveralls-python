@@ -18,6 +18,7 @@ def test_debug(mock_wear, mock_log):
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
 
 
+@mock.patch.dict(os.environ, clear=True)
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug_no_token(mock_wear, mock_log):
@@ -74,6 +75,7 @@ def test_save_report_to_file(mock_coveralls):
     mock_coveralls.assert_called_with('test.log')
 
 
+@mock.patch.dict(os.environ, clear=True)
 @mock.patch.object(coveralls.Coveralls, 'save_report')
 def test_save_report_to_file_no_token(mock_coveralls):
     """Check save_report api usage when token is not set."""
