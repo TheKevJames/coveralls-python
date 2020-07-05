@@ -21,6 +21,7 @@ Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --output=<file>   Write report to file. Doesn't send anything.
     --merge=<file>    Merge report from file when submitting.
+    --finish          Finish parallel jobs.
     -h --help         Display this help.
     -v --verbose      Print extra info, always enabled when debugging.
 
@@ -72,6 +73,12 @@ def main(argv=None):
         if options['--output']:
             log.info('Write coverage report to file...')
             coverallz.save_report(options['--output'])
+            return
+
+        if options['--finish']:
+            log.info('Finishing parallel jobs...')
+            coverallz.parallel_finish()
+            log.info('Done')
             return
 
         log.info('Submitting coverage to coveralls.io...')

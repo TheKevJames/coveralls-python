@@ -207,6 +207,39 @@ class Coveralls:
         except Exception as e:
             raise CoverallsException('Could not submit coverage: {}'.format(e))
 
+    def parallel_finish(self):
+        payload = {
+            'payload': {
+                'status': 'done'
+            }
+        }
+        if self.config.get('repo_token'):
+            payload['repo_token'] = self.config['repo_token']
+        if self.config.get('service_number'):
+            payload['payload']['build_num'] = self.config['service_number']
+
+        # Service-Specific Parameters
+        if os.environ.get('GITHUB_REPOSITORY'):
+            payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
+
+        endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
+        verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        response = requests.post(endpoint, json=payload, verify=verify)
+        try:
+            response.raise_for_status()
+            response = response.json()
+        except Exception as e:
+            raise CoverallsException('Parallel finish failed: {}'.format(e))
+
+        if 'error' in response:
+            e = response['error']
+            raise CoverallsException('Parallel finish failed: {}'.format(e))
+
+        if 'done' not in response or not response['done']:
+            raise CoverallsException('Parallel finish failed')
+
+        return response
+
     def create_report(self):
         """Generate json dumped report for coveralls api."""
         data = self.create_data()

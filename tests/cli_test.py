@@ -1,12 +1,18 @@
+import json
 import os
 
 import mock
+import responses
 
 import coveralls.cli
 from coveralls.exception import CoverallsException
 
 
 EXC = CoverallsException('bad stuff happened')
+
+
+def req_json(request):
+    return json.loads(request.body.decode('utf-8'))
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
@@ -25,6 +31,61 @@ def test_debug_no_token(mock_wear, mock_log):
     coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
+
+
+@mock.patch.dict(
+    os.environ,
+    {'GITHUB_ACTIONS': 'true',
+     'GITHUB_REPOSITORY': 'test/repo',
+     'GITHUB_TOKEN': 'xxx',
+     'GITHUB_RUN_ID': '123456789',
+     'GITHUB_RUN_NUMBER': '123'},
+    clear=True)
+@mock.patch.object(coveralls.cli.log, 'info')
+@responses.activate
+def test_finish(mock_log):
+    responses.add(responses.POST, 'https://coveralls.io/webhook',
+                  json={'done': True}, status=200)
+    expected_json = {
+        'repo_token': 'xxx',
+        'repo_name': 'test/repo',
+        'payload': {
+            'status': 'done',
+            'build_num': '123456789'
+        }
+    }
+
+    coveralls.cli.main(argv=['--finish'])
+
+    mock_log.assert_has_calls(
+        [mock.call('Finishing parallel jobs...'),
+         mock.call('Done')])
+    assert len(responses.calls) == 1
+    assert req_json(responses.calls[0].request) == expected_json
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'exception')
+@responses.activate
+def test_finish_exception(mock_log):
+    responses.add(responses.POST, 'https://coveralls.io/webhook',
+                  json={'error': 'Mocked'}, status=200)
+    expected_json = {
+        'payload': {
+            'status': 'done'
+        }
+    }
+    msg = 'Parallel finish failed: Mocked'
+
+    try:
+        coveralls.cli.main(argv=['--finish'])
+        assert 0 == 1  # Should never reach this line
+    except SystemExit:
+        pass
+
+    mock_log.assert_has_calls([mock.call(CoverallsException(msg))])
+    assert len(responses.calls) == 1
+    assert req_json(responses.calls[0].request) == expected_json
 
 
 @mock.patch.object(coveralls.cli.log, 'info')

@@ -60,7 +60,7 @@ Coveralls natively supports jobs running on Github Actions. You can directly pas
     run: |
         coveralls
 
-For parallel builds you have to specify a unique flag-name for every step/job. You can use the official coveralls action to finalize the build::
+For parallel builds you have to add a final step to let coveralls know the parallel build is finished. You also have to set COVERALLS_FLAG_NAME to something unique to the specific step, so re-runs of the same job don't keep piling up builds::
 
     jobs:
       test:
@@ -74,20 +74,22 @@ For parallel builds you have to specify a unique flag-name for every step/job. Y
           - name: Checkout
             uses: actions/checkout@v2
           - name: Test
-            run: |
-              ./run_tests.sh ${{ matrix.test-name }}
-              coveralls
+            run: ./run_tests.sh ${{ matrix.test-name }}
+          - name: Upload Coverage
+            run: coveralls
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
               COVERALLS_PARALLEL: true
-              COVERALLS_FLAG_NAME: test-${{ matrix.test-env }}
       coveralls:
-        name: Coveralls
+        name: Finish Coveralls
         needs: test
         runs-on: ubuntu-latest
+        container: python:3-slim
         steps:
         - name: Finished
-          uses: coverallsapp/github-action@master
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            parallel-finished: true
+          run: |
+            pip3 install --upgrade coveralls
+            coveralls --finish
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
