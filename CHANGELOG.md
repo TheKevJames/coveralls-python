@@ -1,3 +1,14 @@
+<a name="2.1.0"></a>
+## 2.1.0 (2020-07-07)
+
+#### Features
+
+* **cli**:  add new `--finish` flag for finalizing parallel builds (#277) ([f597109b](f597109b))
+
+#### Bug Fixes
+
+* **github:**  fix Github Actions support (#227) ([f597109b](f597109b))
+
 <a name="2.0.0"></a>
 ## 2.0.0 (2020-04-07)
 

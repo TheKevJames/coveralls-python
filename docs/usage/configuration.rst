@@ -29,6 +29,10 @@ If you are running multiple jobs in parallel and want coveralls.io to merge thos
 
     COVERALLS_PARALLEL=true coveralls
 
+Later on, you can use ``coveralls --finish`` to let the Coveralls service know you have completed all your parallel runs::
+
+    coveralls --finish
+
 If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set ``COVERALLS_HOST`` to the base URL of that insance::
 
     COVERALLS_HOST="https://coveralls.aperture.com" coveralls
@@ -60,7 +64,7 @@ Coveralls natively supports jobs running on Github Actions. You can directly pas
     run: |
         coveralls
 
-For parallel builds you have to add a final step to let coveralls know the parallel build is finished. You also have to set COVERALLS_FLAG_NAME to something unique to the specific step, so re-runs of the same job don't keep piling up builds::
+For parallel builds, you have to add a final step to let coveralls know the parallel build is finished. You also have to set COVERALLS_FLAG_NAME to something unique to the specific step, so re-runs of the same job don't keep piling up builds::
 
     jobs:
       test:

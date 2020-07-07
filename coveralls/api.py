@@ -207,19 +207,19 @@ class Coveralls:
         except Exception as e:
             raise CoverallsException('Could not submit coverage: {}'.format(e))
 
+    # https://docs.coveralls.io/parallel-build-webhook
     def parallel_finish(self):
-        payload = {
-            'payload': {
-                'status': 'done'
-            }
-        }
+        payload = {'payload': {'status': 'done'}}
+
+        # required args
         if self.config.get('repo_token'):
             payload['repo_token'] = self.config['repo_token']
         if self.config.get('service_number'):
             payload['payload']['build_num'] = self.config['service_number']
 
-        # Service-Specific Parameters
+        # service-specific parameters
         if os.environ.get('GITHUB_REPOSITORY'):
+            # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
         endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
