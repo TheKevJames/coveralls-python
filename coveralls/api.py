@@ -49,16 +49,12 @@ class Coveralls:
 
         self.load_config_from_environment()
 
-        name, job, pr = self.load_config_from_ci_environment()
+        name, job, number, pr = self.load_config_from_ci_environment()
         self.config['service_name'] = self.config.get('service_name', name)
         if job:
-            # N.B. Github Actions uses a different chunk of the Coveralls
-            # config when running parallel builds, ie. `service_number` instead
-            # of `service_job_id`.
-            if name.startswith('github'):
-                self.config['service_number'] = job
-            else:
-                self.config['service_job_id'] = job
+            self.config['service_job_id'] = job
+        if number:
+            self.config['service_number'] = number
         if pr:
             self.config['service_pull_request'] = pr
 
@@ -76,67 +72,78 @@ class Coveralls:
     @staticmethod
     def load_config_from_appveyor():
         pr = os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER')
-        return 'appveyor', os.environ.get('APPVEYOR_BUILD_ID'), pr
+        return 'appveyor', os.environ.get('APPVEYOR_BUILD_ID'), None, pr
 
     @staticmethod
     def load_config_from_buildkite():
         pr = os.environ.get('BUILDKITE_PULL_REQUEST')
         if pr == 'false':
             pr = None
-        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), pr
+        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), None, pr
 
     @staticmethod
     def load_config_from_circle():
         pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
-        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), pr
+        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), None, pr
 
-    @staticmethod
-    def load_config_from_github():
-        service_number = os.environ.get('GITHUB_SHA')
+    def load_config_from_github(self):
+        service = 'github'
+        if self.config.get('repo_token'):
+            service = 'github-actions'
+        else:
+            gh_token = os.environ.get('GITHUB_TOKEN')
+            if not gh_token:
+                raise CoverallsException(
+                    'Running on Github Actions but GITHUB_TOKEN is not set. '
+                    'Add "env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to '
+                    'your step config.')
+            self.config['repo_token'] = gh_token
+
+        number = os.environ.get('GITHUB_RUN_ID')
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-            service_number += '-PR-{}'.format(pr)
-        return 'github-actions', service_number, pr
+        return service, None, number, pr
 
     @staticmethod
     def load_config_from_jenkins():
         pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
-        return 'jenkins', os.environ.get('BUILD_NUMBER'), pr
+        return 'jenkins', os.environ.get('BUILD_NUMBER'), None, pr
 
     @staticmethod
     def load_config_from_travis():
         pr = os.environ.get('TRAVIS_PULL_REQUEST')
-        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), pr
+        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None, pr
 
     @staticmethod
     def load_config_from_semaphore():
+        job = os.environ.get('SEMAPHORE_BUILD_NUMBER')
         pr = os.environ.get('PULL_REQUEST_NUMBER')
-        return 'semaphore-ci', os.environ.get('SEMAPHORE_BUILD_NUMBER'), pr
+        return 'semaphore-ci', job, None, pr
 
     @staticmethod
     def load_config_from_unknown():
-        return 'coveralls-python', None, None
+        return 'coveralls-python', None, None, None
 
     def load_config_from_ci_environment(self):
         if os.environ.get('APPVEYOR'):
-            name, job, pr = self.load_config_from_appveyor()
+            name, job, number, pr = self.load_config_from_appveyor()
         elif os.environ.get('BUILDKITE'):
-            name, job, pr = self.load_config_from_buildkite()
+            name, job, number, pr = self.load_config_from_buildkite()
         elif os.environ.get('CIRCLECI'):
-            name, job, pr = self.load_config_from_circle()
+            name, job, number, pr = self.load_config_from_circle()
         elif os.environ.get('GITHUB_ACTIONS'):
-            name, job, pr = self.load_config_from_github()
+            name, job, number, pr = self.load_config_from_github()
         elif os.environ.get('JENKINS_HOME'):
-            name, job, pr = self.load_config_from_jenkins()
+            name, job, number, pr = self.load_config_from_jenkins()
         elif os.environ.get('TRAVIS'):
             self._token_required = False
-            name, job, pr = self.load_config_from_travis()
+            name, job, number, pr = self.load_config_from_travis()
         elif os.environ.get('SEMAPHORE'):
-            name, job, pr = self.load_config_from_semaphore()
+            name, job, number, pr = self.load_config_from_semaphore()
         else:
-            name, job, pr = self.load_config_from_unknown()
-        return (name, job, pr)
+            name, job, number, pr = self.load_config_from_unknown()
+        return (name, job, number, pr)
 
     def load_config_from_environment(self):
         coveralls_host = os.environ.get('COVERALLS_HOST')
@@ -158,6 +165,10 @@ class Coveralls:
         flag_name = os.environ.get('COVERALLS_FLAG_NAME')
         if flag_name:
             self.config['flag_name'] = flag_name
+
+        number = os.environ.get('COVERALLS_SERVICE_JOB_NUMBER')
+        if number:
+            self.config['service_number'] = number
 
     def load_config_from_file(self):
         try:
@@ -195,6 +206,39 @@ class Coveralls:
             return response.json()
         except Exception as e:
             raise CoverallsException('Could not submit coverage: {}'.format(e))
+
+    def parallel_finish(self):
+        payload = {
+            'payload': {
+                'status': 'done'
+            }
+        }
+        if self.config.get('repo_token'):
+            payload['repo_token'] = self.config['repo_token']
+        if self.config.get('service_number'):
+            payload['payload']['build_num'] = self.config['service_number']
+
+        # Service-Specific Parameters
+        if os.environ.get('GITHUB_REPOSITORY'):
+            payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
+
+        endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
+        verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        response = requests.post(endpoint, json=payload, verify=verify)
+        try:
+            response.raise_for_status()
+            response = response.json()
+        except Exception as e:
+            raise CoverallsException('Parallel finish failed: {}'.format(e))
+
+        if 'error' in response:
+            e = response['error']
+            raise CoverallsException('Parallel finish failed: {}'.format(e))
+
+        if 'done' not in response or not response['done']:
+            raise CoverallsException('Parallel finish failed')
+
+        return response
 
     def create_report(self):
         """Generate json dumped report for coveralls api."""

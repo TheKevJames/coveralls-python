@@ -53,13 +53,43 @@ Sample ``.coveralls.yml`` file::
 Github Actions Gotcha
 ---------------------
 
-There's something weird with using Github Actions that we've not yet been able to entirely sort out -- if you find you're getting a 422 error on Github Actions which looks like this::
-
-    Could not submit coverage: 422 Client Error: Unprocessable Entity for url: https://coveralls.io/api/v1/jobs
-
-Then you may be able to solve it by ensuring your ``secret`` is named ``COVERALLS_REPO_TOKEN``; it seems like Github Actions may do Magic(tm) to some environment variables based on their name. The following config block seems to work properly::
+Coveralls natively supports jobs running on Github Actions. You can directly pass the default-provided secret GITHUB_TOKEN::
 
     env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     run: |
         coveralls
+
+For parallel builds you have to add a final step to let coveralls know the parallel build is finished. You also have to set COVERALLS_FLAG_NAME to something unique to the specific step, so re-runs of the same job don't keep piling up builds::
+
+    jobs:
+      test:
+        strategy:
+          matrix:
+            test-name:
+              - test1
+              - test2
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v2
+          - name: Test
+            run: ./run_tests.sh ${{ matrix.test-name }}
+          - name: Upload Coverage
+            run: coveralls
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
+              COVERALLS_PARALLEL: true
+      coveralls:
+        name: Finish Coveralls
+        needs: test
+        runs-on: ubuntu-latest
+        container: python:3-slim
+        steps:
+        - name: Finished
+          run: |
+            pip3 install --upgrade coveralls
+            coveralls --finish
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

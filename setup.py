@@ -38,7 +38,7 @@ setup(
         'docopt>=0.6.1',
         'requests>=1.0.0',
     ],
-    tests_require=['mock', 'pytest'],
+    tests_require=['mock', 'responses', 'pytest'],
     extras_require={
         'yaml': ['PyYAML>=3.10'],
     },
