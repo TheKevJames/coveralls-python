@@ -1,3 +1,13 @@
+<a name="2.1.1"></a>
+## 2.1.1 (2020-07-08)
+
+#### Bug Fixes
+
+*  fix unhashable CoverallsException (#230) ([aa55335d](aa55335d))
+   This fixes a regression introduced in v2.1.0 which affected (at least) any
+   Python 3.5 installations.
+
+
 <a name="2.1.0"></a>
 ## 2.1.0 (2020-07-07)
 
