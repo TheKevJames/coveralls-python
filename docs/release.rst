@@ -15,9 +15,9 @@ To cut a new release, ensure the latest master passes all tests. Then, create a 
 To create a new PyPI release, do the following:
 
 1. Build the sources (``python setup.py sdist bdist_wheel``).
-2. Register & upload the sources. (``twine upload dist/*``).
+2. Register & upload the sources. (``twine upload $PWD/dist/*``).
 
-To create a new Conda Forge release, do the following:
+Conda should automatically create a PR on their `coveralls-feedstock`_ shortly with the updated version -- if something goes wrong, the manual process would be to:
 
 1. Fork `coveralls-feedstock`_.
 2. Update ``recipe/meta.yaml`` with the new version number and `sha`_.
