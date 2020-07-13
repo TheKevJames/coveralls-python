@@ -28,4 +28,4 @@ Technical Details
 The JSON file to be merged must be of "coveralls-style" and contain thus a ``source_files`` key. The `Coveralls API`_ has more information.
 
 .. _coveralls-lcov: https://github.com/okkez/coveralls-lcov
-.. _Coveralls API: https://coveralls.zendesk.com/hc/en-us/articles/201774865-API-Introduction
+.. _Coveralls API: https://docs.coveralls.io/api-introduction
