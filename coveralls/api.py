@@ -84,7 +84,8 @@ class Coveralls:
     @staticmethod
     def load_config_from_circle():
         pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
-        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), os.environ.get('CIRCLE_WORKFLOW_ID'), pr
+        number = os.environ.get('CIRCLE_WORKFLOW_ID')
+        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), number, pr
 
     def load_config_from_github(self):
         service = 'github'
