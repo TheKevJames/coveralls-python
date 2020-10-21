@@ -40,7 +40,7 @@ BuildKite
 All variables:
 
 - ``BUILDKITE``
-- ``BUILDKIT_JOB_ID``
+- ``BUILDKITE_JOB_ID``
 - ``BUILDKITE_BRANCH``
 
 CircleCI
