@@ -3,6 +3,8 @@ import json
 import logging
 import os
 import re
+import random
+import sys
 
 import coverage
 import requests
@@ -114,7 +116,7 @@ class Coveralls:
     @staticmethod
     def load_config_from_travis():
         pr = os.environ.get('TRAVIS_PULL_REQUEST')
-        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None, pr
+        return 'travis-ci', '{}-{}'.format(os.environ.get('TRAVIS_JOB_ID'), random.randint(0,sys.maxsize)), None, pr
 
     @staticmethod
     def load_config_from_semaphore():
