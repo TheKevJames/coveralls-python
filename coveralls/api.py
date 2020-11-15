@@ -2,8 +2,8 @@ import codecs
 import json
 import logging
 import os
-import re
 import random
+import re
 import sys
 
 import coverage
@@ -208,14 +208,16 @@ class Coveralls:
         # check and adjust/resubmit if submission looks like it
         # failed due to resubmission (non-unique)
         if response.status_code == 422:
-            self.config['service_job_id']='{}-{}'.format(self.config['service_job_id'],random.randint(0,sys.maxsize))
+            self.config['service_job_id'] = '{}-{}'.format(
+                self.config['service_job_id'], random.randint(0, sys.maxsize))
 
             # ensure create_report uses updated data
             self._data = None
 
-            print('resubmitting with id {}'.format(self.config['service_job_id']))
+            print('resubmitting with id {}'.format(
+                self.config['service_job_id']))
             response = requests.post(endpoint, files={'json_file': self.create_report()},
-                                 verify=verify)
+                                     verify=verify)
 
         try:
             response.raise_for_status()
