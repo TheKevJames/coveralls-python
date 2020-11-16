@@ -21,7 +21,7 @@ If you would like to override the service name (auto-discovered on most CI syste
 
 If you are interested in merging the coverage results between multiple languages/projects, see our :ref:`multi-language <multilang>` documentation.
 
-If coveralls-python is being run on TravisCI, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::
+If coveralls-python is being run on TravisCI or on GitHub Actions, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::
 
     COVERALLS_REPO_TOKEN=mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy coveralls
 
@@ -54,8 +54,8 @@ Sample ``.coveralls.yml`` file::
     parallel: true
     coveralls_host: https://coveralls.aperture.com
 
-Github Actions Gotcha
----------------------
+Github Actions support
+----------------------
 
 Coveralls natively supports jobs running on Github Actions. You can directly pass the default-provided secret GITHUB_TOKEN::
 
@@ -64,7 +64,12 @@ Coveralls natively supports jobs running on Github Actions. You can directly pas
     run: |
         coveralls
 
-For parallel builds, you have to add a final step to let coveralls know the parallel build is finished. You also have to set COVERALLS_FLAG_NAME to something unique to the specific step, so re-runs of the same job don't keep piling up builds::
+Passing a coveralls.io token via the ``COVERALLS_REPO_TOKEN`` environment variable
+(or via the ``repo_token`` parameter in the config file) is not needed for
+Github Actions.
+
+For parallel builds, you have to add a final step to let coveralls.io know the
+parallel build is finished::
 
     jobs:
       test:
@@ -79,14 +84,14 @@ For parallel builds, you have to add a final step to let coveralls know the para
             uses: actions/checkout@v2
           - name: Test
             run: ./run_tests.sh ${{ matrix.test-name }}
-          - name: Upload Coverage
+          - name: Upload coverage data to coveralls.io
             run: coveralls
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
               COVERALLS_PARALLEL: true
       coveralls:
-        name: Finish Coveralls
+        name: Indicate completion to coveralls.io
         needs: test
         runs-on: ubuntu-latest
         container: python:3-slim
@@ -97,3 +102,7 @@ For parallel builds, you have to add a final step to let coveralls know the para
             coveralls --finish
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+The ``COVERALLS_FLAG_NAME`` environment variable (or the ``flag_name`` parameter
+in the config file) is optional and can be used to better identify each job
+on coveralls.io. It does not need to be unique across the parallel jobs.
