@@ -120,9 +120,19 @@ class Coveralls:
 
     @staticmethod
     def load_config_from_semaphore():
-        job = os.environ.get('SEMAPHORE_BUILD_NUMBER')
-        pr = os.environ.get('PULL_REQUEST_NUMBER')
-        return 'semaphore-ci', job, None, pr
+        job = (
+            os.environ.get('SEMAPHORE_JOB_UUID')  # Classic
+            or os.environ.get('SEMAPHORE_JOB_ID')  # 2.0
+        )
+        number = (
+            os.environ.get('SEMAPHORE_EXECUTABLE_UUID')  # Classic
+            or os.environ.get('SEMAPHORE_WORKFLOW_ID')  # 2.0
+        )
+        pr = (
+            os.environ.get('SEMAPHORE_BRANCH_ID')  # Classic
+            or os.environ.get('SEMAPHORE_GIT_PR_NUMBER')  # 2.0
+        )
+        return 'semaphore-ci', job, number, pr
 
     @staticmethod
     def load_config_from_unknown():

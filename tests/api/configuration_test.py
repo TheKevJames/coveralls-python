@@ -170,15 +170,32 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '777'
         assert 'repo_token' not in cover.config
 
-    @mock.patch.dict(os.environ,
-                     {'SEMAPHORE': 'True',
-                      'SEMAPHORE_BUILD_NUMBER': '888',
-                      'PULL_REQUEST_NUMBER': '9999'},
-                     clear=True)
-    def test_semaphore_no_config(self):
+    @mock.patch.dict(
+        os.environ,
+        {'SEMAPHORE': 'True',
+         'SEMAPHORE_EXECUTABLE_UUID': '36980c73',
+         'SEMAPHORE_JOB_UUID': 'a26d42cf',
+         'SEMAPHORE_BRANCH_ID': '9999'},
+        clear=True)
+    def test_semaphore_classic_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'semaphore-ci'
-        assert cover.config['service_job_id'] == '888'
+        assert cover.config['service_job_id'] == 'a26d42cf'
+        assert cover.config['service_number'] == '36980c73'
+        assert cover.config['service_pull_request'] == '9999'
+
+    @mock.patch.dict(
+        os.environ,
+        {'SEMAPHORE': 'True',
+         'SEMAPHORE_WORKFLOW_ID': 'b86b3adf',
+         'SEMAPHORE_JOB_ID': '2b942b49',
+         'SEMAPHORE_GIT_PR_NUMBER': '9999'},
+        clear=True)
+    def test_semaphore_20_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'semaphore-ci'
+        assert cover.config['service_job_id'] == '2b942b49'
+        assert cover.config['service_number'] == 'b86b3adf'
         assert cover.config['service_pull_request'] == '9999'
 
     @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
