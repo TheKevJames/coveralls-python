@@ -215,18 +215,22 @@ class Coveralls:
         response = requests.post(endpoint, files={'json_file': json_string},
                                  verify=verify)
 
-        # check and adjust/resubmit if submission looks like it
-        # failed due to resubmission (non-unique)
+        # check and adjust/resubmit if submission looks like it failed due to
+        # resubmission (non-unique)
         if response.status_code == 422:
-            self.config['service_job_id'] = '{}-{}'.format(
+            # attach a random value to ensure uniqueness
+            # TODO: an auto-incrementing integer might be easier to reason
+            # about if we could fetch the previous value
+            new_id = '{}-{}'.format(
                 self.config['service_job_id'], random.randint(0, sys.maxsize))
+            print('resubmitting with id {}'.format(new_id))
 
-            # ensure create_report uses updated data
-            self._data = None
+            self.config['service_job_id'] = new_id
+            self._data = None  # force create_report to use updated data
+            json_string = self.create_report()
 
-            print('resubmitting with id {}'.format(
-                self.config['service_job_id']))
-            response = requests.post(endpoint, files={'json_file': self.create_report()},
+            response = requests.post(endpoint,
+                                     files={'json_file': json_string},
                                      verify=verify)
 
         try:
