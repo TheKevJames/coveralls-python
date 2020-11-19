@@ -1,5 +1,5 @@
-Coveralls for Python (Docs)
-===========================
+Coveralls for Python
+====================
 
 :Test Status:
     .. image:: https://img.shields.io/circleci/project/github/coveralls-clients/coveralls-python/master.svg?style=flat-square&label=CircleCI
@@ -33,6 +33,10 @@ Coveralls for Python (Docs)
 
     .. image:: https://img.shields.io/pypi/implementation/coveralls.svg?style=flat-square&label=Python%20Implementations
         :target: https://pypi.org/project/coveralls/
+
+:Documentation:
+    .. image:: https://img.shields.io/readthedocs/coveralls-python?style=flat-square&label=Docs
+        :target: http://coveralls-python.readthedocs.io/en/latest/
 
 `coveralls.io`_ is a service for publishing your coverage stats online. This
 package provides seamless integration with `coverage.py`_ (and thus ``pytest``,
