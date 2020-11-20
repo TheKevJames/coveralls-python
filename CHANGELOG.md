@@ -1,3 +1,14 @@
+<a name="2.2.0"></a>
+## 2.2.0 (2020-11-20)
+
+#### Features
+
+* **api:**  add workaround allowing job resubmission (#241) ([0de0c019](0de0c019))
+
+#### Bug Fixes
+
+* **integrations:**  fixup environment detection for Semaphore CI (#236) ([ad4f8fa8](ad4f8fa8))
+
 <a name="2.1.2"></a>
 ## 2.1.2 (2020-08-12)
 
