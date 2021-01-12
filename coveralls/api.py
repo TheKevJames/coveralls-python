@@ -53,7 +53,9 @@ class Coveralls:
 
         name, job, number, pr = self.load_config_from_ci_environment()
         self.config['service_name'] = self.config.get('service_name', name)
-        if job:
+        if job or os.environ.get('GITHUB_ACTIONS'):
+            # N.B. Github Actions fails if this is not set even when null.
+            # Other services fail if this is set to null. Sigh.
             self.config['service_job_id'] = job
         if number:
             self.config['service_number'] = number
