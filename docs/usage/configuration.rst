@@ -6,7 +6,8 @@ Configuration
 coveralls-python often works without any outside configuration by examining the
 environment it is being run in. Special handling has been added for AppVeyor,
 BuildKite, CircleCI, Github Actions, Jenkins, and TravisCI to make
-coveralls-python as close to "plug and play" as possible.
+coveralls-python as close to "plug and play" as possible. It should be useable
+in any other CI system as well, but may need some configuration!
 
 In cases where you do need to modify the configuration, we obey a very strict
 precedence order where the **latest value is used**:
@@ -123,3 +124,28 @@ parallel build is finished::
 The ``COVERALLS_FLAG_NAME`` environment variable (or the ``flag_name`` parameter
 in the config file) is optional and can be used to better identify each job
 on coveralls.io. It does not need to be unique across the parallel jobs.
+
+Azure Pipelines support
+-----------------------
+
+Coveralls does not yet support Azure Pipelines, but you can make things work by
+impersonating another CI system such as CircleCI. For example, you can set this
+up by using the following script at the end of your test pipeline::
+
+    - script: |
+        pip install coveralls
+        export CIRCLE_BRANCH=$BUILD_SOURCEBRANCH
+        coveralls
+      displayName: 'coveralls'
+      env:
+        CIRCLECI: 1
+        CIRCLE_BUILD_NUM: $(Build.BuildNumber)
+        COVERALLS_REPO_TOKEN: $(coveralls_repo_token)
+
+Note that you will also need to use the Azure Pipelines web UI to add the
+``coveralls_repo_token`` variable to this pipeline with your repo token (which
+you can copy from the coveralls.io website).
+
+As per `#245 <https://github.com/coveralls-clients/coveralls-python/issues/245>`_,
+our users suggest leaving "keep this value secret" unchecked -- this may be
+secure enough as-is, in that a user making a PR cannot access this variable.
