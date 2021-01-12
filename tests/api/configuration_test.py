@@ -131,7 +131,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_name'] == 'github-actions'
         assert cover.config['service_pull_request'] == '1234'
         assert cover.config['service_number'] == '123456789'
-        assert 'service_job_id' not in cover.config
+        assert 'service_job_id' in cover.config
 
     @mock.patch.dict(
         os.environ,
@@ -147,7 +147,7 @@ class NoConfiguration(unittest.TestCase):
         cover = Coveralls()
         assert cover.config['service_name'] == 'github'
         assert cover.config['service_number'] == '987654321'
-        assert 'service_job_id' not in cover.config
+        assert 'service_job_id' in cover.config
         assert 'service_pull_request' not in cover.config
 
     @mock.patch.dict(
