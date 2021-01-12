@@ -224,7 +224,8 @@ class Coveralls:
             # TODO: an auto-incrementing integer might be easier to reason
             # about if we could fetch the previous value
             new_id = '{}-{}'.format(
-                self.config['service_job_id'], random.randint(0, sys.maxsize))
+                self.config.get('service_job_id', 42),
+                random.randint(0, sys.maxsize))
             print('resubmitting with id {}'.format(new_id))
 
             self.config['service_job_id'] = new_id
