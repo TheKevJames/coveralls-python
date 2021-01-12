@@ -1,3 +1,35 @@
+<a name="3.0.0"></a>
+## 3.0.0 (2021-01-12)
+
+#### Features (BREAKING)
+
+* **config:**  reorder configuration precedence (#249) ([f4faa92d](f4faa92d))
+
+We have *reversed* the order in which configurations are parsed. This means we
+are now following the following precedence (latest configured value is used):
+
+1. CI Config
+2. COVERALLS_* env vars
+3. .coveralls.yml file
+4. CLI flags
+
+If you have the same fields set in multiple of the above locations, please
+double-check them before upgrading to v3.
+
+The motivation for this change is allowing users to selectively fix values
+which may be automatically set to the wrong value. For example, Github Actions
+users may find that Github Actions expects you to use a different "service name"
+in various different cases. Now you can run, for example:
+
+   coveralls --service-name=github
+
+In places where you need to override the default (which is `github-actions`).
+
+#### Bug Fixes
+
+* **github:**  send null job_id to fix 422 ([05b66aa0](05b66aa0))
+* **api:**  fixup retries for services without job IDs ([6ebdc5e2](6ebdc5e2))
+
 <a name="2.2.0"></a>
 ## 2.2.0 (2020-11-20)
 
