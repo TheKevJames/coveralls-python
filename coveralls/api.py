@@ -18,6 +18,7 @@ log = logging.getLogger('coveralls.api')
 
 
 class Coveralls:
+    # pylint: disable=too-many-public-methods
     config_filename = '.coveralls.yml'
 
     def __init__(self, token_required=True, service_name=None, **kwargs):
@@ -40,38 +41,45 @@ class Coveralls:
         self._data = None
         self._coveralls_host = 'https://coveralls.io/'
         self._token_required = token_required
+        self.config = {}
 
-        self.config = self.load_config_from_file()
-        self.config.update(kwargs)
-        if service_name:
-            self.config['service_name'] = service_name
-        if self.config.get('coveralls_host'):
-            self._coveralls_host = self.config['coveralls_host']
-            del self.config['coveralls_host']
-
-        self.load_config_from_environment()
-
-        name, job, number, pr = self.load_config_from_ci_environment()
-        self.config['service_name'] = self.config.get('service_name', name)
-        if job or os.environ.get('GITHUB_ACTIONS'):
-            # N.B. Github Actions fails if this is not set even when null.
-            # Other services fail if this is set to null. Sigh.
-            self.config['service_job_id'] = job
-        if number:
-            self.config['service_number'] = number
-        if pr:
-            self.config['service_pull_request'] = pr
-
+        self.load_config(kwargs, service_name)
         self.ensure_token()
 
     def ensure_token(self):
         if self.config.get('repo_token') or not self._token_required:
             return
 
+        if os.environ.get('GITHUB_ACTIONS'):
+            raise CoverallsException(
+                'Running on Github Actions but GITHUB_TOKEN is not set. '
+                'Add "env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to '
+                'your step config.')
+
         raise CoverallsException(
             'Not on TravisCI. You have to provide either repo_token in {} or '
             'set the COVERALLS_REPO_TOKEN env var.'.format(
                 self.config_filename))
+
+    def load_config(self, kwargs, service_name):
+        """
+        Loads all coveralls configuration in the following precedence order.
+
+            1. automatic CI configuration
+            2. COVERALLS_* env vars
+            3. .coveralls.yml config file
+            4. CLI flags
+        """
+        self.load_config_from_ci_environment()
+        self.load_config_from_environment()
+        self.load_config_from_file()
+        self.config.update(kwargs)
+        if self.config.get('coveralls_host'):
+            # N.B. users can set --coveralls-host via CLI, but we don't keep
+            # that in the config
+            self._coveralls_host = self.config.pop('coveralls_host')
+        if service_name:
+            self.config['service_name'] = service_name
 
     @staticmethod
     def load_config_from_appveyor():
@@ -92,23 +100,19 @@ class Coveralls:
         return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), number, pr
 
     def load_config_from_github(self):
-        service = 'github'
-        if self.config.get('repo_token'):
-            service = 'github-actions'
-        else:
-            gh_token = os.environ.get('GITHUB_TOKEN')
-            if not gh_token:
-                raise CoverallsException(
-                    'Running on Github Actions but GITHUB_TOKEN is not set. '
-                    'Add "env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to '
-                    'your step config.')
-            self.config['repo_token'] = gh_token
+        # Github tokens and standard Coveralls tokens are almost but not quite
+        # the same -- forceibly using Github's flow seems to be more stable
+        self.config['repo_token'] = os.environ.get('GITHUB_TOKEN')
 
-        number = os.environ.get('GITHUB_RUN_ID')
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-        return service, None, number, pr
+
+        # N.B. some users require this to be 'github' and some require it to
+        # be 'github-actions'. Defaulting to 'github-actions' as it seems more
+        # common -- users can specify the service name manually to override
+        # this.
+        return 'github-actions', None, os.environ.get('GITHUB_RUN_ID'), pr
 
     @staticmethod
     def load_config_from_jenkins():
@@ -148,6 +152,9 @@ class Coveralls:
         elif os.environ.get('CIRCLECI'):
             name, job, number, pr = self.load_config_from_circle()
         elif os.environ.get('GITHUB_ACTIONS'):
+            # N.B. Github Actions fails if this is not set even when null.
+            # Other services fail if this is set to null. Sigh.
+            self.config['service_job_id'] = None
             name, job, number, pr = self.load_config_from_github()
         elif os.environ.get('JENKINS_HOME'):
             name, job, number, pr = self.load_config_from_jenkins()
@@ -158,7 +165,14 @@ class Coveralls:
             name, job, number, pr = self.load_config_from_semaphore()
         else:
             name, job, number, pr = self.load_config_from_unknown()
-        return (name, job, number, pr)
+
+        self.config['service_name'] = name
+        if job:
+            self.config['service_job_id'] = job
+        if number:
+            self.config['service_number'] = number
+        if pr:
+            self.config['service_pull_request'] = pr
 
     def load_config_from_environment(self):
         coveralls_host = os.environ.get('COVERALLS_HOST')
@@ -191,15 +205,13 @@ class Coveralls:
                                    self.config_filename)) as config:
                 try:
                     import yaml  # pylint: disable=import-outside-toplevel
-                    return yaml.safe_load(config)
+                    self.config.update(yaml.safe_load(config))
                 except ImportError:
                     log.warning('PyYAML is not installed, skipping %s.',
                                 self.config_filename)
         except OSError:
             log.debug('Missing %s file. Using only env variables.',
                       self.config_filename)
-
-        return {}
 
     def merge(self, path):
         reader = codecs.getreader('utf-8')

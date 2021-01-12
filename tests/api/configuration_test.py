@@ -145,7 +145,7 @@ class NoConfiguration(unittest.TestCase):
         clear=True)
     def test_github_no_config_no_pr(self):
         cover = Coveralls()
-        assert cover.config['service_name'] == 'github'
+        assert cover.config['service_name'] == 'github-actions'
         assert cover.config['service_number'] == '987654321'
         assert 'service_job_id' in cover.config
         assert 'service_pull_request' not in cover.config

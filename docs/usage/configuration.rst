@@ -3,9 +3,22 @@
 Configuration
 =============
 
-coveralls-python often works without any outside configuration by examining the environment it is being run in. Special handling has been added for AppVeyor, BuildKite, CircleCI, Github Actions, Jenkins, and TravisCI to make coveralls-python as close to "plug and play" as possible.
+coveralls-python often works without any outside configuration by examining the
+environment it is being run in. Special handling has been added for AppVeyor,
+BuildKite, CircleCI, Github Actions, Jenkins, and TravisCI to make
+coveralls-python as close to "plug and play" as possible.
 
-Most often, you will simply need to run coveralls-python with no additional options after you have run your coverage suite::
+In cases where you do need to modify the configuration, we obey a very strict
+precedence order where the **latest value is used**:
+
+* first, the CI environment will be loaded
+* second, any environment variables will be loaded (eg. those which begin with
+  ``COVERALLS_``
+* third, the config file is loaded (eg. ``./..coveralls.yml``)
+* finally, any command line flags are evaluated
+
+Most often, you will simply need to run coveralls-python with no additional
+options after you have run your coverage suite::
 
     coveralls
 
@@ -67,6 +80,10 @@ Coveralls natively supports jobs running on Github Actions. You can directly pas
 Passing a coveralls.io token via the ``COVERALLS_REPO_TOKEN`` environment variable
 (or via the ``repo_token`` parameter in the config file) is not needed for
 Github Actions.
+
+Sometimes Github Actions gets a little picky about the service name which needs to
+be used in various cases. If you run into issues, try setting the ``COVERALLS_SERVICE_NAME``
+explicitly to either ``github`` or ``github-actions``.
 
 For parallel builds, you have to add a final step to let coveralls.io know the
 parallel build is finished::
