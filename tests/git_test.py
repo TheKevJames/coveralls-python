@@ -5,8 +5,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-
-import mock
+from unittest import mock
 
 import coveralls.git
 

@@ -1,7 +1,6 @@
 import json
 import os
-
-import mock
+from unittest import mock
 
 from coveralls import Coveralls
 

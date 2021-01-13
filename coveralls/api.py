@@ -252,7 +252,8 @@ class Coveralls:
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            raise CoverallsException('Could not submit coverage: {}'.format(e))
+            raise CoverallsException(
+                'Could not submit coverage: {}'.format(e)) from e
 
     # https://docs.coveralls.io/parallel-build-webhook
     def parallel_finish(self):
@@ -276,7 +277,8 @@ class Coveralls:
             response.raise_for_status()
             response = response.json()
         except Exception as e:
-            raise CoverallsException('Parallel finish failed: {}'.format(e))
+            raise CoverallsException(
+                'Parallel finish failed: {}'.format(e)) from e
 
         if 'error' in response:
             e = response['error']
