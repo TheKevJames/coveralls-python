@@ -17,8 +17,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'coveralls-python'
-globals()['copyright'] = '2013, coveralls-clients'
-author = 'coveralls-clients'
+globals()['copyright'] = '2013, TheKevJames'
+author = 'TheKevJames'
 
 version = __version__
 release = __version__

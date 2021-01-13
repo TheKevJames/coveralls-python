@@ -146,6 +146,6 @@ Note that you will also need to use the Azure Pipelines web UI to add the
 ``coveralls_repo_token`` variable to this pipeline with your repo token (which
 you can copy from the coveralls.io website).
 
-As per `#245 <https://github.com/coveralls-clients/coveralls-python/issues/245>`_,
+As per `#245 <https://github.com/TheKevJames/coveralls-python/issues/245>`_,
 our users suggest leaving "keep this value secret" unchecked -- this may be
 secure enough as-is, in that a user making a PR cannot access this variable.

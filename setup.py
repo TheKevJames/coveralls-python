@@ -17,14 +17,14 @@ setup(
     name='coveralls',
     version=VERSION,
     packages=['coveralls'],
-    url='http://github.com/coveralls-clients/coveralls-python',
+    url='http://github.com/TheKevJames/coveralls-python',
     project_urls={
-        'Changelog': ('https://github.com/coveralls-clients/coveralls-python/'
+        'Changelog': ('https://github.com/TheKevJames/coveralls-python/'
                       'blob/master/CHANGELOG.md'),
         'Docs': 'https://coveralls-python.rtfd.io/',
     },
     license='MIT',
-    author='coveralls-clients contributors',
+    author='TheKevJames',
     description='Show coverage stats online via coveralls.io',
     long_description=DESCRIPTION,
     entry_points={

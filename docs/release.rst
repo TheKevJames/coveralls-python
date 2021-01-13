@@ -27,5 +27,5 @@ Conda should automatically create a PR on their `coveralls-feedstock`_ shortly w
 
 .. _coveralls: https://pypi.org/project/coveralls/
 .. _coveralls-feedstock: https://github.com/conda-forge/coveralls-feedstock
-.. _GitHub release: https://github.com/coveralls-clients/coveralls-python/releases/new
+.. _GitHub release: https://github.com/TheKevJames/coveralls-python/releases/new
 .. _sha: https://pypi.org/project/coveralls/#files

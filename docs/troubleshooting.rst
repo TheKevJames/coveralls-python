@@ -9,4 +9,4 @@ Debug mode doesn't send anything, it just outputs prepared json and reported fil
 
 We also have an `issue tracker`_ on GitHub.
 
-.. _issue tracker: https://github.com/coveralls-clients/coveralls-python/issues
+.. _issue tracker: https://github.com/TheKevJames/coveralls-python/issues

@@ -5,4 +5,4 @@ Coveralls is written and maintained by various contributors, without whom none o
 
 Special thanks goes to the original maintainer, Ilya Baryshev.
 
-.. _GitHub: https://github.com/coveralls-clients/coveralls-python/graphs/contributors
+.. _GitHub: https://github.com/TheKevJames/coveralls-python/graphs/contributors
