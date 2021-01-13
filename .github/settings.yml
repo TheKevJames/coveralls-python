@@ -1,0 +1,45 @@
+repository:
+  name: coveralls-python
+  description: Show coverage stats online via coveralls.io
+  homepage: coveralls-python.readthedocs.io
+  topics: coveralls, coverage, nosetests, pytest, python
+  private: false
+
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: false
+
+  default_branch: master
+
+  allow_merge_commit: false
+  allow_rebase_merge: true
+  allow_squash_merge: true
+
+labels:
+  - name: bug
+    color: '#fc2929'
+  - name: feature
+    color: '#84b6eb'
+    oldname: enhancement
+  - name: task
+    color: '#d93f0b'
+
+  - name: help wanted
+    color: '#159818'
+  - name: low-priority
+    color: '#fbca04'
+  - name: question
+    color: '#cc317c'
+
+  - name: triage
+    color: '#ededed'
+  - name: backlog
+    color: '#ededed'
+  - name: in-progress
+    color: '#0052cc'
+  - name: in-review
+    color: '#5319e7'
+
+branches:
+  - name: master
