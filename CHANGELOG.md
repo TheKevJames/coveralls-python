@@ -21,7 +21,7 @@ which may be automatically set to the wrong value. For example, Github Actions
 users may find that Github Actions expects you to use a different "service name"
 in various different cases. Now you can run, for example:
 
-   coveralls --service-name=github
+   coveralls --service=github
 
 In places where you need to override the default (which is `github-actions`).
 
