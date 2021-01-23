@@ -71,20 +71,27 @@ Sample ``.coveralls.yml`` file::
 Github Actions support
 ----------------------
 
-Coveralls natively supports jobs running on Github Actions. You can directly pass the default-provided secret GITHUB_TOKEN::
+Coveralls natively supports jobs running on Github Actions. You can directly
+pass the default-provided secret GITHUB_TOKEN::
 
     env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     run: |
-        coveralls
+        coveralls --service=github
 
 Passing a coveralls.io token via the ``COVERALLS_REPO_TOKEN`` environment variable
 (or via the ``repo_token`` parameter in the config file) is not needed for
 Github Actions.
 
-Sometimes Github Actions gets a little picky about the service name which needs to
-be used in various cases. If you run into issues, try setting the ``COVERALLS_SERVICE_NAME``
-explicitly to either ``github`` or ``github-actions``.
+Sometimes Github Actions gets a little picky about the service name which needs
+to be used in various cases. If you run into issues, try setting the
+``COVERALLS_SERVICE_NAME`` explicitly to either ``github`` or
+``github-actions``. It seems to be the case that you should use the
+``--service=github`` value if you are also planning to use the ``GITHUB_TOKEN``
+env var, and ``github-actions`` (which is the default) in any other case, but
+we've have conflicting reports on this: YMMV! See
+`#452 <https://github.com/TheKevJames/coveralls-python/issues/252>`_ for more
+info.
 
 For parallel builds, you have to add a final step to let coveralls.io know the
 parallel build is finished::
@@ -103,7 +110,7 @@ parallel build is finished::
           - name: Test
             run: ./run_tests.sh ${{ matrix.test-name }}
           - name: Upload coverage data to coveralls.io
-            run: coveralls
+            run: coveralls --service=github
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
@@ -117,7 +124,7 @@ parallel build is finished::
         - name: Finished
           run: |
             pip3 install --upgrade coveralls
-            coveralls --finish
+            coveralls --service=github --finish
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
