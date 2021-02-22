@@ -235,9 +235,14 @@ class Coveralls:
             # attach a random value to ensure uniqueness
             # TODO: an auto-incrementing integer might be easier to reason
             # about if we could fetch the previous value
-            new_id = '{}-{}'.format(
-                self.config.get('service_job_id', 42),
-                random.randint(0, sys.maxsize))
+            # N.B. Github Actions fails if this is not set to null.
+            # Other services fail if this is set to null. Sigh x2.
+            if os.environ.get('GITHUB_REPOSITORY'):
+                new_id = None
+            else:
+                new_id = '{}-{}'.format(
+                    self.config.get('service_job_id', 42),
+                    random.randint(0, sys.maxsize))
             print('resubmitting with id {}'.format(new_id))
 
             self.config['service_job_id'] = new_id
