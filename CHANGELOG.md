@@ -1,3 +1,10 @@
+<a name="3.0.1"></a>
+## 3.0.1 (2021-03-02)
+
+#### Bug Fixes
+
+* **github:**  send null job_id to fix 422 during resubmission (#269) ([54be7545](54be7545))
+
 <a name="3.0.0"></a>
 ## 3.0.0 (2021-01-12)
 
