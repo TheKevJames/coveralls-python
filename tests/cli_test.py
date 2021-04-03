@@ -104,7 +104,8 @@ def test_real(mock_wear, mock_log):
 def test_rcfile(mock_coveralls):
     coveralls.cli.main(argv=['--rcfile=coveragerc'])
     mock_coveralls.assert_called_with(True, config_file='coveragerc',
-                                      service_name=None)
+                                      service_name=None,
+                                      base_dir=None)
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
@@ -112,7 +113,8 @@ def test_rcfile(mock_coveralls):
 def test_service_name(mock_coveralls):
     coveralls.cli.main(argv=['--service=travis-pro'])
     mock_coveralls.assert_called_with(True, config_file='.coveragerc',
-                                      service_name='travis-pro')
+                                      service_name='travis-pro',
+                                      base_dir=None)
 
 
 @mock.patch.object(coveralls.cli.log, 'exception')
