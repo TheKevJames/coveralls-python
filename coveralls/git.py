@@ -32,7 +32,10 @@ def git_branch():
     branch = None
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
-        if github_ref.startswith('refs/heads/') or github_ref.startswith('refs/tags/'):
+        if (
+            github_ref.startswith('refs/heads/')
+            or github_ref.startswith('refs/tags/')
+        ):
             # E.g. in push events.
             branch = github_ref.split('/', 2)[-1]
         else:
