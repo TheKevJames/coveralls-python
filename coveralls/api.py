@@ -223,8 +223,7 @@ class Coveralls:
         json_string = self.create_report()
         if dry_run:
             return {}
-        else:
-            return self.submit_report(json_string)
+        return self.submit_report(json_string)
 
     def submit_report(self, json_string):
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))

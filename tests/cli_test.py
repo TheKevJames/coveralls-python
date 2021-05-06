@@ -11,6 +11,10 @@ from coveralls.exception import CoverallsException
 EXC = CoverallsException('bad stuff happened')
 
 
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
+
+
 def req_json(request):
     return json.loads(request.body.decode('utf-8'))
 
@@ -144,3 +148,20 @@ def test_save_report_to_file_no_token(mock_coveralls):
     """Check save_report api usage when token is not set."""
     coveralls.cli.main(argv=['--output=test.log'])
     mock_coveralls.assert_called_with('test.log')
+
+
+@mock.patch.object(coveralls.Coveralls, 'submit_report')
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_submit(mock_submit):
+    json_file = os.path.join(EXAMPLE_DIR, 'example.json')
+    json_string = open(json_file).read()
+    coveralls.cli.main(argv=['--submit=' + json_file])
+    mock_submit.assert_called_with(json_string)
+
+
+@mock.patch('coveralls.cli.Coveralls')
+def test_base_dir_arg(mock_coveralls):
+    coveralls.cli.main(argv=['--base_dir=foo'])
+    mock_coveralls.assert_called_with(True, config_file='.coveragerc',
+                                      service_name=None,
+                                      base_dir='foo')

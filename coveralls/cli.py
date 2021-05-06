@@ -79,7 +79,7 @@ def main(argv=None):
             return
 
         if options['--submit']:
-            with open(options['--submit'], 'r') as report_file:
+            with open(options['--submit']) as report_file:
                 coverallz.submit_report(report_file.read())
             return
 

@@ -15,9 +15,9 @@ class CoverallReporter:
     def __init__(self, cov, conf, base_dir=None):
         self.coverage = []
         if base_dir:
-            self.base_dir = base_dir + os.path.sep if base_dir and \
-                            base_dir[-1] != os.path.sep else base_dir
-            self.base_dir = self.base_dir.replace(os.path.sep, '/')
+            self.base_dir = base_dir.replace(os.path.sep, '/')
+            if self.base_dir[-1] != '/':
+                self.base_dir += '/'
         else:
             self.base_dir = None
         self.report(cov, conf)
