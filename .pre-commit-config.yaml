@@ -54,28 +54,28 @@ repos:
         - -d wrong-import-order  # conflicts with reorder-python-imports
         exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.9
+    rev: v1.1.10
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.4.0
+    rev: v2.5.0
     hooks:
     -   id: reorder-python-imports
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.11.0
+    rev: v2.14.0
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/yesqa
-    rev: v1.2.2
+    rev: v1.2.3
     hooks:
     -   id: yesqa
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.5.6
+    rev: v1.5.7
     hooks:
     -   id: autopep8
         files: coveralls/.*
@@ -87,7 +87,7 @@ repos:
         - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.0
+    rev: 3.9.1
     hooks:
     -   id: flake8
         additional_dependencies:
