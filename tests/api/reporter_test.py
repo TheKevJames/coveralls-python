@@ -103,7 +103,8 @@ class ReporterTest(unittest.TestCase):
 
         # without base_dir arg, file name is prefixed with 'example/'
         os.chdir(BASE_DIR)
-        results = Coveralls(repo_token='xxx', base_dir='example').get_coverage()
+        results = Coveralls(repo_token='xxx',
+                            base_dir='example').get_coverage()
         assert len(results) == 2
 
         assert_coverage(results[0], {
@@ -138,7 +139,8 @@ class ReporterTest(unittest.TestCase):
 
         # without base_dir arg, file name is prefixed with 'example/'
         os.chdir(BASE_DIR)
-        results = Coveralls(repo_token='xxx', base_dir='example/').get_coverage()
+        results = Coveralls(repo_token='xxx',
+                            base_dir='example/').get_coverage()
         assert len(results) == 2
 
         assert_coverage(results[0], {
