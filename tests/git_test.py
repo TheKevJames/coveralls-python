@@ -125,6 +125,16 @@ class GitInfoTestBranch(GitTest):
         'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
         'GITHUB_HEAD_REF': ''
     }, clear=True)
-    def test_gitinfo_github_nopr(self):
+    def test_gitinfo_github_branch(self):
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'master'
+
+    @mock.patch.dict(os.environ, {
+        'GITHUB_ACTIONS': 'true',
+        'GITHUB_REF': 'refs/tags/v1.0',
+        'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
+        'GITHUB_HEAD_REF': ''
+    }, clear=True)
+    def test_gitinfo_github_tag(self):
+        git_info = coveralls.git.git_info()
+        assert git_info['git']['branch'] == 'v1.0'
