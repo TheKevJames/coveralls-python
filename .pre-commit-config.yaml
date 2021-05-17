@@ -80,7 +80,7 @@ repos:
     -   id: autopep8
         files: coveralls/.*
 -   repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.0.0
+    rev: 6.1.0
     hooks:
     -   id: pydocstyle
         args:
