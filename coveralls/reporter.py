@@ -12,14 +12,13 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
-    def __init__(self, cov, conf, base_dir=None):
+    def __init__(self, cov, conf, base_dir=''):
         self.coverage = []
-        if base_dir:
-            self.base_dir = base_dir.replace(os.path.sep, '/')
+        self.base_dir = base_dir
+        if self.base_dir:
+            self.base_dir = self.base_dir.replace(os.path.sep, '/')
             if self.base_dir[-1] != '/':
                 self.base_dir += '/'
-        else:
-            self.base_dir = None
         self.report(cov, conf)
 
     def report5(self, cov):

@@ -370,7 +370,7 @@ class Coveralls:
         workman.load()
         workman.get_data()
 
-        base_dir = self.config.get('base_dir', None)
+        base_dir = self.config.get('base_dir') or ''
         return CoverallReporter(workman, workman.config, base_dir).coverage
 
     @staticmethod
