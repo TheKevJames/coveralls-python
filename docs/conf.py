@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from coveralls import __version__
 
 

@@ -1,11 +1,12 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
     -   id: check-json
     -   id: check-merge-conflict
+    -   id: check-shebang-scripts-are-executable
     -   id: check-symlinks
     -   id: check-toml
     -   id: check-vcs-permalinks
@@ -64,7 +65,7 @@ repos:
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.14.0
+    rev: v2.17.0
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
@@ -80,14 +81,14 @@ repos:
     -   id: autopep8
         files: coveralls/.*
 -   repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.0.0
+    rev: 6.1.1
     hooks:
     -   id: pydocstyle
         args:
         - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.1
+    rev: 3.9.2
     hooks:
     -   id: flake8
         additional_dependencies:
