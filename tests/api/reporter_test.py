@@ -62,6 +62,113 @@ class ReporterTest(unittest.TestCase):
             'name': 'runtests.py',
             'coverage': [1, 1, None, 1, 1, 1, 1]})
 
+    def test_reporter_no_base_dir_arg(self):
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'example/runtests.py'], cwd=BASE_DIR)
+
+        # without base_dir arg, file name is prefixed with 'example/'
+        os.chdir(BASE_DIR)
+        results = Coveralls(repo_token='xxx').get_coverage()
+        assert len(results) == 2
+
+        assert_coverage(results[0], {
+            'source': ('def hello():\n'
+                       '    print(\'world\')\n\n\n'
+                       'class Foo:\n'
+                       '    """ Bar """\n\n\n'
+                       'def baz():\n'
+                       '    print(\'this is not tested\')\n\n'
+                       'def branch(cond1, cond2):\n'
+                       '    if cond1:\n'
+                       '        print(\'condition tested both ways\')\n'
+                       '    if cond2:\n'
+                       '        print(\'condition not tested both ways\')\n'),
+            'name': 'example/project.py',
+            'coverage': [1, 1, None, None, 1, None, None,
+                         None, 1, 0, None, 1, 1, 1, 1, 1]})
+
+        assert_coverage(results[1], {
+            'source': ('from project import branch\n'
+                       'from project import hello\n\n'
+                       "if __name__ == '__main__':\n"
+                       '    hello()\n'
+                       '    branch(False, True)\n'
+                       '    branch(True, True)\n'),
+            'name': 'example/runtests.py',
+            'coverage': [1, 1, None, 1, 1, 1, 1]})
+
+    def test_reporter_with_base_dir_arg(self):
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'example/runtests.py'], cwd=BASE_DIR)
+
+        # without base_dir arg, file name is prefixed with 'example/'
+        os.chdir(BASE_DIR)
+        results = Coveralls(repo_token='xxx',
+                            base_dir='example').get_coverage()
+        assert len(results) == 2
+
+        assert_coverage(results[0], {
+            'source': ('def hello():\n'
+                       '    print(\'world\')\n\n\n'
+                       'class Foo:\n'
+                       '    """ Bar """\n\n\n'
+                       'def baz():\n'
+                       '    print(\'this is not tested\')\n\n'
+                       'def branch(cond1, cond2):\n'
+                       '    if cond1:\n'
+                       '        print(\'condition tested both ways\')\n'
+                       '    if cond2:\n'
+                       '        print(\'condition not tested both ways\')\n'),
+            'name': 'project.py',
+            'coverage': [1, 1, None, None, 1, None, None,
+                         None, 1, 0, None, 1, 1, 1, 1, 1]})
+
+        assert_coverage(results[1], {
+            'source': ('from project import branch\n'
+                       'from project import hello\n\n'
+                       "if __name__ == '__main__':\n"
+                       '    hello()\n'
+                       '    branch(False, True)\n'
+                       '    branch(True, True)\n'),
+            'name': 'runtests.py',
+            'coverage': [1, 1, None, 1, 1, 1, 1]})
+
+    def test_reporter_with_base_dir_trailing_sep(self):
+        subprocess.call(['coverage', 'run', '--omit=**/.tox/*',
+                         'example/runtests.py'], cwd=BASE_DIR)
+
+        # without base_dir arg, file name is prefixed with 'example/'
+        os.chdir(BASE_DIR)
+        results = Coveralls(repo_token='xxx',
+                            base_dir='example/').get_coverage()
+        assert len(results) == 2
+
+        assert_coverage(results[0], {
+            'source': ('def hello():\n'
+                       '    print(\'world\')\n\n\n'
+                       'class Foo:\n'
+                       '    """ Bar """\n\n\n'
+                       'def baz():\n'
+                       '    print(\'this is not tested\')\n\n'
+                       'def branch(cond1, cond2):\n'
+                       '    if cond1:\n'
+                       '        print(\'condition tested both ways\')\n'
+                       '    if cond2:\n'
+                       '        print(\'condition not tested both ways\')\n'),
+            'name': 'project.py',
+            'coverage': [1, 1, None, None, 1, None, None,
+                         None, 1, 0, None, 1, 1, 1, 1, 1]})
+
+        assert_coverage(results[1], {
+            'source': ('from project import branch\n'
+                       'from project import hello\n\n'
+                       "if __name__ == '__main__':\n"
+                       '    hello()\n'
+                       '    branch(False, True)\n'
+                       '    branch(True, True)\n'),
+            'name': 'runtests.py',
+            'coverage': [1, 1, None, 1, 1, 1, 1]})
+
     def test_reporter_with_branches(self):
         subprocess.call(['coverage', 'run', '--branch', '--omit=**/.tox/*',
                          'runtests.py'], cwd=EXAMPLE_DIR)

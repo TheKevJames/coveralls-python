@@ -223,7 +223,9 @@ class Coveralls:
         json_string = self.create_report()
         if dry_run:
             return {}
+        return self.submit_report(json_string)
 
+    def submit_report(self, json_string):
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
         response = requests.post(endpoint, files={'json_file': json_string},
@@ -368,7 +370,8 @@ class Coveralls:
         workman.load()
         workman.get_data()
 
-        return CoverallReporter(workman, workman.config).coverage
+        base_dir = self.config.get('base_dir') or ''
+        return CoverallReporter(workman, workman.config, base_dir).coverage
 
     @staticmethod
     def debug_bad_encoding(data):

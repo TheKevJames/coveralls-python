@@ -12,8 +12,13 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
-    def __init__(self, cov, conf):
+    def __init__(self, cov, conf, base_dir=''):
         self.coverage = []
+        self.base_dir = base_dir
+        if self.base_dir:
+            self.base_dir = self.base_dir.replace(os.path.sep, '/')
+            if self.base_dir[-1] != '/':
+                self.base_dir += '/'
         self.report(cov, conf)
 
     def report5(self, cov):
@@ -183,8 +188,12 @@ class CoverallReporter:
     def parse_file(self, cu, analysis):
         """Generate data for single file."""
         filename = cu.relative_filename()
+
         # ensure results are properly merged between platforms
         posix_filename = filename.replace(os.path.sep, '/')
+
+        if self.base_dir and posix_filename.startswith(self.base_dir):
+            posix_filename = posix_filename[len(self.base_dir):]
 
         source = analysis.file_reporter.source()
 

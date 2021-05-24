@@ -19,7 +19,9 @@ Usage:
 Global options:
     --service=<name>  Provide an alternative service name to submit.
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
+    --basedir=<dir>   Base directory that is removed from reported paths.
     --output=<file>   Write report to file. Doesn't send anything.
+    --submit=<file>   Upload a previously generated file.
     --merge=<file>    Merge report from file when submitting.
     --finish          Finish parallel jobs.
     -h --help         Display this help.
@@ -60,7 +62,8 @@ def main(argv=None):
     try:
         coverallz = Coveralls(token_required,
                               config_file=options['--rcfile'],
-                              service_name=options['--service'])
+                              service_name=options['--service'],
+                              base_dir=options.get('--basedir') or '')
 
         if options['--merge']:
             coverallz.merge(options['--merge'])
@@ -75,6 +78,11 @@ def main(argv=None):
             coverallz.save_report(options['--output'])
             return
 
+        if options['--submit']:
+            with open(options['--submit']) as report_file:
+                coverallz.submit_report(report_file.read())
+            return
+
         if options['--finish']:
             log.info('Finishing parallel jobs...')
             coverallz.parallel_finish()
@@ -86,8 +94,9 @@ def main(argv=None):
 
         log.info('Coverage submitted!')
         log.debug(result)
-        log.info(result['message'])
-        log.info(result['url'])
+        if result:
+            log.info(result.get('message'))
+            log.info(result.get('url'))
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
     except CoverallsException as e:
