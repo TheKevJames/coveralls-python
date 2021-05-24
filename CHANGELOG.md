@@ -1,3 +1,11 @@
+<a name="3.1.0"></a>
+## 3.1.0 (2021-05-24)
+
+#### Features
+
+* **cli**:  add `--basedir` and `--submit` options (#287) ([165a5cd1](165a5cd1))
+* **github:**  push coverage info from tags (#284) ([0a49bd28](0a49bd28))
+
 <a name="3.0.1"></a>
 ## 3.0.1 (2021-03-02)
 
