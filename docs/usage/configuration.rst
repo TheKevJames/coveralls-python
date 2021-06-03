@@ -156,3 +156,27 @@ you can copy from the coveralls.io website).
 As per `#245 <https://github.com/TheKevJames/coveralls-python/issues/245>`_,
 our users suggest leaving "keep this value secret" unchecked -- this may be
 secure enough as-is, in that a user making a PR cannot access this variable.
+
+Other CI systems
+----------------
+
+As specified in the Coveralls `official docs
+<https://docs.coveralls.io/supported-ci-services>`
+other CI systems can be supported if the following environment variables are
+defined::
+
+    CI_NAME
+        # Name of the CI service being used
+    CI_BUILD_NUMBER
+        # Number (counter) relative to the current build
+    CI_BUILD_URL
+        # URL to a webpage showing the build information/output
+    CI_BRANCH
+        # For pull requests this is the name of the branch targeted by the PR,
+        # otherwise it corresponds to the name of the current branch or tag
+    CI_JOB_ID (optional)
+        # Unique identifier of the job in the CI service.
+        # When missing, CI_BUILD_NUMBER is used
+    CI_PULL_REQUEST (optional)
+        # If given, corresponds to the number of the pull request, as specified
+        # in the supported repository hosting service (GitHub, GitLab, etc)

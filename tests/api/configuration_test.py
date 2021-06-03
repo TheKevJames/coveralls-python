@@ -198,6 +198,40 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_number'] == 'b86b3adf'
         assert cover.config['service_pull_request'] == '9999'
 
+    @mock.patch.dict(
+        os.environ,
+        {'CI_NAME': 'generic-ci',
+         'CI_PULL_REQUEST': 'pull/1234',
+         'CI_JOB_ID': 'bb0e00166',
+         'CI_BUILD_NUMBER': '3',
+         'CI_BUILD_URL': 'https://generic-ci.local/build/123456789',
+         'CI_BRANCH': 'fixup-branch',
+         'COVERALLS_REPO_TOKEN': 'xxx'},
+        clear=True)
+    def test_generic_no_config(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'generic-ci'
+        assert cover.config['service_job_id'] == 'bb0e00166'
+        assert cover.config['service_branch'] == 'fixup-branch'
+        assert cover.config['service_pull_request'] == '1234'
+
+    @mock.patch.dict(
+        os.environ,
+        {'CI_NAME': 'generic-ci',
+         'CI_PULL_REQUEST': '',
+         'CI_JOB_ID': 'bb0e00166',
+         'CI_BUILD_NUMBER': '3',
+         'CI_BUILD_URL': 'https://generic-ci.local/build/123456789',
+         'CI_BRANCH': 'fixup-branch',
+         'COVERALLS_REPO_TOKEN': 'xxx'},
+        clear=True)
+    def test_generic_no_config_no_pr(self):
+        cover = Coveralls()
+        assert cover.config['service_name'] == 'generic-ci'
+        assert cover.config['service_job_id'] == 'bb0e00166'
+        assert cover.config['service_branch'] == 'fixup-branch'
+        assert 'service_pull_request' not in cover.config
+
     @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
     def test_service_name_from_env(self):
         cover = Coveralls(repo_token='yyy')

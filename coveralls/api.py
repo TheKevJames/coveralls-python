@@ -16,6 +16,8 @@ from .reporter import CoverallReporter
 
 log = logging.getLogger('coveralls.api')
 
+NUMBER_REGEX = re.compile(r'(\d+)$', re.IGNORECASE)
+
 
 class Coveralls:
     # pylint: disable=too-many-public-methods
@@ -144,7 +146,33 @@ class Coveralls:
     def load_config_from_unknown():
         return 'coveralls-python', None, None, None
 
+    def load_config_from_generic_ci_environment(self):
+        # Inspired by the official client:
+        # coveralls-ruby in lib/coveralls/configuration.rb
+        # (set_standard_service_params_for_generic_ci)
+
+        config = {
+            'service_name': os.environ.get('CI_NAME'),
+            'service_number': os.environ.get('CI_BUILD_NUMBER'),
+            'service_build_url': os.environ.get('CI_BUILD_URL'),
+            'service_job_id': os.environ.get('CI_JOB_ID'),
+            'service_branch': os.environ.get('CI_BRANCH'),
+        }
+
+        pr_match = NUMBER_REGEX.findall(os.environ.get('CI_PULL_REQUEST', ''))
+        if pr_match:
+            config['service_pull_request'] = pr_match[-1]
+
+        non_empty = {key: value for key, value in config.items() if value}
+        self.config.update(non_empty)
+
     def load_config_from_ci_environment(self):
+        # As defined at the bottom of
+        # https://docs.coveralls.io/supported-ci-services
+        # there are a few env vars that should support any arbitrary CI.
+        # We load them first and allow more specific vars to overwrite
+        self.load_config_from_generic_ci_environment()
+
         if os.environ.get('APPVEYOR'):
             name, job, number, pr = self.load_config_from_appveyor()
         elif os.environ.get('BUILDKITE'):
@@ -166,7 +194,7 @@ class Coveralls:
         else:
             name, job, number, pr = self.load_config_from_unknown()
 
-        self.config['service_name'] = name
+        self.config.setdefault('service_name', name)
         if job:
             self.config['service_job_id'] = job
         if number:
