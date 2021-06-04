@@ -151,6 +151,9 @@ class Coveralls:
         # coveralls-ruby in lib/coveralls/configuration.rb
         # (set_standard_service_params_for_generic_ci)
 
+        # The meaning of each env var is clarified in:
+        # https://github.com/lemurheavy/coveralls-public/issues/1558
+
         config = {
             'service_name': os.environ.get('CI_NAME'),
             'service_number': os.environ.get('CI_BUILD_NUMBER'),

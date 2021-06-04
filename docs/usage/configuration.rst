@@ -168,15 +168,16 @@ defined::
     CI_NAME
         # Name of the CI service being used
     CI_BUILD_NUMBER
-        # Number (counter) relative to the current build
+        # The number assigned to the build by your CI service.
     CI_BUILD_URL
-        # URL to a webpage showing the build information/output
+        # URL to a webpage showing the build information/logs
     CI_BRANCH
-        # For pull requests this is the name of the branch targeted by the PR,
+        # For pull requests this is the name of the branch being targeted,
         # otherwise it corresponds to the name of the current branch or tag
     CI_JOB_ID (optional)
-        # Unique identifier of the job in the CI service.
-        # When missing, CI_BUILD_NUMBER is used
+        # For parallel builds, the number assigned to each job comprising the build.
+        # When missing, Coveralls will assign an incrementing integer (1, 2, 3 ...).
+        # This value should not change between multiple runs of the build.
     CI_PULL_REQUEST (optional)
         # If given, corresponds to the number of the pull request, as specified
         # in the supported repository hosting service (GitHub, GitLab, etc)
