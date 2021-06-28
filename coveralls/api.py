@@ -371,7 +371,9 @@ class Coveralls:
         workman.get_data()
 
         base_dir = self.config.get('base_dir') or ''
-        return CoverallReporter(workman, workman.config, base_dir).coverage
+        src_dir = self.config.get('src_dir') or ''
+        return CoverallReporter(workman, workman.config, base_dir,
+                                src_dir).coverage
 
     @staticmethod
     def debug_bad_encoding(data):
