@@ -65,7 +65,7 @@ repos:
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.21.0
+    rev: v2.21.1
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
