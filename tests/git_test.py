@@ -8,7 +8,7 @@ import unittest
 from unittest import mock
 
 import coveralls.git
-
+from coveralls.exception import CoverallsException
 
 GIT_COMMIT_MSG = 'first commit'
 GIT_EMAIL = 'me@here.com'
@@ -106,6 +106,22 @@ class GitInfoTestEnvVars(unittest.TestCase):
                 'branch': 'master',
             },
         }
+
+
+class GitInfoTestNotAGitRepository(unittest.TestCase):
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+
+        os.chdir(self.dir)
+
+    def tearDown(self):
+        shutil.rmtree(self.dir)
+
+    def test_gitlog_not_a_git_repo(self):
+        git_info = coveralls.git.git_info()
+
+        self.assertRaises(CoverallsException)
+        assert git_info == {}
 
 
 class GitInfoTestBranch(GitTest):
