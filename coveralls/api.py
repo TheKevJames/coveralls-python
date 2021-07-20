@@ -214,21 +214,18 @@ class Coveralls:
         if parallel:
             self.config['parallel'] = parallel
 
-        repo_token = os.environ.get('COVERALLS_REPO_TOKEN')
-        if repo_token:
-            self.config['repo_token'] = repo_token
-
-        service_name = os.environ.get('COVERALLS_SERVICE_NAME')
-        if service_name:
-            self.config['service_name'] = service_name
-
-        flag_name = os.environ.get('COVERALLS_FLAG_NAME')
-        if flag_name:
-            self.config['flag_name'] = flag_name
-
-        number = os.environ.get('COVERALLS_SERVICE_JOB_NUMBER')
-        if number:
-            self.config['service_number'] = number
+        fields = {
+            'COVERALLS_FLAG_NAME': 'flag_name',
+            'COVERALLS_REPO_TOKEN': 'repo_token',
+            'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
+            'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
+            'COVERALLS_SERVICE_NAME': 'service_name',
+            'COVERALLS_SERVICE_NUMBER': 'service_number',
+        }
+        for var, key in fields.items():
+            value = os.environ.get(var)
+            if value:
+                self.config[key] = value
 
     def load_config_from_file(self):
         try:
