@@ -21,6 +21,7 @@ Global options:
     --rcfile=<file>   Specify configuration file. [default: .coveragerc]
     --basedir=<dir>   Base directory that is removed from reported paths.
     --output=<file>   Write report to file. Doesn't send anything.
+    --srcdir=<dir>    Source directory added to reported paths.
     --submit=<file>   Upload a previously generated file.
     --merge=<file>    Merge report from file when submitting.
     --finish          Finish parallel jobs.
@@ -63,7 +64,8 @@ def main(argv=None):
         coverallz = Coveralls(token_required,
                               config_file=options['--rcfile'],
                               service_name=options['--service'],
-                              base_dir=options.get('--basedir') or '')
+                              base_dir=options.get('--basedir') or '',
+                              src_dir=options.get('--srcdir') or '')
 
         if options['--merge']:
             coverallz.merge(options['--merge'])

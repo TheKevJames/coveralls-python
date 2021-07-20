@@ -12,14 +12,19 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
-    def __init__(self, cov, conf, base_dir=''):
+    def __init__(self, cov, conf, base_dir='', src_dir=''):
         self.coverage = []
-        self.base_dir = base_dir
-        if self.base_dir:
-            self.base_dir = self.base_dir.replace(os.path.sep, '/')
-            if self.base_dir[-1] != '/':
-                self.base_dir += '/'
+        self.base_dir = self.sanitize_dir(base_dir)
+        self.src_dir = self.sanitize_dir(src_dir)
         self.report(cov, conf)
+
+    @staticmethod
+    def sanitize_dir(directory):
+        if directory:
+            directory = directory.replace(os.path.sep, '/')
+            if directory[-1] != '/':
+                directory += '/'
+        return directory
 
     def report5(self, cov):
         # N.B. this method is 99% copied from the coverage source code;
@@ -194,6 +199,7 @@ class CoverallReporter:
 
         if self.base_dir and posix_filename.startswith(self.base_dir):
             posix_filename = posix_filename[len(self.base_dir):]
+        posix_filename = self.src_dir + posix_filename
 
         source = analysis.file_reporter.source()
 
