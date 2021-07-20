@@ -1,3 +1,10 @@
+<a name="3.2.0"></a>
+## 3.2.0 (2021-07-20)
+
+#### Features
+
+* **api:**  support officially documented generic CI env vars (#300) ([ca1c6a47](ca1c6a47))
+
 <a name="3.1.0"></a>
 ## 3.1.0 (2021-05-24)
 
