@@ -23,7 +23,7 @@ options after you have run your coverage suite::
 
     coveralls
 
-If you have placed your ``.coveragerc`` in a non-standard location, you can run::
+If you have placed your ``.coveragerc`` in a non-standard location (ie. other than ``./.coveragerc``), you can run::
 
     coveralls --rcfile=/path/to/coveragerc
 
