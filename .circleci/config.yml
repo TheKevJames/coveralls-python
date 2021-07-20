@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  linter: thekevjames/linter@1.1.60
+  linter: talkiq/linter@1.1.60
 
 jobs:
   toxpy:
