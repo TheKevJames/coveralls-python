@@ -6,6 +6,7 @@ import pytest
 
 from coveralls.exception import CoverallsException
 
+
 class CoverallsExceptionTest(unittest.TestCase):
 
     _caplog = None

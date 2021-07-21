@@ -232,7 +232,34 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_branch'] == 'fixup-branch'
         assert 'service_pull_request' not in cover.config
 
-    @mock.patch.dict(os.environ, {'COVERALLS_SERVICE_NAME': 'xxx'}, clear=True)
+    @mock.patch.dict(
+        os.environ,
+        {'COVERALLS_HOST': 'aaa',
+         'COVERALLS_PARALLEL': 'true',
+         'COVERALLS_REPO_TOKEN': 'a1b2c3d4',
+         'COVERALLS_SERVICE_NAME': 'bbb',
+         'COVERALLS_FLAG_NAME': 'cc',
+         'COVERALLS_SERVICE_JOB_NUMBER': '1234'
+         },
+        clear=True)
     def test_service_name_from_env(self):
-        cover = Coveralls(repo_token='yyy')
-        assert cover.config['service_name'] == 'xxx'
+        cover = Coveralls()
+        assert cover._coveralls_host == 'aaa'
+        assert cover.config['parallel'] is True
+        assert cover.config['repo_token'] == 'a1b2c3d4'
+        assert cover.config['service_name'] == 'bbb'
+        assert cover.config['flag_name'] == 'cc'
+        assert cover.config['service_number'] == '1234'
+
+
+@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+class CLIConfiguration(unittest.TestCase):
+    def test_load_config(self):
+        cover = Coveralls(
+            repo_token='yyy',
+            service_name='coveralls-aaa',
+            coveralls_host='https://coveralls.aaa.com'
+        )
+        assert cover.config['repo_token'] == 'yyy'
+        assert cover.config['service_name'] == 'coveralls-aaa'
+        assert cover._coveralls_host == 'https://coveralls.aaa.com'

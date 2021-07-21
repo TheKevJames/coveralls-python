@@ -92,6 +92,30 @@ def test_finish_exception(mock_log):
     assert req_json(responses.calls[0].request) == expected_json
 
 
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'exception')
+@responses.activate
+def test_finish_exception_without_error(mock_log):
+    responses.add(responses.POST, 'https://coveralls.io/webhook',
+                  json={}, status=200)
+    expected_json = {
+        'payload': {
+            'status': 'done'
+        }
+    }
+    msg = 'Parallel finish failed'
+
+    try:
+        coveralls.cli.main(argv=['--finish'])
+        assert 0 == 1  # Should never reach this line
+    except SystemExit:
+        pass
+
+    mock_log.assert_has_calls([mock.call(CoverallsException(msg))])
+    assert len(responses.calls) == 1
+    assert req_json(responses.calls[0].request) == expected_json
+
+
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
