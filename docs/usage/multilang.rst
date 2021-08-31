@@ -5,7 +5,7 @@ Multiple Language Support
 
 Tracking multi-language repo coverage requires an extra setup of merging coverage data for submission.
 
-To send coveralls.io merged data, you must use each of your coverage reporting tools in sequence, then merge the JSON data in the last step.
+To send coveralls.io merged data, you must use each of your coverage reporting tools in sequence, then merge the JSON data in the last step. Note that there is varying levels of support for these tools; for example you should be set to long as your coverage tool of choice emits ``lcov``-style data, but as far as I am aware no method yet exists for converting ``kcov``-style data tot he correct format. YMMV.
 
 For example, to submit coverage for a project using both ``mocha`` and ``py.test``, you could use the `coveralls-lcov`_ library and run::
 
