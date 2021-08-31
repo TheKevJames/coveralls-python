@@ -120,3 +120,30 @@ class WearTest(unittest.TestCase):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
             'https://coveralls.io/api/v1/jobs', files=mock.ANY, verify=True)
+
+    @mock.patch.dict(os.environ, {}, clear=True)
+    def test_submit_report_resubmission(self, mock_requests):
+        # This would trigger the resubmission condition
+        mock_requests.post.return_value.status_code = 422
+        result = coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+
+        # A new service_job_id is created
+        mock_requests.post.return_value.json.return_value = EXPECTED
+        result = coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+
+        assert result == EXPECTED
+
+    @mock.patch.dict(
+        os.environ,
+        {'GITHUB_REPOSITORY': 'test/repo'},
+        clear=True)
+    def test_submit_report_resubmission_github(self, mock_requests):
+        # This would trigger the resubmission condition, for github
+        mock_requests.post.return_value.status_code = 422
+        result = coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+
+        # A new service_job_id is created, null for github
+        mock_requests.post.return_value.json.return_value = EXPECTED
+        result = coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+
+        assert result == EXPECTED
