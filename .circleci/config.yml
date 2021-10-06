@@ -49,7 +49,7 @@ workflows:
   lint:
     jobs:
       - linter/pre-commit:
-          python_version: 3.7.5
+          python_version: 3.10.0
 
   test-cpython:
     jobs:
@@ -78,6 +78,20 @@ workflows:
           matrix:
             parameters:
               cov_version: ['41', '5']
+      - toxpy:
+          name: test-py3.9-cov<<matrix.cov_version>>
+          docker_image: '3.9'
+          tox_environment: py39
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
+      - toxpy:
+          name: test-py3.10-cov<<matrix.cov_version>>
+          docker_image: '3.10'
+          tox_environment: py310
+          matrix:
+            parameters:
+              cov_version: ['41', '5']
 
   test-pypy:
     jobs:
@@ -87,13 +101,3 @@ workflows:
             parameters:
               cov_version: ['41', '5']
               docker_image: ['3-5', '3-6', '3-7']
-
-  test-alphaversions:
-    jobs:
-      - toxpy:
-          name: test-py3.9-alpha-cov<<matrix.cov_version>>
-          docker_image: '3.9.0a2'
-          tox_environment: py39
-          matrix:
-            parameters:
-              cov_version: ['41', '5']
