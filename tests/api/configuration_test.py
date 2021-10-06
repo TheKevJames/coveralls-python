@@ -243,6 +243,7 @@ class NoConfiguration(unittest.TestCase):
          },
         clear=True)
     def test_service_name_from_env(self):
+        # pylint: disable=protected-access
         cover = Coveralls()
         assert cover._coveralls_host == 'aaa'
         assert cover.config['parallel'] is True
@@ -255,6 +256,7 @@ class NoConfiguration(unittest.TestCase):
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class CLIConfiguration(unittest.TestCase):
     def test_load_config(self):
+        # pylint: disable=protected-access
         cover = Coveralls(
             repo_token='yyy',
             service_name='coveralls-aaa',
