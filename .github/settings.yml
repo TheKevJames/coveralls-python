@@ -11,10 +11,14 @@ repository:
   has_downloads: false
 
   default_branch: master
+  delete_branch_on_merge: true
 
   allow_merge_commit: false
   allow_rebase_merge: true
   allow_squash_merge: true
+
+  enable_automated_security_fixes: true
+  enable_vulnerability_alerts: true
 
 labels:
   - name: bug
