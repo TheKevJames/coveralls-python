@@ -2,9 +2,13 @@ import logging
 import os
 
 from coverage import __version__
-from coverage.misc import NoSource
-from coverage.misc import NotPython
 
+try:
+    from coverage.exceptions import NoSource
+    from coverage.exceptions import NotPython
+except ImportError:
+    from coverage.misc import NoSource
+    from coverage.misc import NotPython
 
 log = logging.getLogger('coveralls.reporter')
 

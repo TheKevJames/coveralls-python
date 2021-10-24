@@ -34,7 +34,7 @@ setup(
     },
     python_requires='>= 3.5',
     install_requires=[
-        'coverage>=4.1,<6.0',
+        'coverage>=4.1,<7.0',
         'docopt>=0.6.1',
         'requests>=1.0.0',
     ],
@@ -53,6 +53,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
