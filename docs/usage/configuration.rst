@@ -121,10 +121,10 @@ parallel build is finished::
         runs-on: ubuntu-latest
         container: python:3-slim
         steps:
+        - name: Install coveralls
+          run: pip3 install --upgrade coveralls
         - name: Finished
-          run: |
-            pip3 install --upgrade coveralls
-            coveralls --service=github --finish
+          run: coveralls --service=github --finish
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
