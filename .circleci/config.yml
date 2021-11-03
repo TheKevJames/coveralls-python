@@ -49,7 +49,9 @@ workflows:
   lint:
     jobs:
       - linter/pre-commit:
-          python_version: 3.10.0
+          # N.B. lowest common denominator, don't want to error on not using
+          # the latest syntax.
+          python_version: 3.6.15
 
   test-cpython:
     jobs:
@@ -63,35 +65,35 @@ workflows:
           tox_environment: py36
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['41', '5', '6']
       - toxpy:
           name: test-py3.7-cov<<matrix.cov_version>>
           docker_image: '3.7'
           tox_environment: py37
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['41', '5', '6']
       - toxpy:
           name: test-py3.8-cov<<matrix.cov_version>>
           docker_image: '3.8'
           tox_environment: py38
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['41', '5', '6']
       - toxpy:
           name: test-py3.9-cov<<matrix.cov_version>>
           docker_image: '3.9'
           tox_environment: py39
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['41', '5', '6']
       - toxpy:
           name: test-py3.10-cov<<matrix.cov_version>>
           docker_image: '3.10'
           tox_environment: py310
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['41', '5', '6']
 
   test-pypy:
     jobs:
@@ -100,4 +102,10 @@ workflows:
           matrix:
             parameters:
               cov_version: ['41', '5']
-              docker_image: ['3-5', '3-6', '3-7']
+              docker_image: ['3-5', '3-6']
+      - toxpypy:
+          name: test-pypy3-7-cov<<matrix.cov_version>>
+          docker_image: '3-7'
+          matrix:
+            parameters:
+              cov_version: ['41', '5', '6']

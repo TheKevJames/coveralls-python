@@ -180,9 +180,9 @@ def test_save_report_to_file_no_token(mock_coveralls):
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_submit(mock_submit):
     json_file = os.path.join(EXAMPLE_DIR, 'example.json')
-    json_string = open(json_file).read()
     coveralls.cli.main(argv=['--submit=' + json_file])
-    mock_submit.assert_called_with(json_string)
+    with open(json_file) as f:
+        mock_submit.assert_called_with(f.read())
 
 
 @mock.patch('coveralls.cli.Coveralls')

@@ -6,9 +6,9 @@ from setuptools import setup
 VERSION_FILE = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                             'coveralls', 'version.py')
 
-DESCRIPTION = open('README.rst').read()
+with open('README.rst') as f:
+    DESCRIPTION = f.read()
 
-VERSION = None
 with open(VERSION_FILE) as f:
     VERSION = f.read().split()[2][1:-1]
 

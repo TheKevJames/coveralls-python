@@ -229,8 +229,9 @@ class Coveralls:
 
     def load_config_from_file(self):
         try:
-            with open(os.path.join(os.getcwd(),
-                                   self.config_filename)) as config:
+            fname = os.path.join(os.getcwd(), self.config_filename)
+
+            with open(fname) as config:
                 try:
                     import yaml  # pylint: disable=import-outside-toplevel
                     self.config.update(yaml.safe_load(config))

@@ -22,7 +22,8 @@ class GitTest(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
 
         os.chdir(self.dir)
-        open('README', 'a').close()
+        # TODO: switch to pathlib
+        open('README', 'a').close()  # pylint: disable=consider-using-with
 
         subprocess.call(['git', 'init'], cwd=self.dir)
         subprocess.call(['git', 'config', 'user.name',

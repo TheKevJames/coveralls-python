@@ -28,6 +28,7 @@ repos:
     -   id: double-quote-string-fixer
         exclude: nonunicode/.*
     -   id: name-tests-test
+        exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
     rev: v2.11.1
@@ -53,6 +54,9 @@ repos:
         - -d too-few-public-methods
         - -d ungrouped-imports  # conflicts with reorder-python-imports
         - -d wrong-import-order  # conflicts with reorder-python-imports
+        - -d consider-using-f-string  # not py35 compatible
+        - -d unspecified-encoding  # TODO: reevaluate
+        - -d disallowed-name  # TODO: fix
         exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.1.10

@@ -250,7 +250,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['repo_token'] == 'a1b2c3d4'
         assert cover.config['service_name'] == 'bbb'
         assert cover.config['flag_name'] == 'cc'
-        assert cover.config['service_number'] == '1234'
+        assert cover.config['service_job_number'] == '1234'
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')

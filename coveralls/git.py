@@ -9,16 +9,16 @@ log = logging.getLogger('coveralls.git')
 
 
 def run_command(*args):
-    cmd = subprocess.Popen(list(args), stdout=subprocess.PIPE,
-                           stderr=subprocess.PIPE)
-    stdout, stderr = cmd.communicate()
+    with subprocess.Popen(list(args), stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE) as cmd:
+        stdout, stderr = cmd.communicate()
 
-    if cmd.returncode != 0:
-        raise CoverallsException(
-            'command return code {}, STDOUT: "{}"\nSTDERR: "{}"'.format(
-                cmd.returncode, stdout, stderr))
+        if cmd.returncode != 0:
+            raise CoverallsException(
+                'command return code {}, STDOUT: "{}"\nSTDERR: "{}"'.format(
+                    cmd.returncode, stdout, stderr))
 
-    return stdout.decode().strip()
+        return stdout.decode().strip()
 
 
 def gitlog(fmt):

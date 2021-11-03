@@ -1,91 +1,66 @@
 import os
+import subprocess
+import sys
 import tempfile
 import unittest
-from os.path import join as jp, dirname
-from pprint import pprint
-from subprocess import check_call
 
 from coveralls import Coveralls
 
-COVERAGE_CONFIG = """
-[run]
-branch = True
-data_file = %s
-
-[paths]
-source = %s 
- %s
-"""
 
 COVERAGE_CODE_STANZA = """
 import sys
+sys.path.append('{}')
 
-sys.path.append(%r)
-
-exec('''
 import foo
-
-foo.test_func(%r)
-''')
+foo.test_func({:d})
 """
 
-COVERAGE_TEMPLATE_PATH = jp(dirname(__file__), "coverage_templates")
+COVERAGE_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'data')
 
 
 class IntegrationTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        try:
-            cls.old_cwd = os.getcwd()
-        except FileNotFoundError:
-            cls.old_cwd = None
+    gitinfo = {
+        'GIT_ID': 'asdf1234',
+        'GIT_AUTHOR_NAME': 'Integration Tests',
+        'GIT_AUTHOR_EMAIL': 'integration@test.com',
+        'GIT_COMMITTER_NAME': 'Integration Tests',
+        'GIT_COMMITTER_EMAIL': 'integration@test.com',
+        'GIT_MESSAGE': 'Ran the integration tests',
+    }
 
-    @classmethod
-    def tearDownClass(cls):
-        if cls.old_cwd:
-            os.chdir(cls.old_cwd)
+    def _test_harness(self, num, hits):
+        with tempfile.TemporaryDirectory() as tempdir:
+            os.chdir(tempdir)
 
-    def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory()
-        os.chdir(self.temp_dir.name)
-        self.covrc = jp(self.temp_dir.name, ".coveragerc")
-        self.cov = jp(self.temp_dir.name, ".coverage")
-        self.test_file = jp(self.temp_dir.name, "test.py")
+            test_file = os.path.join(tempdir, 'test.py')
+            with open(test_file, 'wt') as f:
+                f.write(COVERAGE_CODE_STANZA.format(COVERAGE_TEMPLATE_PATH,
+                                                    num))
 
-    def tearDown(self):
-        self.temp_dir.cleanup()
+            subprocess.check_call([sys.executable, '-m', 'coverage', 'run',
+                                   test_file])
 
-    def _test_harness(self, code):
-        with open(self.covrc, "wt") as f:
-            f.write(COVERAGE_CONFIG % (self.cov, COVERAGE_TEMPLATE_PATH, self.temp_dir))
-        with open(self.test_file, "wt") as f:
-            f.write(code)
+            coverallz = Coveralls(repo_token='xxx')
+            report = coverallz.create_data()
+            coverallz.create_report()  # This is purely for coverage
 
-        check_call(["coverage", "run", "test.py"])
+            source_files = {f['name'] for f in report['source_files']}
+            print(source_files)
+            foo = os.path.join(COVERAGE_TEMPLATE_PATH, 'foo.py')
+            self.assertIn(foo, source_files)
 
-        os.unlink(self.test_file)
+            lines = next((f['coverage'] for f in report['source_files']
+                          if f['name'] == foo), None)
+            assert sum(int(bool(x)) for x in lines) == hits
 
-        coverallz = Coveralls(repo_token="xxx",
-                              config_file=self.covrc)
-        report = coverallz.create_data()
-        coverallz.create_report()  # This is purely for coverage
-
-        source_files = set(f["name"] for f in report["source_files"])
-        self.assertNotIn(self.test_file, source_files)
-        self.assertIn(jp(COVERAGE_TEMPLATE_PATH, "foo.py"), source_files)
-        self.assertTrue(jp(COVERAGE_TEMPLATE_PATH, "bar.py") in source_files or
-                        jp(COVERAGE_TEMPLATE_PATH, "bar_310.py") in source_files)
-        self.assertFalse(jp(COVERAGE_TEMPLATE_PATH, "bar.py") in source_files and
-                         jp(COVERAGE_TEMPLATE_PATH, "bar_310.py") in source_files)
-
-    def _test_number(self, num):
-        self._test_harness(COVERAGE_CODE_STANZA % (COVERAGE_TEMPLATE_PATH, num))
-
+    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
     def test_5(self):
-        self._test_number(5)
+        self._test_harness(5, 8)
 
+    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
     def test_7(self):
-        self._test_number(7)
+        self._test_harness(7, 9)
 
+    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
     def test_11(self):
-        self._test_number(11)
+        self._test_harness(11, 9)
