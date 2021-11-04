@@ -1,6 +1,5 @@
 # pylint: disable=no-self-use
 import os
-import shutil
 import tempfile
 import unittest
 from unittest import mock
@@ -17,16 +16,20 @@ from coveralls.api import log
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configuration(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
     def setUp(self):
         self.dir = tempfile.mkdtemp()
-
         os.chdir(self.dir)
         with open('.coveralls.mock', 'w+') as fp:
             fp.write('repo_token: xxx\n')
             fp.write('service_name: jenkins\n')
-
-    def tearDown(self):
-        shutil.rmtree(self.dir)
 
     @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
     @mock.patch.dict(os.environ, {}, clear=True)

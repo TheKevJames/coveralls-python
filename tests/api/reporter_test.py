@@ -18,6 +18,14 @@ def assert_coverage(actual, expected):
 
 
 class ReporterTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
     def setUp(self):
         os.chdir(EXAMPLE_DIR)
 
