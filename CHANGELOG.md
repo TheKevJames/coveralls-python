@@ -1,3 +1,19 @@
+<a name="3.3.0"></a>
+## 3.3.0 (2021-11-04)
+
+#### Features
+
+* **cli:**  add --srcdir option (#306) ([4120c540](4120c540))
+* **deps:**  add support for coverage v6.x (#330) ([372443dc](372443dc), closes [#326](326))
+
+Note this implicitly improves support for Python 3.10, as coverage v6.x includes some fixes for v3.10 of Python.
+
+#### Bug Fixes
+
+* **env:**  fixup handling of default env service values (#314) ([1a0fd9b3](1a0fd9b3), closes [#303](303))
+
+This solves some edge cases around duplicated / unmerged coverage results in parallel runs.
+
 <a name="3.2.0"></a>
 ## 3.2.0 (2021-07-20)
 
