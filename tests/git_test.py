@@ -1,7 +1,6 @@
 # pylint: disable=no-self-use
 import os
 import re
-import shutil
 import subprocess
 import tempfile
 import unittest
@@ -18,10 +17,18 @@ GIT_URL = 'https://github.com/username/Hello-World.git'
 
 
 class GitTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
     def setUp(self):
         self.dir = tempfile.mkdtemp()
-
         os.chdir(self.dir)
+
         # TODO: switch to pathlib
         open('README', 'a').close()  # pylint: disable=consider-using-with
 
@@ -34,9 +41,6 @@ class GitTest(unittest.TestCase):
         subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=self.dir)
         subprocess.call(['git', 'remote', 'add', GIT_REMOTE, GIT_URL],
                         cwd=self.dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.dir)
 
     @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
     def test_git(self):
@@ -74,7 +78,19 @@ class GitLogTest(GitTest):
         assert coveralls.git.gitlog('%s') == GIT_COMMIT_MSG
 
 
-class GitInfoTestEnvVars(unittest.TestCase):
+class GitInfoTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
+    def setUp(self):
+        self.dir = tempfile.mkdtemp()
+        os.chdir(self.dir)
+
     @mock.patch.dict(os.environ, {
         'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
         'GIT_BRANCH': 'master',
@@ -86,7 +102,7 @@ class GitInfoTestEnvVars(unittest.TestCase):
         'GIT_URL': GIT_URL,
         'GIT_REMOTE': GIT_REMOTE,
     }, clear=True)
-    def test_gitlog_envvars(self):
+    def test_gitinfo_envvars(self):
         git_info = coveralls.git.git_info()
         commit_id = git_info['git']['head'].pop('id')
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
@@ -108,24 +124,14 @@ class GitInfoTestEnvVars(unittest.TestCase):
             },
         }
 
-
-class GitInfoTestNotAGitRepository(unittest.TestCase):
-    def setUp(self):
-        self.dir = tempfile.mkdtemp()
-
-        os.chdir(self.dir)
-
-    def tearDown(self):
-        shutil.rmtree(self.dir)
-
-    def test_gitlog_not_a_git_repo(self):
+    def test_gitinfo_not_a_git_repo(self):
         git_info = coveralls.git.git_info()
 
         self.assertRaises(CoverallsException)
         assert git_info == {}
 
 
-class GitInfoTestBranch(GitTest):
+class GitInfoOverridesTest(unittest.TestCase):
     @mock.patch.dict(os.environ, {
         'GITHUB_ACTIONS': 'true',
         'GITHUB_REF': 'refs/pull/1234/merge',

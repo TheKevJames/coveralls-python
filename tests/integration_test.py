@@ -28,6 +28,14 @@ class IntegrationTest(unittest.TestCase):
         'GIT_MESSAGE': 'Ran the integration tests',
     }
 
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
     def _test_harness(self, num, hits):
         with tempfile.TemporaryDirectory() as tempdir:
             os.chdir(tempdir)
