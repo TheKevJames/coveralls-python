@@ -24,7 +24,7 @@ jobs:
           condition: <<parameters.cov_version>>
           steps:
             - run: tox -f <<parameters.tox_environment>>
-            - run: tox -e coveralls41
+            - run: tox -e coveralls5
       - when:
           condition: <<parameters.cov_version>>
           steps:
@@ -65,35 +65,35 @@ workflows:
           tox_environment: py36
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
       - toxpy:
           name: test-py3.7-cov<<matrix.cov_version>>
           docker_image: '3.7'
           tox_environment: py37
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
       - toxpy:
           name: test-py3.8-cov<<matrix.cov_version>>
           docker_image: '3.8'
           tox_environment: py38
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
       - toxpy:
           name: test-py3.9-cov<<matrix.cov_version>>
           docker_image: '3.9'
           tox_environment: py39
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
       - toxpy:
           name: test-py3.10-cov<<matrix.cov_version>>
           docker_image: '3.10'
           tox_environment: py310
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
 
   test-pypy:
     jobs:
@@ -101,11 +101,11 @@ workflows:
           name: test-pypy<<matrix.docker_image>>-cov<<matrix.cov_version>>
           matrix:
             parameters:
-              cov_version: ['41', '5']
+              cov_version: ['5']
               docker_image: ['3-5', '3-6']
       - toxpypy:
           name: test-pypy3-7-cov<<matrix.cov_version>>
           docker_image: '3-7'
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              cov_version: ['5', '6']
