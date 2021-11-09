@@ -113,11 +113,23 @@ class NoConfiguration(unittest.TestCase):
          'CIRCLE_BUILD_NUM': '888',
          'CI_PULL_REQUEST': 'https://github.com/org/repo/pull/9999'},
         clear=True)
-    def test_circleci_no_config(self):
+    def test_circleci_singular_no_config(self):
         cover = Coveralls(repo_token='xxx')
-        assert cover.config['service_name'] == 'circle-ci'
-        assert cover.config['service_job_id'] == '888'
+        assert cover.config['service_name'] == 'circleci'
+        assert cover.config['service_number'] == '888'
         assert cover.config['service_pull_request'] == '9999'
+
+    @mock.patch.dict(
+        os.environ,
+        {'CIRCLECI': 'True',
+         'CIRCLE_WORKFLOW_ID': '0ea2c0f7-4e56-4a94-bf77-bfae6bdbf80a',
+         'CIRCLE_NODE_INDEX': '15'},
+        clear=True)
+    def test_circleci_parallel_no_config(self):
+        cover = Coveralls(repo_token='xxx')
+        assert cover.config['service_name'] == 'circleci'
+        assert cover.config['service_number'] == '0ea2c0f7-4e56-4a94-bf77-bfae6bdbf80a'
+        assert cover.config['service_job_id'] == '15'
 
     @mock.patch.dict(
         os.environ,

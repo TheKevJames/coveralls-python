@@ -52,8 +52,10 @@ CircleCI
 All variables:
 
 - ``CIRCLECI``
+- ``CIRCLE_WORKFLOW_ID``
 - ``CIRCLE_BUILD_NUM``
 - ``CIRCLE_BRANCH``
+- ``CIRCLE_NODE_INDEX``
 - ``CI_PULL_REQUEST``
 
 Github Actions
