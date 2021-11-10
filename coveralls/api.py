@@ -97,7 +97,8 @@ class Coveralls:
 
     @staticmethod
     def load_config_from_circle():
-        number = os.environ.get('CIRCLE_WORKFLOW_ID') or os.environ.get('CIRCLE_BUILD_NUM')
+        number = os.environ.get(
+            'CIRCLE_WORKFLOW_ID') or os.environ.get('CIRCLE_BUILD_NUM')
         pr = (os.environ.get('CI_PULL_REQUEST') or "").split("/")[-1] or None
         job = os.environ.get('CIRCLE_NODE_INDEX') or None
         return 'circleci', job, number, pr
