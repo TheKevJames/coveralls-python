@@ -97,9 +97,11 @@ class Coveralls:
 
     @staticmethod
     def load_config_from_circle():
-        pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
-        number = os.environ.get('CIRCLE_WORKFLOW_ID')
-        return 'circle-ci', os.environ.get('CIRCLE_BUILD_NUM'), number, pr
+        number = os.environ.get(
+            'CIRCLE_WORKFLOW_ID') or os.environ.get('CIRCLE_BUILD_NUM')
+        pr = (os.environ.get('CI_PULL_REQUEST') or "").split("/")[-1] or None
+        job = os.environ.get('CIRCLE_NODE_INDEX') or None
+        return 'circleci', job, number, pr
 
     def load_config_from_github(self):
         # Github tokens and standard Coveralls tokens are almost but not quite
