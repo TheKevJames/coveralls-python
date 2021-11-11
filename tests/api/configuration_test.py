@@ -128,7 +128,8 @@ class NoConfiguration(unittest.TestCase):
     def test_circleci_parallel_no_config(self):
         cover = Coveralls(repo_token='xxx')
         assert cover.config['service_name'] == 'circleci'
-        assert cover.config['service_number'] == '0ea2c0f7-4e56-4a94-bf77-bfae6bdbf80a'
+        assert cover.config['service_number'] == (
+            '0ea2c0f7-4e56-4a94-bf77-bfae6bdbf80a')
         assert cover.config['service_job_id'] == '15'
 
     @mock.patch.dict(
