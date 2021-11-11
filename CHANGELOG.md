@@ -1,3 +1,18 @@
+<a name="3.3.1"></a>
+## 3.3.1 (2021-11-11)
+
+#### Bug Fixes
+
+* correctly support parallel execution on CircleCI (#336) ([2610885a](2610885a))
+
+#### Internal
+
+* exclude a few incompatible `coverage` versions (#337)
+
+`coverage` versions v6.0.0 through v6.1.1 exhibited some incompatibilies with
+`coveralls`; we've updated our version compatibility ranges to exclude those
+versions.
+
 <a name="3.3.0"></a>
 ## 3.3.0 (2021-11-04)
 
