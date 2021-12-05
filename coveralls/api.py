@@ -259,8 +259,12 @@ class Coveralls:
     def submit_report(self, json_string):
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(endpoint, files={'json_file': json_string},
-                                 verify=verify)
+        try:
+            response = requests.post(endpoint, files={'json_file': json_string},
+                                     verify=verify)
+        except requests.RequestException as e:
+            raise CoverallsException(
+                'Cannot submit report to coveralls.io: {}'.format(e)) from e
 
         # check and adjust/resubmit if submission looks like it failed due to
         # resubmission (non-unique)
@@ -282,9 +286,14 @@ class Coveralls:
             self._data = None  # force create_report to use updated data
             json_string = self.create_report()
 
-            response = requests.post(endpoint,
-                                     files={'json_file': json_string},
-                                     verify=verify)
+            try:
+                response = requests.post(endpoint,
+                                         files={'json_file': json_string},
+                                         verify=verify)
+            except requests.RequestException as e:
+                raise CoverallsException(
+                    'Cannot re-submit report to coveralls.io: {}'.format(e)) \
+                    from e
 
         try:
             response.raise_for_status()
@@ -310,7 +319,11 @@ class Coveralls:
 
         endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(endpoint, json=payload, verify=verify)
+        try:
+            response = requests.post(endpoint, json=payload, verify=verify)
+        except requests.RequestException as e:
+            raise CoverallsException(
+                'Cannot submit finish to coveralls.io: {}'.format(e)) from e
         try:
             response.raise_for_status()
             response = response.json()
