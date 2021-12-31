@@ -68,12 +68,12 @@ class CoverallReporter:
         config = cov.config
 
         if config.report_include:
-            matcher = FnmatchMatcher(prep_patterns(config.report_include))
+            matcher = FnmatchMatcher(prep_patterns(config.report_include), name='coveralls')
             file_reporters = [fr for fr in file_reporters
                               if matcher.match(fr.filename)]
 
         if config.report_omit:
-            matcher = FnmatchMatcher(prep_patterns(config.report_omit))
+            matcher = FnmatchMatcher(prep_patterns(config.report_omit), name='coveralls')
             file_reporters = [fr for fr in file_reporters
                               if not matcher.match(fr.filename)]
 
