@@ -1,3 +1,7 @@
+ci:
+    autofix_commit_msg: 'refactor(lint): apply automatic lint fixes'
+    autoupdate_commit_msg: 'chore(deps): bump pre-commit linter versions'
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
