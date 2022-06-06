@@ -35,7 +35,7 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.14.0-b1
+    rev: v2.14.0
     hooks:
     -   id: pylint
         additional_dependencies:
@@ -95,8 +95,8 @@ repos:
         args:
         - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+-   repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
     hooks:
     -   id: flake8
         additional_dependencies:
