@@ -4,7 +4,7 @@ ci:
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.2.0
+    rev: v4.3.0
     hooks:
     -   id: check-case-conflict
     -   id: check-executables-have-shebangs
@@ -35,7 +35,7 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.14.0
+    rev: v2.14.1
     hooks:
     -   id: pylint
         additional_dependencies:
@@ -73,7 +73,7 @@ repos:
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.32.1
+    rev: v2.34.0
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
