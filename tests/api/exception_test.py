@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import logging
 import unittest
 

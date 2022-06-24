@@ -47,6 +47,7 @@ repos:
         - --max-line-length=79
         - --max-args=10
         - --score=n
+        - -d bad-file-encoding
         - -d broad-except
         - -d duplicate-code
         - -d fixme
@@ -100,11 +101,11 @@ repos:
     hooks:
     -   id: flake8
         additional_dependencies:
-        - flake8-2020==1.6.0
-        - flake8-broken-line==0.3.0
+        - flake8-2020==1.6.1
+        - flake8-broken-line==0.4.0
         - flake8-builtins==1.5.3
-        - flake8-commas==2.0.0
-        - flake8-comprehensions==3.3.0
+        - flake8-commas==2.1.0
+        - flake8-comprehensions==3.10.0
         args:
         - --ignore=E501,W503,F401,F811
         files: coveralls/.*

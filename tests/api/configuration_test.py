@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import os
 import tempfile
 import unittest

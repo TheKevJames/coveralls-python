@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import os
 import re
 import subprocess
@@ -128,7 +127,7 @@ class GitInfoTest(unittest.TestCase):
         git_info = coveralls.git.git_info()
 
         self.assertRaises(CoverallsException)
-        assert git_info == {}
+        assert not git_info
 
 
 class GitInfoOverridesTest(unittest.TestCase):

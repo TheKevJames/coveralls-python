@@ -2,6 +2,7 @@ import json
 import os
 from unittest import mock
 
+import pytest
 import responses
 
 import coveralls.cli
@@ -81,11 +82,8 @@ def test_finish_exception(mock_log):
     }
     msg = 'Parallel finish failed: Mocked'
 
-    try:
+    with pytest.raises(SystemExit):
         coveralls.cli.main(argv=['--finish'])
-        assert 0 == 1  # Should never reach this line
-    except SystemExit:
-        pass
 
     mock_log.assert_has_calls([mock.call(CoverallsException(msg))])
     assert len(responses.calls) == 1
@@ -105,11 +103,8 @@ def test_finish_exception_without_error(mock_log):
     }
     msg = 'Parallel finish failed'
 
-    try:
+    with pytest.raises(SystemExit):
         coveralls.cli.main(argv=['--finish'])
-        assert 0 == 1  # Should never reach this line
-    except SystemExit:
-        pass
 
     mock_log.assert_has_calls([mock.call(CoverallsException(msg))])
     assert len(responses.calls) == 1
@@ -151,11 +146,8 @@ def test_service_name(mock_coveralls):
 @mock.patch.object(coveralls.Coveralls, 'wear', side_effect=EXC)
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_exception(_mock_coveralls, mock_log):
-    try:
+    with pytest.raises(SystemExit):
         coveralls.cli.main(argv=[])
-        assert 0 == 1  # Should never reach this line
-    except SystemExit:
-        pass
 
     mock_log.assert_has_calls([mock.call(EXC)])
 

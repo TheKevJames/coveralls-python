@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import json
 import os
 import tempfile

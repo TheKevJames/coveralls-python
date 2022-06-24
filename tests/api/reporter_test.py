@@ -1,4 +1,3 @@
-# pylint: disable=no-self-use
 import os
 import subprocess
 import unittest
@@ -186,7 +185,8 @@ class ReporterTest(unittest.TestCase):
             os.remove('extra.py')
         except Exception:
             pass
-        assert Coveralls(repo_token='xxx').get_coverage() == []
+
+        assert not Coveralls(repo_token='xxx').get_coverage()
 
     def test_not_python(self):
         with open('extra.py', 'w') as f:
@@ -195,4 +195,5 @@ class ReporterTest(unittest.TestCase):
                          'extra.py'], cwd=EXAMPLE_DIR)
         with open('extra.py', 'w') as f:
             f.write("<h1>This isn't python!</h1>\n")
-        assert Coveralls(repo_token='xxx').get_coverage() == []
+
+        assert not Coveralls(repo_token='xxx').get_coverage()
