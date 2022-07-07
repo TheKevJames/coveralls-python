@@ -132,6 +132,71 @@ The ``COVERALLS_FLAG_NAME`` environment variable (or the ``flag_name`` parameter
 in the config file) is optional and can be used to better identify each job
 on coveralls.io. It does not need to be unique across the parallel jobs.
 
+
+Running inside a container on GitHub Actions
+--------------------------------------------
+When running inside a (docker) container on GitHub Actions, you'll need to pass environment variables to your container
+as ``coveralls-python`` will not have access to the host environment.
+
+You'll want to pass the following values to your action step to ensure all the links to GitHub work:
+
+* COVERALLS_REPO_TOKEN
+* CI_NAME
+* CI_BUILD_NUMBER
+* CI_BUILD_URL
+* CI_BRANCH
+* CI_JOB_ID
+* COVERALLS_SERVICE_NUMBER
+* CI_PULL_REQUEST
+* COVERALLS_FLAG_NAME (optional)
+
+Example Github Action Step to run tests in the container
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here's an example workflow step that passes all the environment variables to your container
+running the tests::
+
+    - name: Run tests and send coverage data to coveralls.io
+      env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+          CI_NAME: "github-actions"
+          CI_BUILD_NUMBER: ${{ github.run_number }}
+          CI_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CI_BRANCH:  ${{ github.head_ref }}
+          CI_JOB_ID: "None"
+          COVERALLS_SERVICE_NUMBER:  ${{ github.job }}
+          CI_PULL_REQUEST: ${{ github.event.pull_request.number }}
+          COVERALLS_FLAG_NAME: "Unit"
+      run: make test
+
+Example Makefile
+^^^^^^^^^^^^^^^^
+
+Here's an example makefile which builds the ``test-app`` container from the currently checked out code in the GitHub Action and runs ``./test_suite.sh`` which has your language specific testing commands::
+
+    test:
+        docker build --progress=plain --target=test  -t test-app .
+        docker run -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} \
+            -e CI_NAME=${CI_NAME} \
+            -e CI_BUILD_NUMBER=${CI_BUILD_NUMBER} \
+            -e CI_BUILD_URL=${CI_BUILD_URL} \
+            -e CI_BRANCH=${CI_BRANCH} \
+            -e CI_JOB_ID=${CI_JOB_ID} \
+            -e COVERALLS_SERVICE_NUMBER=${COVERALLS_SERVICE_NUMBER} \
+            -e CI_PULL_REQUEST=${CI_PULL_REQUEST} \
+            -e COVERALLS_FLAG_NAME=${COVERALLS_FLAG_NAME} \
+            -t test-app ./test_suite.sh
+
+Example test_suite.sh script
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Here's an example script using ``pytest`` via ``pipenv``::
+
+    #!/bin/bash -e
+    pipenv run coverage run pytest tests/
+    pipenv run coveralls
+
+
 Azure Pipelines support
 -----------------------
 
