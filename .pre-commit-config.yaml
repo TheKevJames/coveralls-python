@@ -35,7 +35,7 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.14.4
+    rev: v2.14.5
     hooks:
     -   id: pylint
         additional_dependencies:
