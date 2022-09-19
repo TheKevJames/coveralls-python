@@ -35,12 +35,11 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.14.5
+    rev: v2.15.3
     hooks:
     -   id: pylint
         additional_dependencies:
-        # TODO: >0.2.0
-        - git+https://github.com/bayesimpact/pylint_import_modules@016f79e4d2
+        - pylint-import-modules==0.3.0
         args:
         - --allowed-direct-imports="typing.*"
         - --load-plugins=pylint_import_modules
@@ -64,28 +63,28 @@ repos:
         - -d disallowed-name  # TODO: fix
         exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.0
+    rev: v1.3.1
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.2
+    rev: v3.8.3
     hooks:
     -   id: reorder-python-imports
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.2
+    rev: v2.38.2
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/yesqa
-    rev: v1.3.0
+    rev: v1.4.0
     hooks:
     -   id: yesqa
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.6.0
+    rev: v1.7.0
     hooks:
     -   id: autopep8
         files: coveralls/.*
@@ -97,12 +96,12 @@ repos:
         - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
 -   repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
     -   id: flake8
         additional_dependencies:
-        - flake8-2020==1.6.1
-        - flake8-broken-line==0.4.0
+        - flake8-2020==1.7.0
+        - flake8-broken-line==0.5.0
         - flake8-builtins==1.5.3
         - flake8-commas==2.1.0
         - flake8-comprehensions==3.10.0
