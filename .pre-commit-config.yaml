@@ -39,8 +39,7 @@ repos:
     hooks:
     -   id: pylint
         additional_dependencies:
-        # TODO: >0.2.0
-        - git+https://github.com/bayesimpact/pylint_import_modules@016f79e4d2
+        - pylint-import-modules==0.3.0
         args:
         - --allowed-direct-imports="typing.*"
         - --load-plugins=pylint_import_modules
