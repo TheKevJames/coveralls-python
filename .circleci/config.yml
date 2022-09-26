@@ -1,7 +1,15 @@
 version: 2.1
 
 orbs:
-  linter: talkiq/linter@2.0.0
+  linter: talkiq/linter@3
+
+executors:
+  python-minimum:
+    docker:
+      # N.B. lowest common denominator, don't want to error on not using the
+      # latest syntax.
+      - image: python:3.6.15
+    resource_class: small
 
 jobs:
   toxpy:
@@ -49,9 +57,7 @@ workflows:
   lint:
     jobs:
       - linter/pre-commit:
-          # N.B. lowest common denominator, don't want to error on not using
-          # the latest syntax.
-          python_version: 3.6.15
+          executor: python-minimum
 
   test-cpython:
     jobs:
