@@ -41,7 +41,7 @@ class IntegrationTest(unittest.TestCase):
             os.chdir(tempdir)
 
             test_file = os.path.join(tempdir, 'test.py')
-            with open(test_file, 'wt') as f:
+            with open(test_file, 'w') as f:
                 f.write(COVERAGE_CODE_STANZA.format(COVERAGE_TEMPLATE_PATH,
                                                     num))
 
