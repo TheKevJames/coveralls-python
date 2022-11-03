@@ -35,7 +35,7 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.15.4
+    rev: v2.15.5
     hooks:
     -   id: pylint
         additional_dependencies:
@@ -67,13 +67,13 @@ repos:
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.8.5
+    rev: v3.9.0
     hooks:
     -   id: reorder-python-imports
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.1.0
+    rev: v3.2.0
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
@@ -84,7 +84,7 @@ repos:
     -   id: yesqa
         files: coveralls/.*
 -   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v1.7.0
+    rev: v2.0.0
     hooks:
     -   id: autopep8
         files: coveralls/.*
