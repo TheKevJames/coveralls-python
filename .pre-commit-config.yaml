@@ -35,7 +35,7 @@ repos:
         exclude: tests/data/.*
     -   id: requirements-txt-fixer
 -   repo: https://github.com/pycqa/pylint
-    rev: v2.15.5
+    rev: v2.15.6
     hooks:
     -   id: pylint
         additional_dependencies:
@@ -73,7 +73,7 @@ repos:
         args: [--py3-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.0
+    rev: v3.2.2
     hooks:
     -   id: pyupgrade
         args: [--py3-plus]
