@@ -44,6 +44,8 @@ labels:
     color: '#0052cc'
   - name: in-review
     color: '#5319e7'
+  - name: blocked
+    color: '#dbe19f'
 
 branches:
   - name: master
