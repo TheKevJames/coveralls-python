@@ -47,5 +47,8 @@ labels:
   - name: blocked
     color: '#dbe19f'
 
+  - name: automerge
+    color: '#d913a6'
+
 branches:
   - name: master
