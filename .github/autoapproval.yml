@@ -3,6 +3,7 @@ from_owner:
   - renovate[bot]
 
 required_labels: []
+apply_labels: []
 blacklisted_labels:
   - in-progress
   - blocked
