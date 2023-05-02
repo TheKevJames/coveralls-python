@@ -1,7 +1,7 @@
 import os
 import tempfile
-import unittest
 from unittest import mock
+from unittest import TestCase
 
 import pytest
 try:
@@ -14,7 +14,7 @@ from coveralls.api import log
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
-class Configuration(unittest.TestCase):
+class Configuration(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.old_cwd = os.getcwd()
@@ -49,7 +49,7 @@ class Configuration(unittest.TestCase):
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
-class NoConfiguration(unittest.TestCase):
+class NoConfiguration(TestCase):
     @mock.patch.dict(os.environ, {'TRAVIS': 'True',
                                   'TRAVIS_JOB_ID': '777',
                                   'COVERALLS_REPO_TOKEN': 'yyy'}, clear=True)
@@ -269,7 +269,7 @@ class NoConfiguration(unittest.TestCase):
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
-class CLIConfiguration(unittest.TestCase):
+class CLIConfiguration(TestCase):
     def test_load_config(self):
         # pylint: disable=protected-access
         cover = Coveralls(

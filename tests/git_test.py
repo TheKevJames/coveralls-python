@@ -2,8 +2,8 @@ import os
 import re
 import subprocess
 import tempfile
-import unittest
 from unittest import mock
+from unittest import TestCase
 
 import coveralls.git
 from coveralls.exception import CoverallsException
@@ -15,7 +15,7 @@ GIT_REMOTE = 'origin'
 GIT_URL = 'https://github.com/username/Hello-World.git'
 
 
-class GitTest(unittest.TestCase):
+class GitTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.old_cwd = os.getcwd()
@@ -77,7 +77,7 @@ class GitLogTest(GitTest):
         assert coveralls.git.gitlog('%s') == GIT_COMMIT_MSG
 
 
-class GitInfoTest(unittest.TestCase):
+class GitInfoTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.old_cwd = os.getcwd()
@@ -130,7 +130,7 @@ class GitInfoTest(unittest.TestCase):
         assert not git_info
 
 
-class GitInfoOverridesTest(unittest.TestCase):
+class GitInfoOverridesTest(TestCase):
     @mock.patch.dict(os.environ, {
         'GITHUB_ACTIONS': 'true',
         'GITHUB_REF': 'refs/pull/1234/merge',
