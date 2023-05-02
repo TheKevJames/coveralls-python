@@ -1,8 +1,8 @@
 import json
 import os
 import tempfile
-import unittest
 from unittest import mock
+from unittest import TestCase
 
 import coverage
 import pytest
@@ -18,7 +18,7 @@ EXPECTED = {
 
 
 @mock.patch('coveralls.api.requests')
-class WearTest(unittest.TestCase):
+class WearTest(TestCase):
     def setUp(self):
         try:
             os.remove('.coverage')
