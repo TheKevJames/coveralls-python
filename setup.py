@@ -34,13 +34,13 @@ setup(
     },
     python_requires='>= 3.5',
     install_requires=[
-        'coverage>=4.1,<7.0,!=6.0.*,!=6.1,!=6.1.1',
-        'docopt>=0.6.1',
-        'requests>=1.0.0',
+        'coverage==6.5.0',
+        'docopt==0.6.2',
+        'requests==2.31.0',
     ],
     tests_require=['mock', 'responses', 'pytest'],
     extras_require={
-        'yaml': ['PyYAML>=3.10'],
+        'yaml': ['PyYAML==6.0.1'],
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
