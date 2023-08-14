@@ -1,12 +1,12 @@
 from_owner:
-  - pre-commit-ci
+  - pre-commit-ci[bot]
   - renovate[bot]
 
 required_labels: []
 apply_labels: []
 blacklisted_labels:
-  - in-progress
   - blocked
+  - in-progress
 
 auto_squash_merge_labels:
   - automerge
