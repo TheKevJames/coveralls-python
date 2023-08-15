@@ -108,15 +108,23 @@ class Coveralls:
         # the same -- forceibly using Github's flow seems to be more stable
         self.config['repo_token'] = os.environ.get('GITHUB_TOKEN')
 
+        # TODO: Clarify default service.
+        # From experiments, it seems that service should always be set to
+        # 'github'. However, that is not yet confirmed - for discussion, see
+        # https://github.com/lemurheavy/coveralls-public/issues/1710.
+        # For compatibility, the service continues to be set to 'github-actions'
+        # for now. Users can specify the service name manually to override
+        # this.
+        service = 'github-actions'
+
+        job = os.environ.get('GITHUB_RUN_ID')
+        number = os.environ.get('GITHUB_RUN_ID')
+
         pr = None
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
 
-        # N.B. some users require this to be 'github' and some require it to
-        # be 'github-actions'. Defaulting to 'github-actions' as it seems more
-        # common -- users can specify the service name manually to override
-        # this.
-        return 'github-actions', None, os.environ.get('GITHUB_RUN_ID'), pr
+        return service, job, number, pr
 
     @staticmethod
     def load_config_from_jenkins():
@@ -185,9 +193,6 @@ class Coveralls:
         elif os.environ.get('CIRCLECI'):
             name, job, number, pr = self.load_config_from_circle()
         elif os.environ.get('GITHUB_ACTIONS'):
-            # N.B. Github Actions fails if this is not set even when null.
-            # Other services fail if this is set to null. Sigh.
-            self.config['service_job_id'] = None
             name, job, number, pr = self.load_config_from_github()
         elif os.environ.get('JENKINS_HOME'):
             name, job, number, pr = self.load_config_from_jenkins()
@@ -198,6 +203,34 @@ class Coveralls:
             name, job, number, pr = self.load_config_from_semaphore()
         else:
             name, job, number, pr = self.load_config_from_unknown()
+
+        # Documentation of some request parameters,
+        # from https://docs.coveralls.io/api-jobs-endpoint:
+        # * service_name (String, required) - The CI service or other
+        #   environment in which the test suite was run. Can be anything, but
+        #   certain values may trigger automatic support by certain Coveralls
+        #   Integrations.
+        # * service_number (String) - The build number. Will default to
+        #   incrementing integers, applied chronologically to the builds on
+        #   a repo.
+        # * service_job_id (String, required) - A unique identifier for the
+        #   job, assigned by the service specified in "service_name".
+        # * service_job_number (String) - The job number. Will default to
+        #   incrementing integers based on the jobs in a build.
+        #
+        # Notes:
+        # * Other than documented, the optional 'service_number' request
+        #   parameter defaults to the 'service_job_id' parameter. The resulting
+        #   value for the 'service_number' parameter is treated by coveralls.io
+        #   as a unique identifier for a build. It is used to match any parallel
+        #   submissions, and also to match a parallel finish request via its
+        #   'build_num' request parameter. This unique ID is also shown on the
+        #   coveralls.io web site as an identifier for the build.
+        # * It is not clear whether coveralls.io uses the 'service_job_id'
+        #   request parameter for anything else but as a default for
+        #   'service_number'.
+        # * The optional 'service_job_number' request parameter is used by
+        #   coveralls.io as the job number behind the unique build ID.
 
         self.config.setdefault('service_name', name)
         if job:
@@ -226,7 +259,9 @@ class Coveralls:
         }
         for var, key in fields.items():
             value = os.environ.get(var)
-            if value:
+            if value == 'omit' and key in self.config:
+                del self.config[key]
+            elif value:
                 self.config[key] = value
 
     def load_config_from_file(self):
@@ -259,6 +294,12 @@ class Coveralls:
     def submit_report(self, json_string):
         endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        log.info('Submitting with: service_name=%r, service_number=%r, '
+                 'service_job_id=%r, service_job_number=%r',
+                 self.config.get('service_name'),
+                 self.config.get('service_number'),
+                 self.config.get('service_job_id'),
+                 self.config.get('service_job_number'))
         response = requests.post(endpoint, files={'json_file': json_string},
                                  verify=verify)
 
@@ -276,9 +317,14 @@ class Coveralls:
                 new_id = '{}-{}'.format(
                     self.config.get('service_job_id', 42),
                     random.randint(0, sys.maxsize))
-            print('resubmitting with id {}'.format(new_id))
-
             self.config['service_job_id'] = new_id
+            log.warning(
+                'Resubmitting with changed service_job_id: service_name=%r, '
+                'service_number=%r, service_job_id=%r, service_job_number=%r',
+                self.config.get('service_name'),
+                self.config.get('service_number'),
+                self.config.get('service_job_id'),
+                self.config.get('service_job_number'))
             self._data = None  # force create_report to use updated data
             json_string = self.create_report()
 
@@ -308,6 +354,8 @@ class Coveralls:
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
+        log.info('Submitting parallel finish request with: build_num=%r',
+                 payload['payload'].get('build_num'))
         endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
         response = requests.post(endpoint, json=payload, verify=verify)
