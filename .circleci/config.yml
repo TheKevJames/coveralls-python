@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  linter: talkiq/linter@3.1.0
+  linter: talkiq/linter@4.0.0
 
 executors:
   python-minimum:
