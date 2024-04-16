@@ -8,7 +8,7 @@ executors:
     docker:
       # N.B. lowest common denominator, don't want to error on not using the
       # latest syntax.
-      - image: python:3.10.7
+      - image: python:3.10.14
     resource_class: small
 
 jobs:
