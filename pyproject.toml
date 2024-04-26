@@ -28,6 +28,7 @@ Docs = "https://coveralls-python.rtfd.io/"
 
 [tool.poetry.scripts]
 coveralls = "coveralls.cli:main"
+python-coveralls = "coveralls.cli:main"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.13"
