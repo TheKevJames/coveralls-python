@@ -2,6 +2,9 @@ ci:
     autofix_commit_msg: 'refactor(lint): apply automatic lint fixes'
     autoupdate_commit_msg: 'chore(deps): bump pre-commit linter versions'
 
+default_language_version:
+    python: python3.7
+
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
@@ -58,7 +61,6 @@ repos:
         - -d too-few-public-methods
         - -d ungrouped-imports  # conflicts with reorder-python-imports
         - -d wrong-import-order  # conflicts with reorder-python-imports
-        - -d consider-using-f-string  # not py35 compatible
         - -d unspecified-encoding  # TODO: reevaluate
         - -d disallowed-name  # TODO: fix
         exclude: example/.*
@@ -70,13 +72,13 @@ repos:
     rev: v3.9.0
     hooks:
     -   id: reorder-python-imports
-        args: [--py3-plus]
+        args: [--py36-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/pyupgrade
     rev: v3.2.2
     hooks:
     -   id: pyupgrade
-        args: [--py3-plus]
+        args: [--py36-plus]
         exclude: nonunicode/.*
 -   repo: https://github.com/asottile/yesqa
     rev: v1.4.0

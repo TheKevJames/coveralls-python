@@ -33,9 +33,9 @@ class GitTest(unittest.TestCase):
 
         subprocess.call(['git', 'init'], cwd=self.dir)
         subprocess.call(['git', 'config', 'user.name',
-                         '"{}"'.format(GIT_NAME)], cwd=self.dir)
+                         f'"{GIT_NAME}"'], cwd=self.dir)
         subprocess.call(['git', 'config', 'user.email',
-                         '"{}"'.format(GIT_EMAIL)], cwd=self.dir)
+                         f'"{GIT_EMAIL}"'], cwd=self.dir)
         subprocess.call(['git', 'add', 'README'], cwd=self.dir)
         subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=self.dir)
         subprocess.call(['git', 'remote', 'add', GIT_REMOTE, GIT_URL],

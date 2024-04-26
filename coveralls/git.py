@@ -15,15 +15,15 @@ def run_command(*args):
 
         if cmd.returncode != 0:
             raise CoverallsException(
-                'command return code {}, STDOUT: "{}"\nSTDERR: "{}"'.format(
-                    cmd.returncode, stdout, stderr))
+                f'command returned code {cmd.returncode}, STDOUT: "{stdout}"\n'
+                f'STDERR: "{stderr}"')
 
         return stdout.decode().strip()
 
 
 def gitlog(fmt):
     glog = run_command('git', '--no-pager', 'log', '-1',
-                       '--pretty=format:{}'.format(fmt))
+                       f'--pretty=format:{fmt}')
 
     return str(glog)
 

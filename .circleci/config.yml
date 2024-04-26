@@ -1,117 +1,125 @@
 version: 2.1
 
 orbs:
-  linter: talkiq/linter@3.1.0
+  linter: talkiq/linter@4
 
 executors:
-  python-minimum:
+  py36:
     docker:
-      # N.B. lowest common denominator, don't want to error on not using the
-      # latest syntax.
-      - image: python:3.10.7
+      - image: python:3.6-alpine
+    resource_class: small
+  py37:
+    docker:
+      - image: python:3.7-alpine
+    resource_class: small
+  py38:
+    docker:
+      - image: python:3.8-alpine
+    resource_class: small
+  py39:
+    docker:
+      - image: python:3.9-alpine
+    resource_class: small
+  py310:
+    docker:
+      - image: python:3.10-alpine
+    resource_class: small
+  pypy731:  # py36
+    docker:
+      - image: pypy:3-7.3.1-slim
+    resource_class: small
+  pypy735:  # py37
+    docker:
+      - image: pypy:3-7.3.5-slim
+    resource_class: small
+  pypy737:  # py37+py38
+    docker:
+      - image: pypy:3-7.3.7-slim
+    resource_class: small
+  pypy7311:  # py38+py39
+    docker:
+      - image: pypy:3-7.3.11-slim
+    resource_class: small
+  pypy73:  # py39+py310
+    docker:
+      - image: pypy:3-7.3-slim
     resource_class: small
 
 jobs:
-  toxpy:
-    docker:
-      - image: python:<<parameters.docker_image>>-alpine
+  toxpylegacy:
+    executor: <<parameters.executor>>
     parameters:
-      cov_version:
-        default: ""
-        type: string
-      docker_image:
-        type: string
-      # TODO: figure out `<<parameters.docker_image>>.replace('.','')`
-      tox_environment:
-        type: string
+      executor:
+        type: executor
     steps:
-      - run: apk add --no-cache gcc git libffi-dev musl-dev openssh-client openssl-dev
+      - run: apk add --no-cache git
       - checkout
-      - run: pip install tox tox-factor
-      - unless:
-          condition: <<parameters.cov_version>>
-          steps:
-            - run: tox -f <<parameters.tox_environment>>
-            - run: tox -e coveralls41
-      - when:
-          condition: <<parameters.cov_version>>
-          steps:
-            - run: tox -f <<parameters.tox_environment>>-cov<<parameters.cov_version>>
-            - run: tox -e coveralls<<parameters.cov_version>>
+      - run: pip install --upgrade tox tox-factor
+      - run: tox run -f "${CIRCLE_JOB//test-}"
+      - run: tox run -e upload
+
+  toxpy:
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        type: executor
+    steps:
+      - run: apk add --no-cache git
+      - checkout
+      - run: pip install --upgrade tox
+      - run: tox run -f "${CIRCLE_JOB//test-}"
+      - run: tox run -e upload
+
+  toxpypylegacy:
+    executor: <<parameters.executor>>
+    parameters:
+      executor:
+        type: executor
+    steps:
+      - run: apt-get update -qy
+      - run: apt-get install -qy --no-install-recommends git
+      - checkout
+      - run: pip install --upgrade tox tox-factor
+      - run: tox run -f pypy3
+      - run: tox run -e upload
 
   toxpypy:
-    docker:
-      - image: pypy:<<parameters.docker_image>>
+    executor: <<parameters.executor>>
     parameters:
-      cov_version:
-        type: string
-      docker_image:
-        type: string
+      executor:
+        type: executor
     steps:
+      - run: apt-get update -qy
+      - run: apt-get install -qy --no-install-recommends git
       - checkout
-      - run: pip install tox tox-factor
-      - run: tox -f pypy3-cov<<parameters.cov_version>>
-      - run: tox -e coveralls<<parameters.cov_version>>
+      - run: pip install --upgrade tox
+      - run: tox run -f pypy3
+      - run: tox run -e upload
 
 workflows:
-  lint:
+  test:
     jobs:
       - linter/pre-commit:
-          executor: python-minimum
-
-  test-cpython:
-    jobs:
-      - toxpy:
-          name: test-py3.5
-          docker_image: '3.5'
-          tox_environment: py35
-      - toxpy:
-          name: test-py3.6-cov<<matrix.cov_version>>
-          docker_image: '3.6'
-          tox_environment: py36
+          executor: py37
+          pre-steps:
+            - run: apk add --no-cache git
+      - toxpylegacy:
+          name: test-<<matrix.executor>>
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
+              executor: [py36]
       - toxpy:
-          name: test-py3.7-cov<<matrix.cov_version>>
-          docker_image: '3.7'
-          tox_environment: py37
+          name: test-<<matrix.executor>>
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
-      - toxpy:
-          name: test-py3.8-cov<<matrix.cov_version>>
-          docker_image: '3.8'
-          tox_environment: py38
+              executor: [py37, py38, py39, py310]
+      - toxpypylegacy:
+          name: test-<<matrix.executor>>
           matrix:
             parameters:
-              cov_version: ['41', '5', '6']
-      - toxpy:
-          name: test-py3.9-cov<<matrix.cov_version>>
-          docker_image: '3.9'
-          tox_environment: py39
-          matrix:
-            parameters:
-              cov_version: ['41', '5', '6']
-      - toxpy:
-          name: test-py3.10-cov<<matrix.cov_version>>
-          docker_image: '3.10'
-          tox_environment: py310
-          matrix:
-            parameters:
-              cov_version: ['41', '5', '6']
-
-  test-pypy:
-    jobs:
+              executor: [pypy731]
       - toxpypy:
-          name: test-pypy<<matrix.docker_image>>-cov<<matrix.cov_version>>
+          name: test-<<matrix.executor>>
           matrix:
             parameters:
-              cov_version: ['41', '5']
-              docker_image: ['3-5', '3-6']
-      - toxpypy:
-          name: test-pypy3-7-cov<<matrix.cov_version>>
-          docker_image: '3-7'
-          matrix:
-            parameters:
-              cov_version: ['41', '5', '6']
+              executor: [pypy735, pypy737, pypy7311, pypy73]

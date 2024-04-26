@@ -96,8 +96,7 @@ class CoverallReporter:
                 # should_be_python() method.
                 if fr.should_be_python():
                     if config.ignore_errors:
-                        msg = "Couldn't parse Python file '{}'".format(
-                            fr.filename)
+                        msg = f"Couldn't parse Python file '{fr.filename}'"
                         cov._warn(msg,  # pylint: disable=W0212
                                   slug='couldnt-parse')
                     else:

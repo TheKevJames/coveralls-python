@@ -51,7 +51,7 @@ class ReporterTest(unittest.TestCase):
                        '        print(\'condition tested both ways\')\n'
                        '    if cond2:\n'
                        '        print(\'condition not tested both ways\')\n'),
-            'name': '{}project.py'.format(name_prefix),
+            'name': f'{name_prefix}project.py',
             'coverage': [1, 1, None, None, 1, None, None,
                          None, 1, 0, None, 1, 1, 1, 1, 1]}, {
             'source': ('from project import branch\n'
@@ -60,7 +60,7 @@ class ReporterTest(unittest.TestCase):
                        '    hello()\n'
                        '    branch(False, True)\n'
                        '    branch(True, True)\n'),
-            'name': '{}runtests.py'.format(name_prefix),
+            'name': f'{name_prefix}runtests.py',
             'coverage': [1, 1, None, 1, 1, 1, 1]})
         if with_branches:
             results[0]['branches'] = [13, 0, 14, 1, 13, 0, 15, 1, 15, 0, 16, 1,

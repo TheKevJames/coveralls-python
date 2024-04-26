@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  push:
+    branches:
+    tags:
+
+jobs:
+  build:
+    name: Build sdist and wheels
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: python3 -m pip install wheel
+      - run: python3 setup.py sdist bdist_wheel
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ./dist/*.tar.gz
+
+  publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: artifact
+          path: dist
+      - run: ls -la ./dist
+      # TODO: enable me
+      # - name: Publish package distributions to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1

@@ -32,7 +32,7 @@ setup(
             'coveralls = coveralls.cli:main',
         ],
     },
-    python_requires='>= 3.5',
+    python_requires='>= 3.6',
     install_requires=[
         'coverage>=4.1,<7.0,!=6.0.*,!=6.1,!=6.1.1',
         'docopt>=0.6.1',
@@ -49,7 +49,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',

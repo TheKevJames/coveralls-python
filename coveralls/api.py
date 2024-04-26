@@ -59,9 +59,8 @@ class Coveralls:
                 'your step config.')
 
         raise CoverallsException(
-            'Not on TravisCI. You have to provide either repo_token in {} or '
-            'set the COVERALLS_REPO_TOKEN env var.'.format(
-                self.config_filename))
+            'Not on TravisCI. You have to provide either repo_token in '
+            f'{self.config_filename} or set the COVERALLS_REPO_TOKEN env var.')
 
     def load_config(self, kwargs, service_name):
         """
@@ -257,7 +256,7 @@ class Coveralls:
         return self.submit_report(json_string)
 
     def submit_report(self, json_string):
-        endpoint = '{}/api/v1/jobs'.format(self._coveralls_host.rstrip('/'))
+        endpoint = f'{self._coveralls_host.rstrip("/")}/api/v1/jobs'
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
         response = requests.post(endpoint, files={'json_file': json_string},
                                  verify=verify)
@@ -273,10 +272,11 @@ class Coveralls:
             if os.environ.get('GITHUB_REPOSITORY'):
                 new_id = None
             else:
-                new_id = '{}-{}'.format(
-                    self.config.get('service_job_id', 42),
-                    random.randint(0, sys.maxsize))
-            print('resubmitting with id {}'.format(new_id))
+                new_id = '-'.join((
+                    self.config.get('service_job_id', '42'),
+                    str(random.randint(0, sys.maxsize)),
+                ))
+            print(f'resubmitting with id {new_id}')
 
             self.config['service_job_id'] = new_id
             self._data = None  # force create_report to use updated data
@@ -291,7 +291,7 @@ class Coveralls:
             return response.json()
         except Exception as e:
             raise CoverallsException(
-                'Could not submit coverage: {}'.format(e)) from e
+                f'Could not submit coverage: {e}') from e
 
     # https://docs.coveralls.io/parallel-build-webhook
     def parallel_finish(self):
@@ -308,7 +308,7 @@ class Coveralls:
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
-        endpoint = '{}/webhook'.format(self._coveralls_host.rstrip('/'))
+        endpoint = f'{self._coveralls_host.rstrip("/")}/webhook'
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
         response = requests.post(endpoint, json=payload, verify=verify)
         try:
@@ -316,11 +316,11 @@ class Coveralls:
             response = response.json()
         except Exception as e:
             raise CoverallsException(
-                'Parallel finish failed: {}'.format(e)) from e
+                f'Parallel finish failed: {e}') from e
 
         if 'error' in response:
             e = response['error']
-            raise CoverallsException('Parallel finish failed: {}'.format(e))
+            raise CoverallsException(f'Parallel finish failed: {e}')
 
         if 'done' not in response or not response['done']:
             raise CoverallsException('Parallel finish failed')

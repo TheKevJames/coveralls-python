@@ -7,6 +7,6 @@ import pytest
 def nuke_coverage():
     for folder in ('.', './example', './nonunicode'):
         try:
-            os.remove('{}/.coverage'.format(folder))
+            os.remove(f'{folder}/.coverage')
         except FileNotFoundError:
             pass
