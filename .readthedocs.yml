@@ -1,0 +1,21 @@
+version: 2
+
+build:
+  os: ubuntu-lts-latest
+  tools:
+    python: "3.10"
+  jobs:
+    post_create_environment:
+      - pip install poetry
+    post_install:
+      # VIRTUAL_ENV needs to be set manually for now.
+      # See https://github.com/readthedocs/readthedocs.org/pull/11152/
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
+
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: true
+
+formats:
+  - epub
+  - pdf
