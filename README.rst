@@ -1,37 +1,43 @@
 Coveralls for Python
 ====================
 
-.. raw:: html
+:Test Status:
 
-    <div>
-        <strong>Test Status:</strong>
-        <a href="https://circleci.com/gh/TheKevJames/coveralls-python"><img src="https://img.shields.io/circleci/project/github/TheKevJames/coveralls-python/master.svg?style=flat-square&label=CircleCI"/></a>
-        <a href="https://github.com/TheKevJames/coveralls-python/actions"><img src="https://img.shields.io/github/actions/workflow/status/TheKevJames/coveralls-python/test.yml?branch=master&style=flat-square&label=Github%20Actions"/></a>
-        <a href="https://coveralls.io/r/TheKevJames/coveralls-python"><img src="https://img.shields.io/coveralls/TheKevJames/coveralls-python/master.svg?style=flat-square&label=Coverage"/></a>
-        <a href="http://coveralls-python.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/coveralls-python?style=flat-square&label=Docs"/></a>
-    </div>
-    <br/>
-    <div>
-        <strong>Version Info:</strong>
-        <a href="https://pypi.org/project/coveralls/"><img src="https://img.shields.io/pypi/v/coveralls.svg?style=flat-square&label=PyPI"/></a>
-        <a href="https://anaconda.org/conda-forge/coveralls"><img src="https://img.shields.io/conda/v/conda-forge/coveralls?style=flat-square&label=Conda"/></a>
-        <a href="https://hub.docker.com/r/thekevjames/coveralls"><img src="https://img.shields.io/docker/v/thekevjames/coveralls?sort=semver&style=flat-square&label=Dockerhub"/></a>
-        <a href="https://quay.io/repository/thekevjames/coveralls"><img src="https://img.shields.io/docker/v/thekevjames/coveralls?sort=semver&style=flat-square&label=Quay"/></a>
-    </div>
-    <br/>
-    <div>
-        <strong>Compatibility:</strong>
-        <a href="https://pypi.org/project/coveralls/"><img src="https://img.shields.io/pypi/pyversions/coveralls.svg?style=flat-square&label=Python%20Versions"/></a>
-        <a href="https://pypi.org/project/coveralls/"><img src="https://img.shields.io/pypi/implementation/coveralls.svg?style=flat-square&label=Python%20Implementations"/></a>
-    </div>
-    <br/>
-    <div>
-        <strong>Downloads:</strong>
-        <a href="https://pypi.org/project/coveralls/"><img src="https://img.shields.io/pypi/dm/coveralls.svg?style=flat-square&label=PyPI"/></a>
-        <a href="https://pypi.org/project/coveralls/"><img src="https://img.shields.io/conda/dn/conda-forge/coveralls?style=flat-square&label=Conda"/></a>
-        <a href="https://hub.docker.com/r/thekevjames/coveralls"><img src="https://img.shields.io/docker/pulls/thekevjames/coveralls?style=flat-square&label=Dockerhub"/></a>
-    </div>
-    <br/>
+    .. image:: https://img.shields.io/circleci/project/github/TheKevJames/coveralls-python/master.svg?style=flat-square&label=CircleCI
+        :target: https://circleci.com/gh/TheKevJames/coveralls-python
+    .. image:: https://img.shields.io/github/actions/workflow/status/TheKevJames/coveralls-python/test.yml?branch=master&style=flat-square&label=Github%20Actions
+        :target: https://github.com/TheKevJames/coveralls-python/actions
+    .. image:: https://img.shields.io/coveralls/TheKevJames/coveralls-python/master.svg?style=flat-square&label=Coverage
+        :target: https://coveralls.io/r/TheKevJames/coveralls-python
+    .. image:: https://img.shields.io/readthedocs/coveralls-python?style=flat-square&label=Docs
+        :target: http://coveralls-python.readthedocs.io/en/latest/
+
+:Version Info:
+
+    .. image:: https://img.shields.io/pypi/v/coveralls.svg?style=flat-square&label=PyPI
+        :target: https://pypi.org/project/coveralls/
+    .. image:: https://img.shields.io/conda/v/conda-forge/coveralls?style=flat-square&label=Conda
+        :target: https://anaconda.org/conda-forge/coveralls
+    .. image:: https://img.shields.io/docker/v/thekevjames/coveralls?sort=semver&style=flat-square&label=Dockerhub
+        :target: https://hub.docker.com/r/thekevjames/coveralls
+    .. image:: https://img.shields.io/docker/v/thekevjames/coveralls?sort=semver&style=flat-square&label=Quay
+        :target: https://quay.io/repository/thekevjames/coveralls
+
+:Compatibility:
+
+    .. image:: https://img.shields.io/pypi/pyversions/coveralls.svg?style=flat-square&label=Python%20Versions
+        :target: https://pypi.org/project/coveralls/
+    .. image:: https://img.shields.io/pypi/implementation/coveralls.svg?style=flat-square&label=Python%20Implementations
+        :target: https://pypi.org/project/coveralls/
+
+:Downloads:
+
+    .. image:: https://img.shields.io/pypi/dm/coveralls.svg?style=flat-square&label=PyPI
+        :target: https://pypi.org/project/coveralls/
+    .. image:: https://img.shields.io/conda/dn/conda-forge/coveralls?style=flat-square&label=Conda
+        :target: https://anaconda.org/conda-forge/coveralls
+    .. image:: https://img.shields.io/docker/pulls/thekevjames/coveralls?style=flat-square&label=Dockerhub
+        :target: https://hub.docker.com/r/thekevjames/coveralls
 
 `coveralls.io`_ is a service for publishing your coverage stats online. This
 package provides seamless integration with `coverage.py`_ (and thus ``pytest``,
