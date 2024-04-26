@@ -3,7 +3,7 @@ name: Bug Report
 about: Create a report about a potential bug in the project
 title: ''
 labels: bug, in-review
-assignees: '@TheKevJames'
+assignees: TheKevJames
 ---
 
 **Describe the Bug**
