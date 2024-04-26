@@ -141,7 +141,7 @@ workflows:
           tag: "${CIRCLE_SHA1:0:10}"
           post-steps:
             - run: |
-                export COVERALLS_VERSION=$(awk -F'=' '/ARG COVERALLS_VERSION=/ {print substr($2, 2, length($2))}' Dockerfile)
+                export COVERALLS_VERSION=$(awk -F'=' '/ARG COVERALLS_VERSION=/ {print substr($2, 1, length($2))}' Dockerfile)
                 echo "${COVERALLS_VERSION}" >/tmp/custom-tag
             - custom-tag
       - docker-readme-build:
