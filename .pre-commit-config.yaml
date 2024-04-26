@@ -65,7 +65,7 @@ repos:
         - -d disallowed-name  # TODO: fix
         exclude: example/.*
 -   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.1
+    rev: v1.5.5
     hooks:
     -   id: remove-tabs
 -   repo: https://github.com/asottile/reorder_python_imports
