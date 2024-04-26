@@ -2,7 +2,10 @@ import os
 import subprocess
 import unittest
 
+import pytest
+
 from coveralls import Coveralls
+from coveralls.exception import CoverallsException
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -244,7 +247,8 @@ class ReporterTest(unittest.TestCase):
         except Exception:
             pass
 
-        assert not Coveralls(repo_token='xxx').get_coverage()
+        with pytest.raises(CoverallsException, match='No source for code'):
+            Coveralls(repo_token='xxx').get_coverage()
 
     def test_not_python(self):
         with open('extra.py', 'w') as f:
@@ -258,4 +262,8 @@ class ReporterTest(unittest.TestCase):
         with open('extra.py', 'w') as f:
             f.write("<h1>This isn't python!</h1>\n")
 
-        assert not Coveralls(repo_token='xxx').get_coverage()
+        with pytest.raises(
+                CoverallsException,
+                match=r"Couldn't parse .* as Python",
+        ):
+            Coveralls(repo_token='xxx').get_coverage()
