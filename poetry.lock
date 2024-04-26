@@ -207,6 +207,9 @@ files = [
     {file = "coverage-7.4.4.tar.gz", hash = "sha256:c901df83d097649e257e803be22592aedfd5182f07b3cc87d640bbb9afd50f49"},
 ]
 
+[package.dependencies]
+tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.11.0a6\" and extra == \"toml\""}
+
 [package.extras]
 toml = ["tomli"]
 
@@ -725,4 +728,4 @@ yaml = ["pyyaml"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "ad094093faad909ee84fc2310a3b161828db6f5c4cfb210910eb6629bfbc88f3"
+content-hash = "739e9312c30ef16fd644e9e1b371d358e8abe95788a75b01cd9b1665b22f9e8b"
