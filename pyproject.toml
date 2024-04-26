@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "coveralls"
-version = "3.3.2a0"
+version = "3.4.0a0"
 description = "Show coverage stats online via coveralls.io"
 readme = "README.rst"
 
@@ -32,7 +32,7 @@ python-coveralls = "coveralls.cli:main"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.13"
-coverage = ">=5.0,<7.0,!=6.0.*,!=6.1,!=6.1.1"
+coverage = ">=5.0,<7.5,!=6.0.*,!=6.1,!=6.1.1"
 docopt = ">=0.6.1,<0.7.0"
 requests = ">=1.0.0,<3.0.0"
 

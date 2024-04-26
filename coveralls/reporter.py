@@ -1,8 +1,15 @@
 import logging
 import os
 
-from coverage.files import FnmatchMatcher
 from coverage.files import prep_patterns
+
+
+try:
+    # coverage v7.x
+    from coverage.files import GlobMatcher
+except ImportError:
+    # coverage v5.x and v6.x
+    from coverage.files import FnmatchMatcher as GlobMatcher
 
 try:
     # coverage v6.x
@@ -35,7 +42,7 @@ class CoverallReporter:
 
     def report(self, cov):
         # N.B. this method is 99% copied from the coverage source code;
-        # unfortunately, the coverage v5 style of `get_analysis_to_report`
+        # unfortunately, the coverage v5+ style of `get_analysis_to_report`
         # errors out entirely if any source file has issues -- which would be a
         # breaking change for us. In the interest of backwards compatibility,
         # I've copied their code here so we can maintain the same `coveralls`
@@ -65,18 +72,20 @@ class CoverallReporter:
         #         raise
 
         # get_analysis_to_report starts here; changes marked with TODOs
+        # TODO: in v7.5, this returns list of tuples (fr->morf)
+        # https://github.com/nedbat/coveragepy/commit/4e5027338b93fc893c5e6e82c8a234c48f0b95e7
         file_reporters = cov._get_file_reporters(None)  # pylint: disable=W0212
         config = cov.config
 
         if config.report_include:
-            matcher = FnmatchMatcher(prep_patterns(config.report_include))
+            matcher = GlobMatcher(prep_patterns(config.report_include))
             file_reporters = [
                 fr for fr in file_reporters
                 if matcher.match(fr.filename)
             ]
 
         if config.report_omit:
-            matcher = FnmatchMatcher(prep_patterns(config.report_omit))
+            matcher = GlobMatcher(prep_patterns(config.report_omit))
             file_reporters = [
                 fr for fr in file_reporters
                 if not matcher.match(fr.filename)
