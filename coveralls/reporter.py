@@ -1,24 +1,17 @@
+import collections
 import logging
 import os
+from typing import Dict
+from typing import List
+from typing import Optional
 
-from coverage.files import prep_patterns
+import coverage
+from coverage.plugin import FileReporter
+from coverage.report import get_analysis_to_report
+from coverage.results import Analysis
 
+from .exception import CoverallsException
 
-try:
-    # coverage v7.x
-    from coverage.files import GlobMatcher
-except ImportError:
-    # coverage v5.x and v6.x
-    from coverage.files import FnmatchMatcher as GlobMatcher
-
-try:
-    # coverage v6.x
-    from coverage.exceptions import NoSource
-    from coverage.exceptions import NotPython
-except ImportError:
-    # coverage v5.x
-    from coverage.misc import NoSource
-    from coverage.misc import NotPython
 
 log = logging.getLogger('coveralls.reporter')
 
@@ -26,107 +19,39 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
-    def __init__(self, cov, base_dir='', src_dir=''):
-        self.coverage = []
+    def __init__(
+            self,
+            cov: coverage.Coverage,
+            base_dir: str = '',
+            src_dir: str = '',
+    ) -> None:
         self.base_dir = self.sanitize_dir(base_dir)
         self.src_dir = self.sanitize_dir(src_dir)
+
+        self.coverage = []
         self.report(cov)
 
     @staticmethod
-    def sanitize_dir(directory):
+    def sanitize_dir(directory: str) -> str:
         if directory:
             directory = directory.replace(os.path.sep, '/')
             if directory[-1] != '/':
                 directory += '/'
         return directory
 
-    def report(self, cov):
-        # N.B. this method is 99% copied from the coverage source code;
-        # unfortunately, the coverage v5+ style of `get_analysis_to_report`
-        # errors out entirely if any source file has issues -- which would be a
-        # breaking change for us. In the interest of backwards compatibility,
-        # I've copied their code here so we can maintain the same `coveralls`
-        # API regardless of which `coverage` version is being used.
-        #
-        # TODO: deprecate the relevant APIs so we can just use the coverage
-        # public API directly.
-        #
-        # from coverage.report import get_analysis_to_report
-        # try:
-        #     for cu, analyzed in get_analysis_to_report(cov, None):
-        #         self.parse_file(cu, analyzed)
-        # except NoSource:
-        #     # Note that this behavior must necessarily change between
-        #     # coverage<5 and coverage>=5, as we are no longer interweaving
-        #     # with get_analysis_to_report (a single exception breaks the
-        #     # whole loop)
-        #     log.warning('No source for at least one file')
-        # except NotPython:
-        #     # Note that this behavior must necessarily change between
-        #     # coverage<5 and coverage>=5, as we are no longer interweaving
-        #     # with get_analysis_to_report (a single exception breaks the
-        #     # whole loop)
-        #     log.warning('A source file is not python')
-        # except CoverageException as e:
-        #     if str(e) != 'No data to report.':
-        #         raise
-
-        # get_analysis_to_report starts here; changes marked with TODOs
-        # TODO: in v7.5, this returns list of tuples (fr->morf)
-        # https://github.com/nedbat/coveragepy/commit/4e5027338b93fc893c5e6e82c8a234c48f0b95e7
-        file_reporters = cov._get_file_reporters(None)  # pylint: disable=W0212
-        config = cov.config
-
-        if config.report_include:
-            matcher = GlobMatcher(prep_patterns(config.report_include))
-            file_reporters = [
-                fr for fr in file_reporters
-                if matcher.match(fr.filename)
-            ]
-
-        if config.report_omit:
-            matcher = GlobMatcher(prep_patterns(config.report_omit))
-            file_reporters = [
-                fr for fr in file_reporters
-                if not matcher.match(fr.filename)
-            ]
-
-        # TODO: deprecate changes
-        # if not file_reporters:
-        #     raise CoverageException("No data to report.")
-
-        for fr in sorted(file_reporters):
-            try:
-                analysis = cov._analyze(fr)  # pylint: disable=W0212
-            except NoSource:
-                if not config.ignore_errors:
-                    # TODO: deprecate changes
-                    # raise
-                    log.warning('No source for %s', fr.filename)
-            except NotPython:
-                # Only report errors for .py files, and only if we didn't
-                # explicitly suppress those errors.
-                # NotPython is only raised by PythonFileReporter, which has a
-                # should_be_python() method.
-                if fr.should_be_python():
-                    if config.ignore_errors:
-                        msg = f"Couldn't parse Python file '{fr.filename}'"
-                        cov._warn(  # pylint: disable=W0212
-                            msg, slug='couldnt-parse',
-                        )
-                    else:
-                        # TODO: deprecate changes
-                        # raise
-                        log.warning(
-                            'Source file is not python %s', fr.filename,
-                        )
-            else:
-                # TODO: deprecate changes (well, this one is fine /shrug)
-                # yield (fr, analysis)
+    def report(self, cov: coverage.Coverage) -> None:
+        try:
+            for (fr, analysis) in get_analysis_to_report(cov, None):
                 self.parse_file(fr, analysis)
+        except Exception as e:
+            # As of coverage v6.2, this is a coverage.exceptions.NoDataError
+            if str(e) == 'No data to report.':
+                return
+
+            raise CoverallsException(f'Got coverage library error: {e}') from e
 
     @staticmethod
-    def get_hits(line_num, analysis):
+    def get_hits(line_num: int, analysis: Analysis) -> Optional[int]:
         """
         Source file stats for each line.
 
@@ -145,7 +70,7 @@ class CoverallReporter:
         return 1
 
     @staticmethod
-    def get_arcs(analysis):
+    def get_arcs(analysis: Analysis) -> List[int]:
         """
         Hit stats for each branch.
 
@@ -156,26 +81,35 @@ class CoverallReporter:
         4. hits (we only get 1/0 from coverage.py)
         """
         if not analysis.has_arcs():
-            return None
+            return []
 
-        # N.B. switching to the public method analysis.missing_branch_arcs
-        # would work for half of what we need, but there doesn't seem to be an
-        # equivalent analysis.executed_branch_arcs
-        branch_lines = analysis._branch_lines()  # pylint: disable=W0212
+        missing_arcs: Dict[int, List[int]] = analysis.missing_branch_arcs()
+        try:
+            # coverage v6.3+
+            executed_arcs = analysis.executed_branch_arcs()
+        except AttributeError:
+            # COPIED ~VERBATIM
+            executed = analysis.arcs_executed()
+            lines = analysis._branch_lines()  # pylint: disable=W0212
+            branch_lines = set(lines)
+            eba = collections.defaultdict(list)
+            for l1, l2 in executed:
+                if l1 in branch_lines:
+                    eba[l1].append(l2)
+            # END COPY
+            executed_arcs = eba
 
-        branches = []
-
-        for l1, l2 in analysis.arcs_executed():
-            if l1 in branch_lines:
+        branches: List[int] = []
+        for l1, l2s in executed_arcs.items():
+            for l2 in l2s:
                 branches.extend((l1, 0, abs(l2), 1))
-
-        for l1, l2 in analysis.arcs_missing():
-            if l1 in branch_lines:
+        for l1, l2s in missing_arcs.items():
+            for l2 in l2s:
                 branches.extend((l1, 0, abs(l2), 0))
 
         return branches
 
-    def parse_file(self, cu, analysis):
+    def parse_file(self, cu: FileReporter, analysis: Analysis) -> None:
         """Generate data for single file."""
         filename = cu.relative_filename()
 
