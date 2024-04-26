@@ -4,10 +4,6 @@ orbs:
   linter: talkiq/linter@4
 
 executors:
-  py37:
-    docker:
-      - image: python:3.7-alpine
-    resource_class: small
   py38:
     docker:
       - image: python:3.8-alpine
@@ -20,11 +16,7 @@ executors:
     docker:
       - image: python:3.10-alpine
     resource_class: small
-  pypy735:  # py37
-    docker:
-      - image: pypy:3-7.3.5-slim
-    resource_class: small
-  pypy737:  # py37+py38
+  pypy737:  # py38
     docker:
       - image: pypy:3-7.3.7-slim
     resource_class: small
@@ -74,9 +66,9 @@ workflows:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
-              executor: [py37, py38, py39, py310]
+              executor: [py38, py39, py310]
       - toxpypy:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
-              executor: [pypy735, pypy737, pypy7311, pypy73]
+              executor: [pypy737, pypy7311, pypy73]

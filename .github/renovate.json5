@@ -1,3 +1,13 @@
 {
   "extends": ["github>thekevjames/tools:personal"],
+  "packageRules": [
+    {
+      "matchFileNames": ["pyproject.toml"],
+      "rangeStrategy": "widen",
+    },
+    {
+      "matchDepTypes": ["dev", "devDependencies"],
+      "rangeStrategy": "pin",
+    },
+  ],
 }

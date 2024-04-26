@@ -1,5 +1,7 @@
+import importlib.metadata
+
 from .api import Coveralls
-from .version import __version__
 
 
-__all__ = ['Coveralls', '__version__']
+__version__ = importlib.metadata.version('coveralls')
+__all__ = ['Coveralls']

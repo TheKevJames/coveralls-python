@@ -36,6 +36,7 @@ Example:
     Job #38.1
     https://coveralls.io/jobs/92059
 """
+import importlib.metadata
 import logging
 import sys
 
@@ -43,7 +44,6 @@ import docopt
 
 from .api import Coveralls
 from .exception import CoverallsException
-from .version import __version__
 
 
 log = logging.getLogger('coveralls')
@@ -51,7 +51,8 @@ log = logging.getLogger('coveralls')
 
 def main(argv=None):
     # pylint: disable=too-complex
-    options = docopt.docopt(__doc__, argv=argv, version=__version__)
+    version = importlib.metadata.version('coveralls')
+    options = docopt.docopt(__doc__, argv=argv, version=version)
     if options['debug']:
         options['--verbose'] = True
 

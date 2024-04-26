@@ -1,0 +1,52 @@
+[tool.poetry]
+name = "coveralls"
+version = "3.3.2a0"
+description = "Show coverage stats online via coveralls.io"
+readme = "README.rst"
+
+repository = "http://github.com/TheKevJames/coveralls-python"
+authors = ["Kevin James <coveralls-python@thekev.in>"]
+license = "MIT"
+
+packages = [
+    { include = "coveralls" },
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Testing",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+
+[tool.poetry.urls]
+Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
+Docs = "https://coveralls-python.rtfd.io/"
+
+[tool.poetry.scripts]
+coveralls = "coveralls.cli:main"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+coverage = ">=5.0,<7.0,!=6.0.*,!=6.1,!=6.1.1"
+docopt = ">=0.6.1,<0.7.0"
+requests = ">=1.0.0,<3.0.0"
+
+pyyaml = { version = ">=3.10,<5.3", optional = true }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.1.1"
+responses = "0.25.0"
+
+[tool.poetry.extras]
+yaml = ["pyyaml"]
+
+[tool.pytest.ini_options]
+addopts = "-Werror"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

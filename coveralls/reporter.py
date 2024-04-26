@@ -34,12 +34,6 @@ class CoverallReporter:
         return directory
 
     def report(self, cov):
-        """
-        Generate a part of json report for coveralls.
-
-        `morfs` is a list of modules or filenames.
-        `outfile` is a file object to write the json to.
-        """
         # N.B. this method is 99% copied from the coverage source code;
         # unfortunately, the coverage v5 style of `get_analysis_to_report`
         # errors out entirely if any source file has issues -- which would be a
