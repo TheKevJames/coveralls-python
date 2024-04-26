@@ -98,7 +98,7 @@ repos:
         - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
 -   repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 6.1.0
     hooks:
     -   id: flake8
         additional_dependencies:
