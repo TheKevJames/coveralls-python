@@ -54,9 +54,9 @@ class Coveralls:
 
         if os.environ.get('GITHUB_ACTIONS'):
             raise CoverallsException(
-                'Running on Github Actions but GITHUB_TOKEN is not set. '
-                'Add "env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to '
-                'your step config.',
+                'Running on Github Actions but GITHUB_TOKEN is not set. Add '
+                '"env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to your '
+                'step config.',
             )
 
         raise CoverallsException(

@@ -1,6 +1,9 @@
 import logging
 import os
 import subprocess
+from typing import Any
+from typing import Dict
+from typing import Optional
 
 from .exception import CoverallsException
 
@@ -8,30 +11,28 @@ from .exception import CoverallsException
 log = logging.getLogger('coveralls.git')
 
 
-def run_command(*args):
-    with subprocess.Popen(
-        list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-    ) as cmd:
-        stdout, stderr = cmd.communicate()
+def run_command(*args: str) -> str:
+    try:
+        cmd = subprocess.run(
+            list(args),
+            check=True,
+            capture_output=True,
+        )
+    except subprocess.CalledProcessError as e:
+        raise CoverallsException(
+            f'{e}\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}',
+        ) from e
 
-        if cmd.returncode != 0:
-            raise CoverallsException(
-                f'command returned code {cmd.returncode}, STDOUT: "{stdout}"\n'
-                f'STDERR: "{stderr}"',
-            )
-
-        return stdout.decode().strip()
+    return cmd.stdout.decode('utf-8').strip()
 
 
-def gitlog(fmt):
-    glog = run_command(
+def gitlog(fmt: str) -> str:
+    return run_command(
         'git', '--no-pager', 'log', '-1', f'--pretty=format:{fmt}',
     )
 
-    return str(glog)
 
-
-def git_branch():
+def git_branch() -> Optional[str]:
     branch = None
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
@@ -59,7 +60,7 @@ def git_branch():
     return branch
 
 
-def git_info():
+def git_info() -> Dict[str, Dict[str, Any]]:
     """
     A hash of Git data that can be used to display more information to users.
 
@@ -116,9 +117,8 @@ def git_info():
         }]
         if not all(head.values()):
             log.warning(
-                'Failed collecting git data. Are you running '
-                'coveralls inside a git repository? Is git installed?',
-                exc_info=ex,
+                'Failed collecting git data. Are you running coveralls inside '
+                'a git repository? Is git installed?', exc_info=ex,
             )
             return {}
 

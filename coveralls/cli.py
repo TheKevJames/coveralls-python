@@ -43,7 +43,6 @@ import sys
 import docopt
 
 from .api import Coveralls
-from .exception import CoverallsException
 
 
 log = logging.getLogger('coveralls')
@@ -105,6 +104,6 @@ def main(argv=None):
             log.info(result.get('url'))
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
-    except CoverallsException as e:
+    except Exception as e:
         log.exception('Error running coveralls: %s', e)
         sys.exit(1)
