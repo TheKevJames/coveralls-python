@@ -35,7 +35,7 @@ coverage = ">=5.0,<7.0,!=6.0.*,!=6.1,!=6.1.1"
 docopt = ">=0.6.1,<0.7.0"
 requests = ">=1.0.0,<3.0.0"
 
-pyyaml = { version = ">=3.10,<5.3", optional = true }
+pyyaml = { version = ">=3.10, <6.1", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "8.1.1"
