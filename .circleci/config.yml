@@ -4,10 +4,6 @@ orbs:
   linter: talkiq/linter@4
 
 executors:
-  py36:
-    docker:
-      - image: python:3.6-alpine
-    resource_class: small
   py37:
     docker:
       - image: python:3.7-alpine
@@ -23,10 +19,6 @@ executors:
   py310:
     docker:
       - image: python:3.10-alpine
-    resource_class: small
-  pypy731:  # py36
-    docker:
-      - image: pypy:3-7.3.1-slim
     resource_class: small
   pypy735:  # py37
     docker:
@@ -46,18 +38,6 @@ executors:
     resource_class: small
 
 jobs:
-  toxpylegacy:
-    executor: <<parameters.executor>>
-    parameters:
-      executor:
-        type: executor
-    steps:
-      - run: apk add --no-cache git
-      - checkout
-      - run: pip install --upgrade tox tox-factor
-      - run: tox run -f "${CIRCLE_JOB//test-}"
-      - run: tox run -e upload
-
   toxpy:
     executor: <<parameters.executor>>
     parameters:
@@ -68,19 +48,6 @@ jobs:
       - checkout
       - run: pip install --upgrade tox
       - run: tox run -f "${CIRCLE_JOB//test-}"
-      - run: tox run -e upload
-
-  toxpypylegacy:
-    executor: <<parameters.executor>>
-    parameters:
-      executor:
-        type: executor
-    steps:
-      - run: apt-get update -qy
-      - run: apt-get install -qy --no-install-recommends git
-      - checkout
-      - run: pip install --upgrade tox tox-factor
-      - run: tox run -f pypy3
       - run: tox run -e upload
 
   toxpypy:
@@ -103,21 +70,11 @@ workflows:
           executor: py37
           pre-steps:
             - run: apk add --no-cache git
-      - toxpylegacy:
-          name: test-<<matrix.executor>>
-          matrix:
-            parameters:
-              executor: [py36]
       - toxpy:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
               executor: [py37, py38, py39, py310]
-      - toxpypylegacy:
-          name: test-<<matrix.executor>>
-          matrix:
-            parameters:
-              executor: [pypy731]
       - toxpypy:
           name: test-<<matrix.executor>>
           matrix:

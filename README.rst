@@ -8,7 +8,7 @@ Coveralls for Python
     .. image:: https://img.shields.io/travis/TheKevJames/coveralls-python/master.svg?style=flat-square&label=TravisCI
         :target: https://travis-ci.org/TheKevJames/coveralls-python
 
-    .. image:: https://img.shields.io/github/workflow/status/TheKevJames/coveralls-python/coveralls/master?style=flat-square&label=Github%20Actions
+    .. image:: https://img.shields.io/github/actions/workflow/status/TheKevJames/coveralls-python/coveralls/master?style=flat-square&label=Github%20Actions
         :target: https://github.com/TheKevJames/coveralls-python/actions
 
     .. image:: https://img.shields.io/coveralls/TheKevJames/coveralls-python/master.svg?style=flat-square&label=Coverage
