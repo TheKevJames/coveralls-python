@@ -1,6 +1,7 @@
 version: 2.1
 
 orbs:
+  docker: talkiq/docker@3
   linter: talkiq/linter@4
 
 executors:
