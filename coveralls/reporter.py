@@ -1,10 +1,15 @@
 import logging
 import os
 
+from coverage.files import FnmatchMatcher
+from coverage.files import prep_patterns
+
 try:
+    # coverage v6.x
     from coverage.exceptions import NoSource
     from coverage.exceptions import NotPython
 except ImportError:
+    # coverage v5.x
     from coverage.misc import NoSource
     from coverage.misc import NotPython
 
@@ -14,11 +19,11 @@ log = logging.getLogger('coveralls.reporter')
 class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
-    def __init__(self, cov, conf, base_dir='', src_dir=''):
+    def __init__(self, cov, base_dir='', src_dir=''):
         self.coverage = []
         self.base_dir = self.sanitize_dir(base_dir)
         self.src_dir = self.sanitize_dir(src_dir)
-        self.report(cov, conf)
+        self.report(cov)
 
     @staticmethod
     def sanitize_dir(directory):
@@ -28,7 +33,13 @@ class CoverallReporter:
                 directory += '/'
         return directory
 
-    def report5(self, cov):
+    def report(self, cov):
+        """
+        Generate a part of json report for coveralls.
+
+        `morfs` is a list of modules or filenames.
+        `outfile` is a file object to write the json to.
+        """
         # N.B. this method is 99% copied from the coverage source code;
         # unfortunately, the coverage v5 style of `get_analysis_to_report`
         # errors out entirely if any source file has issues -- which would be a
@@ -58,8 +69,6 @@ class CoverallReporter:
         # except CoverageException as e:
         #     if str(e) != 'No data to report.':
         #         raise
-
-        from coverage.files import FnmatchMatcher, prep_patterns  # pylint: disable=import-outside-toplevel
 
         # get_analysis_to_report starts here; changes marked with TODOs
         file_reporters = cov._get_file_reporters(None)  # pylint: disable=W0212
@@ -113,39 +122,6 @@ class CoverallReporter:
                 # yield (fr, analysis)
                 self.parse_file(fr, analysis)
 
-    def report(self, cov, conf, morfs=None):
-        """
-        Generate a part of json report for coveralls.
-
-        `morfs` is a list of modules or filenames.
-        `outfile` is a file object to write the json to.
-        """
-        # pylint: disable=too-many-branches
-        try:
-            from coverage.report import Reporter  # pylint: disable=import-outside-toplevel
-            self.reporter = Reporter(cov, conf)
-        except ImportError:  # coverage >= 5.0
-            return self.report5(cov)
-
-        for cu in self.reporter.find_file_reporters(morfs):
-            try:
-                _fn = self.reporter.coverage._analyze  # pylint: disable=W0212
-                analyzed = _fn(cu)
-                self.parse_file(cu, analyzed)
-            except NoSource:
-                if not self.reporter.config.ignore_errors:
-                    log.warning('No source for %s', cu.filename)
-            except NotPython:
-                # Only report errors for .py files, and only if we didn't
-                # explicitly suppress those errors.
-                if (
-                    cu.should_be_python()
-                    and not self.reporter.config.ignore_errors
-                ):
-                    log.warning('Source file is not python %s', cu.filename)
-
-        return self.coverage
-
     @staticmethod
     def get_hits(line_num, analysis):
         """
@@ -179,13 +155,10 @@ class CoverallReporter:
         if not analysis.has_arcs():
             return None
 
-        if not hasattr(analysis, 'branch_lines'):
-            # N.B. switching to the public method analysis.missing_branch_arcs
-            # would work for half of what we need, but there doesn't seem to be
-            # an equivalent analysis.executed_branch_arcs
-            branch_lines = analysis._branch_lines()  # pylint: disable=W0212
-        else:
-            branch_lines = analysis.branch_lines()
+        # N.B. switching to the public method analysis.missing_branch_arcs
+        # would work for half of what we need, but there doesn't seem to be an
+        # equivalent analysis.executed_branch_arcs
+        branch_lines = analysis._branch_lines()  # pylint: disable=W0212
 
         branches = []
 

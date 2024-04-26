@@ -426,7 +426,7 @@ class Coveralls:
 
         base_dir = self.config.get('base_dir') or ''
         src_dir = self.config.get('src_dir') or ''
-        return CoverallReporter(work, work.config, base_dir, src_dir).coverage
+        return CoverallReporter(work, base_dir, src_dir).coverage
 
     @staticmethod
     def debug_bad_encoding(data):
