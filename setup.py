@@ -38,7 +38,7 @@ setup(
     },
     python_requires='>= 3.7',
     install_requires=[
-        'coverage>=5.0,<7.0,!=6.0.*,!=6.1,!=6.1.1',
+        'coverage>=7.5,<7.6,!=6.0,!=6.1,!=6.1.1',
         'docopt>=0.6.1',
         'requests>=1.0.0',
     ],
