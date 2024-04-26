@@ -4,6 +4,10 @@ orbs:
   linter: talkiq/linter@4
 
 executors:
+  docker-git:
+    docker:
+      - image: docker:25.0.5-git
+    resource_class: medium
   py38:
     docker:
       - image: python:3.8-alpine
@@ -29,7 +33,80 @@ executors:
       - image: pypy:3-7.3-slim
     resource_class: small
 
+commands:
+  # See thekevjames/tools
+  custom-tag:
+    parameters:
+      ident:
+        type: string
+        default: "coveralls"
+      tag:
+        default: /tmp/custom-tag
+        type: string
+    steps:
+      - run: docker tag "thekevjames/<<parameters.ident>>:latest" "thekevjames/<<parameters.ident>>:$(cat <<parameters.tag>>)"
+      - run: docker tag "quay.io/thekevjames/<<parameters.ident>>:latest" "quay.io/thekevjames/<<parameters.ident>>:$(cat <<parameters.tag>>)"
+      - run: docker push "thekevjames/<<parameters.ident>>:$(cat <<parameters.tag>>)"
+      - run: docker push "quay.io/thekevjames/<<parameters.ident>>:$(cat <<parameters.tag>>)"
+
 jobs:
+  # See thekevjames/tools
+  docker-publish:
+    executor: docker-git
+    parameters:
+      ident:
+        type: string
+        default: "coveralls"
+      tag:
+        type: string
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASS" | docker login docker.io --username "$DOCKER_USER" --password-stdin
+      - run: echo "$QUAY_PASS" | docker login quay.io --username "$QUAY_USER" --password-stdin
+      - docker/build:
+          local_image_name: "<<parameters.ident>>:${CIRCLE_SHA1:0:10}"
+          path: "docker-<<parameters.ident>>"
+      - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "thekevjames/<<parameters.ident>>:<<parameters.tag>>"
+      - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "thekevjames/<<parameters.ident>>:latest"
+      - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "quay.io/thekevjames/<<parameters.ident>>:<<parameters.tag>>"
+      - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "quay.io/thekevjames/<<parameters.ident>>:latest"
+      - run: docker push "thekevjames/<<parameters.ident>>:<<parameters.tag>>"
+      - run: docker push "thekevjames/<<parameters.ident>>:latest"
+      - run: docker push "quay.io/thekevjames/<<parameters.ident>>:<<parameters.tag>>"
+      - run: docker push "quay.io/thekevjames/<<parameters.ident>>:latest"
+
+  # See thekevjames/tools
+  docker-readme-build:
+    docker:
+      - image: pandoc/core:3.1.1
+    steps:
+      - run: apk add --no-cache --no-progress ca-certificates openssl
+      - run: mkdir /meta
+      - checkout
+      - run: pandoc -o/meta/README.md README.rst
+      - persist_to_workspace:
+          root: /meta
+          paths:
+            - README.md
+
+  # See thekevjames/tools
+  # TODO: this should be doable with curl or python...
+  docker-readme-push:
+    docker:
+      - image: node:21.7.3-alpine
+    parameters:
+      ident:
+        type: string
+        default: "coveralls"
+    steps:
+      - run: apk add --no-cache --no-progress ca-certificates openssl
+      - checkout
+      - run: npm install docker-hub-api
+      - attach_workspace:
+          at: /meta
+      - run: node ./docker-update-readme.js thekevjames <<parameters.ident>> /meta/README.md
+
   toxpy:
     executor: <<parameters.executor>>
     parameters:
@@ -56,6 +133,24 @@ jobs:
       - run: tox run -e upload
 
 workflows:
+  docker:
+    when:
+      equal: [ master, << pipeline.git.branch >> ]
+    jobs:
+      - docker-publish:
+          tag: "${CIRCLE_SHA1:0:10}"
+          post-steps:
+            - run: |
+                export COVERALLS_VERSION=$(awk -F'=' '/ARG COVERALLS_VERSION=/ {print substr($2, 2, length($2))}' Dockerfile)
+                echo "${COVERALLS_VERSION}" >/tmp/custom-tag
+            - custom-tag
+      - docker-readme-build:
+          requires:
+            - docker-publish
+      - docker-readme-push:
+          requires:
+            - docker-readme-build
+
   test:
     jobs:
       - linter/pre-commit:

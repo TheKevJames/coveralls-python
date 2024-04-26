@@ -21,7 +21,5 @@ jobs:
           # TODO: renovate
           version: 1.8.2
       - run: poetry build
-      - run: ls -la ./dist
-      # TODO: enable me
-      # - name: Publish package distributions to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
