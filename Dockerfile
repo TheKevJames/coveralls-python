@@ -6,7 +6,7 @@ ARG COVERALLS_VERSION=3.3.1
 ARG GIT_VERSION=2.43.0-r0
 
 
-FROM python:3.10-alpine3.19
+FROM python:3.12-alpine3.19
 
 ARG GIT_VERSION
 RUN --mount=type=cache,target=/var/cache/apk \
