@@ -9,7 +9,7 @@ For example, on TravisCI::
     envlist = py310,py311,py312
 
     [testenv]
-    passenv = TRAVIS TRAVIS_*
+    passenv = TRAVIS , TRAVIS_*
     deps =
         coveralls
     commands =
@@ -22,7 +22,7 @@ AppVeyor
 --------
 ::
 
-    passenv = APPVEYOR APPVEYOR_*
+    passenv = APPVEYOR , APPVEYOR_*
 
 All variables:
 
@@ -35,7 +35,7 @@ BuildKite
 ---------
 ::
 
-    passenv = BUILDKITE BUILDKITE_*
+    passenv = BUILDKITE , BUILDKITE_*
 
 All variables:
 
@@ -47,7 +47,7 @@ CircleCI
 --------
 ::
 
-    passenv = CIRCLECI CIRCLE_* CI_PULL_REQUEST
+    passenv = CIRCLECI , CIRCLE_* , CI_PULL_REQUEST
 
 All variables:
 
@@ -78,7 +78,7 @@ Jenkins
 -------
 ::
 
-    passenv = JENKINS_HOME BUILD_NUMBER GIT_BRANCH CI_PULL_REQUEST
+    passenv = JENKINS_HOME , BUILD_NUMBER , GIT_BRANCH , CI_PULL_REQUEST
 
 All variables:
 
@@ -92,7 +92,7 @@ TravisCI
 --------
 ::
 
-    passenv = TRAVIS TRAVIS_*
+    passenv = TRAVIS , TRAVIS_*
 
 All variables:
 
@@ -110,7 +110,7 @@ Classic
 
 ::
 
-    passenv = SEMAPHORE SEMAPHORE_EXECUTABLE_UUID SEMAPHORE_JOB_UUID SEMAPHORE_BRANCH_ID BRANCH_NAME
+    passenv = SEMAPHORE , SEMAPHORE_EXECUTABLE_UUID , SEMAPHORE_JOB_UUID , SEMAPHORE_BRANCH_ID , BRANCH_NAME
 
 All variables:
 
@@ -125,7 +125,7 @@ All variables:
 
 ::
 
-    passenv = SEMAPHORE SEMAPHORE_WORKFLOW_ID SEMAPHORE_JOB_ID SEMAPHORE_GIT_PR_NUMBER BRANCH_NAME
+    passenv = SEMAPHORE , SEMAPHORE_WORKFLOW_ID , SEMAPHORE_JOB_ID , SEMAPHORE_GIT_PR_NUMBER , BRANCH_NAME
 
 All variables:
 
