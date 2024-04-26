@@ -168,17 +168,7 @@ repos:
         files: coveralls/.*
   - repo: local
     hooks:
-      - id: poetry-check
-        name: check pyproject.toml validity
-        description: 'Validate the structure of the pyproject.toml file'
-        entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
-        language: python
-        additional_dependencies:
-          # renovate: datasource=pypi depName=poetry
-          - poetry==1.8.2
-        pass_filenames: true
-        files: 'pyproject\.toml$'
-      - id: poetry-use-version-ranges
+      - id: pyproject-use-version-ranges
         name: avoid using carets for version ranges
         description: 'Avoid using carets for version ranges'
         entry: '\^'
