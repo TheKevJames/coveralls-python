@@ -2,130 +2,223 @@ ci:
     autofix_commit_msg: 'refactor(lint): apply automatic lint fixes'
     autoupdate_commit_msg: 'chore(deps): bump pre-commit linter versions'
 
+default_install_hook_types:
+  - commit-msg
+  - pre-commit
+
 default_language_version:
-    python: python3.7
+    python: python3.8
 
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.1.0
     hooks:
-    -   id: check-case-conflict
-    -   id: check-executables-have-shebangs
-    -   id: check-json
-    -   id: check-merge-conflict
-    -   id: check-shebang-scripts-are-executable
-    -   id: check-symlinks
-    -   id: check-toml
-    -   id: check-vcs-permalinks
-    -   id: check-xml
-    -   id: check-yaml
+      - id: conventional-pre-commit
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-xml
+      - id: check-yaml
         args: [--allow-multiple-documents]
-    -   id: detect-private-key
-    -   id: end-of-file-fixer
+      - id: detect-private-key
+      - id: end-of-file-fixer
         exclude: example/.*
-    -   id: mixed-line-ending
+      - id: mixed-line-ending
         args: [--fix=lf]
-    -   id: trailing-whitespace
+      - id: trailing-whitespace
 
 # python
-    -   id: check-ast
-    -   id: check-builtin-literals
-    -   id: check-docstring-first
-    -   id: debug-statements
-    -   id: double-quote-string-fixer
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: double-quote-string-fixer
         exclude: nonunicode/.*
-    -   id: name-tests-test
+      - id: name-tests-test
         exclude: tests/data/.*
-    -   id: requirements-txt-fixer
--   repo: https://github.com/pycqa/pylint
-    rev: v2.15.6
+      - id: requirements-txt-fixer
+  - repo: https://github.com/PyCQA/pylint
+    rev: v3.1.0
     hooks:
-    -   id: pylint
-        additional_dependencies:
-        - pylint-import-modules==0.3.0
+    # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
+      - id: pylint
         args:
-        - --allowed-direct-imports="typing.*"
-        - --load-plugins=pylint_import_modules
-        - --max-line-length=79
-        - --max-args=10
-        - --score=n
-        - -d bad-file-encoding
-        - -d broad-except
-        - -d duplicate-code
-        - -d fixme
-        - -d import-error
-        - -d import-only-modules
-        - -d invalid-name
-        - -d locally-disabled
-        - -d missing-docstring
-        - -d too-few-public-methods
-        - -d ungrouped-imports  # conflicts with reorder-python-imports
-        - -d wrong-import-order  # conflicts with reorder-python-imports
-        - -d unspecified-encoding  # TODO: reevaluate
-        - -d disallowed-name  # TODO: fix
-        exclude: example/.*
--   repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.3.1
+          - --load-plugins=pylint.extensions.mccabe
+          - --max-complexity=10
+          - --max-line-length=79
+          - --max-module-lines=500
+          - --max-args=10
+          - --score=n
+          # TODO: narrow these down
+          - -d broad-except
+          - -d duplicate-code
+          - -d fixme
+          - -d import-error
+          - -d invalid-name
+          - -d locally-disabled
+          - -d missing-docstring
+          - -d too-few-public-methods
+          - -d try-except-raise
+          - -d ungrouped-imports  # conflicts with reorder-python-imports
+          - -d wrong-import-order  # conflicts with reorder-python-imports
+          - -d bad-file-encoding  # TODO: fix?
+          - -d disallowed-name  # TODO: fix
+          - -d unspecified-encoding  # TODO: reevaluate
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.1  # TODO: v1.5.2+ requires newer pre-commit, need to drop py3.8?
     hooks:
-    -   id: remove-tabs
--   repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.9.0
+      - id: remove-crlf
+      - id: remove-tabs
+        exclude: 'Makefile'
+  - repo: https://github.com/asottile/reorder-python-imports
+    rev: v3.12.0
     hooks:
-    -   id: reorder-python-imports
+      - id: reorder-python-imports
         args: [--py37-plus]
         exclude: nonunicode/.*
--   repo: https://github.com/asottile/pyupgrade
-    rev: v3.2.2
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.1
     hooks:
-    -   id: pyupgrade
+      - id: pyupgrade
         args: [--py37-plus]
         exclude: nonunicode/.*
--   repo: https://github.com/asottile/yesqa
-    rev: v1.4.0
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
     hooks:
-    -   id: yesqa
+      - id: add-trailing-comma
+        exclude: nonunicode/.*
+# TODO: add type hints
+#   - repo: https://github.com/pre-commit/mirrors-mypy
+#     rev: v1.9.0
+#     hooks:
+#       - id: mypy
+#         require_serial: True
+#         # N.B. mypy requires an installed version of whatever third-party
+#         # library it is asked to check against. In practice, that means
+#         # whenever we see an error telling us to do so, we should add the
+#         # relevant library to `additional_dependencies`.
+#         # Note that some libraries keep their type hints in packages named
+#         # `types-$lib` or `$lib-stubs`.
+#         additional_dependencies: []
+#         args:
+#           - --show-error-codes
+#           - --strict
+#           - --strict-equality
+#           - --warn-unreachable
+  - repo: https://github.com/asottile/yesqa
+    rev: v1.5.0
+    hooks:
+      - id: yesqa
+        # N.B. keep these in sync with flake8, otherwise yesqa will remove
+        # required noqa's related to these plugins
+        additional_dependencies: &flake8deps
+          # renovate: datasource=pypi depName=flake8-2020
+          - flake8-2020==1.8.1
+          # renovate: datasource=pypi depName=flake8-broken-line
+          - flake8-broken-line==1.0.0
+          # renovate: datasource=pypi depName=flake8-builtins
+          - flake8-builtins==2.2.0
+          # renovate: datasource=pypi depName=flake8-comprehensions
+          - flake8-comprehensions==3.14.0
         files: coveralls/.*
--   repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v2.0.0
+# TODO: debug why CoverallsException breaks this
+#   - repo: https://github.com/guilatrova/tryceratops
+#     rev: v2.3.2
+#     hooks:
+#       - id: tryceratops
+#         args:
+#           - --autofix
+#           - -iTRY003
+#           - -iTRY100
+#           - -iTRY101
+#           - -iTRY301
+#         files: coveralls/.*
+  - repo: https://github.com/hhatto/autopep8
+    rev: v2.1.0
     hooks:
-    -   id: autopep8
+      - id: autopep8
+        args: [-a, -i, -p2]
         files: coveralls/.*
--   repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.1.1
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
     hooks:
-    -   id: pydocstyle
+      - id: pydocstyle
         args:
-        - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
+          - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
--   repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
     hooks:
-    -   id: flake8
+      - id: flake8
+        additional_dependencies: *flake8deps
+        args:
+          # https://www.flake8rules.com/
+          # E501: Line too long. Covered by autopep8.
+          # E741: Do not use variables named 'I', 'O', or 'l'.
+          # W503: Line break occurred before a binary operator. Breaks PEP8.
+          - --ignore=E501,E741,W503
+        files: coveralls/.*
+  - repo: local
+    hooks:
+      - id: poetry-check
+        name: check pyproject.toml validity
+        description: 'Validate the structure of the pyproject.toml file'
+        entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
+        language: python
         additional_dependencies:
-        - flake8-2020==1.7.0
-        - flake8-broken-line==0.5.0
-        - flake8-builtins==1.5.3
-        - flake8-commas==2.1.0
-        - flake8-comprehensions==3.10.0
-        args:
-        - --ignore=E501,W503,F401,F811
-        files: coveralls/.*
--   repo: local
-    hooks:
-    -   id: pytest-fixture-require-scope
-        name: Require explicit scope for pytest fixtures
+          # renovate: datasource=pypi depName=poetry
+          - poetry==1.8.2
+        pass_filenames: true
+        files: 'pyproject\.toml$'
+      - id: poetry-use-version-ranges
+        name: avoid using carets for version ranges
+        description: 'Avoid using carets for version ranges'
+        entry: '\^'
+        language: pygrep
+        types: [toml]
+        files: 'pyproject.toml$'
+      - id: pytest-fixtures-require-scope
+        name: ensure pytest fixture scopes are explicitly set
         description: 'Ensure we explicitly set pytest fixture scopes'
         entry: '@pytest\.fixture( |\n|(\(\)))'
         language: pygrep
         types: [python]
--   repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
     hooks:
-    -   id: python-no-eval
-    -   id: python-no-log-warn
-    -   id: python-use-type-annotations
+      - id: python-no-eval
+      - id: python-no-log-warn
+      - id: python-use-type-annotations
 
 # rst
-    -   id: rst-backticks
-    -   id: rst-directive-colons
-    -   id: rst-inline-touching-normal
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+
+# json
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.28.0
+    hooks:
+      - id: check-github-workflows
+      - id: check-renovate
+        additional_dependencies:
+          # renovate: datasource=pypi depName=pyjson5
+          - pyjson5==1.6.6
+
+# docker
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v2.12.1-beta
+    hooks:
+      - id: hadolint
+        args:
+          # unignore 3042 after https://github.com/hadolint/hadolint/issues/497
+          - --ignore=DL3025
+          - --ignore=DL3042

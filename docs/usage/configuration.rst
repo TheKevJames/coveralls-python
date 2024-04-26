@@ -106,7 +106,7 @@ parallel build is finished::
         runs-on: ubuntu-latest
         steps:
           - name: Checkout
-            uses: actions/checkout@v2
+            uses: actions/checkout@v4
           - name: Test
             run: ./run_tests.sh ${{ matrix.test-name }}
           - name: Upload coverage data to coveralls.io

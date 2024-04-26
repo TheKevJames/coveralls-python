@@ -1,8 +1,19 @@
-# eg. docker build --build-arg COVERALLS="coveralls==1.2.3" -t coveralls:1.2.3 .
-ARG COVERALLS=coveralls
+# syntax=docker/dockerfile:1
 
-FROM python:3.10-alpine
+# renovate: datasource=pypi depName=coveralls
+ARG COVERALLS_VERSION=3.3.1
+# renovate: datasource=repology depName=alpine_3_19/git versioning=loose
+ARG GIT_VERSION=2.43.0-r0
 
-ARG COVERALLS
-RUN apk add --update git && \
-    python3 -m pip install "${COVERALLS}"
+
+FROM python:3.10-alpine3.19
+
+ARG GIT_VERSION
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk --update add \
+        "git=${GIT_VERSION}"
+
+ARG COVERALLS_VERSION
+RUN --mount=type=cache,target=/root/.cache/pip \
+    python3 -m pip install \
+        "coveralls==${COVERALLS_VERSION}"

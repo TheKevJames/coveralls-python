@@ -1,8 +1,6 @@
 import logging
 import os
 
-from coverage import __version__
-
 try:
     from coverage.exceptions import NoSource
     from coverage.exceptions import NotPython
@@ -69,13 +67,17 @@ class CoverallReporter:
 
         if config.report_include:
             matcher = FnmatchMatcher(prep_patterns(config.report_include))
-            file_reporters = [fr for fr in file_reporters
-                              if matcher.match(fr.filename)]
+            file_reporters = [
+                fr for fr in file_reporters
+                if matcher.match(fr.filename)
+            ]
 
         if config.report_omit:
             matcher = FnmatchMatcher(prep_patterns(config.report_omit))
-            file_reporters = [fr for fr in file_reporters
-                              if not matcher.match(fr.filename)]
+            file_reporters = [
+                fr for fr in file_reporters
+                if not matcher.match(fr.filename)
+            ]
 
         # TODO: deprecate changes
         # if not file_reporters:
@@ -97,13 +99,15 @@ class CoverallReporter:
                 if fr.should_be_python():
                     if config.ignore_errors:
                         msg = f"Couldn't parse Python file '{fr.filename}'"
-                        cov._warn(msg,  # pylint: disable=W0212
-                                  slug='couldnt-parse')
+                        cov._warn(  # pylint: disable=W0212
+                            msg, slug='couldnt-parse',
+                        )
                     else:
                         # TODO: deprecate changes
                         # raise
-                        log.warning('Source file is not python %s',
-                                    fr.filename)
+                        log.warning(
+                            'Source file is not python %s', fr.filename,
+                        )
             else:
                 # TODO: deprecate changes (well, this one is fine /shrug)
                 # yield (fr, analysis)
@@ -134,8 +138,10 @@ class CoverallReporter:
             except NotPython:
                 # Only report errors for .py files, and only if we didn't
                 # explicitly suppress those errors.
-                if (cu.should_be_python()
-                        and not self.reporter.config.ignore_errors):
+                if (
+                    cu.should_be_python()
+                    and not self.reporter.config.ignore_errors
+                ):
                     log.warning('Source file is not python %s', cu.filename)
 
         return self.coverage
@@ -207,8 +213,10 @@ class CoverallReporter:
         source = analysis.file_reporter.source()
 
         token_lines = analysis.file_reporter.source_token_lines()
-        coverage_lines = [self.get_hits(i, analysis)
-                          for i, _ in enumerate(token_lines, 1)]
+        coverage_lines = [
+            self.get_hits(i, analysis)
+            for i, _ in enumerate(token_lines, 1)
+        ]
 
         results = {
             'name': posix_filename,

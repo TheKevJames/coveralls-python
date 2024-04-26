@@ -3,8 +3,10 @@ import os
 from setuptools import setup
 
 
-VERSION_FILE = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                            'coveralls', 'version.py')
+VERSION_FILE = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    'coveralls', 'version.py',
+)
 
 with open('README.rst') as f:
     DESCRIPTION = f.read()
@@ -19,8 +21,10 @@ setup(
     packages=['coveralls'],
     url='http://github.com/TheKevJames/coveralls-python',
     project_urls={
-        'Changelog': ('https://github.com/TheKevJames/coveralls-python/'
-                      'blob/master/CHANGELOG.md'),
+        'Changelog': (
+            'https://github.com/TheKevJames/coveralls-python/blob/master'
+            '/CHANGELOG.md'
+        ),
         'Docs': 'https://coveralls-python.rtfd.io/',
     },
     license='MIT',

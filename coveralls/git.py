@@ -9,21 +9,24 @@ log = logging.getLogger('coveralls.git')
 
 
 def run_command(*args):
-    with subprocess.Popen(list(args), stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE) as cmd:
+    with subprocess.Popen(
+        list(args), stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    ) as cmd:
         stdout, stderr = cmd.communicate()
 
         if cmd.returncode != 0:
             raise CoverallsException(
                 f'command returned code {cmd.returncode}, STDOUT: "{stdout}"\n'
-                f'STDERR: "{stderr}"')
+                f'STDERR: "{stderr}"',
+            )
 
         return stdout.decode().strip()
 
 
 def gitlog(fmt):
-    glog = run_command('git', '--no-pager', 'log', '-1',
-                       f'--pretty=format:{fmt}')
+    glog = run_command(
+        'git', '--no-pager', 'log', '-1', f'--pretty=format:{fmt}',
+    )
 
     return str(glog)
 
@@ -42,14 +45,16 @@ def git_branch():
             # E.g. in pull_request events.
             branch = os.environ.get('GITHUB_HEAD_REF')
     else:
-        branch = (os.environ.get('APPVEYOR_REPO_BRANCH')
-                  or os.environ.get('BUILDKITE_BRANCH')
-                  or os.environ.get('CI_BRANCH')
-                  or os.environ.get('CIRCLE_BRANCH')
-                  or os.environ.get('GIT_BRANCH')
-                  or os.environ.get('TRAVIS_BRANCH')
-                  or os.environ.get('BRANCH_NAME')
-                  or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD'))
+        branch = (
+            os.environ.get('APPVEYOR_REPO_BRANCH')
+            or os.environ.get('BUILDKITE_BRANCH')
+            or os.environ.get('CI_BRANCH')
+            or os.environ.get('CIRCLE_BRANCH')
+            or os.environ.get('GIT_BRANCH')
+            or os.environ.get('TRAVIS_BRANCH')
+            or os.environ.get('BRANCH_NAME')
+            or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD')
+        )
 
     return branch
 
@@ -86,9 +91,11 @@ def git_info():
             'committer_email': gitlog('%ce'),
             'message': gitlog('%s'),
         }
-        remotes = [{'name': line.split()[0], 'url': line.split()[1]}
-                   for line in run_command('git', 'remote', '-v').splitlines()
-                   if '(fetch)' in line]
+        remotes = [
+            {'name': line.split()[0], 'url': line.split()[1]}
+            for line in run_command('git', 'remote', '-v').splitlines()
+            if '(fetch)' in line
+        ]
     except (CoverallsException, OSError) as ex:
         # When git is not available, try env vars as per Coveralls docs:
         # https://docs.coveralls.io/mercurial-support
@@ -108,9 +115,11 @@ def git_info():
             'url': os.environ.get('GIT_URL'),
         }]
         if not all(head.values()):
-            log.warning('Failed collecting git data. Are you running '
-                        'coveralls inside a git repository? Is git installed?',
-                        exc_info=ex)
+            log.warning(
+                'Failed collecting git data. Are you running '
+                'coveralls inside a git repository? Is git installed?',
+                exc_info=ex,
+            )
             return {}
 
     return {

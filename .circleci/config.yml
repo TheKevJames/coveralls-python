@@ -67,7 +67,7 @@ workflows:
   test:
     jobs:
       - linter/pre-commit:
-          executor: py37
+          executor: py38
           pre-steps:
             - run: apk add --no-cache git
       - toxpy:

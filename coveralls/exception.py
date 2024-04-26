@@ -1,4 +1,5 @@
 class CoverallsException(Exception):
+    # TODO: do we really need this?
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return str(self) == str(other)

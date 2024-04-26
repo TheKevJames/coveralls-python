@@ -42,11 +42,17 @@ class IntegrationTest(unittest.TestCase):
 
             test_file = os.path.join(tempdir, 'test.py')
             with open(test_file, 'w') as f:
-                f.write(COVERAGE_CODE_STANZA.format(COVERAGE_TEMPLATE_PATH,
-                                                    num))
+                f.write(
+                    COVERAGE_CODE_STANZA.format(
+                        COVERAGE_TEMPLATE_PATH,
+                        num,
+                    ),
+                )
 
-            subprocess.check_call([sys.executable, '-m', 'coverage', 'run',
-                                   test_file])
+            subprocess.check_call([
+                sys.executable, '-m', 'coverage', 'run',
+                test_file,
+            ])
 
             coverallz = Coveralls(repo_token='xxx')
             report = coverallz.create_data()
@@ -57,8 +63,12 @@ class IntegrationTest(unittest.TestCase):
             foo = os.path.join(COVERAGE_TEMPLATE_PATH, 'foo.py')
             self.assertIn(foo, source_files)
 
-            lines = next((f['coverage'] for f in report['source_files']
-                          if f['name'] == foo), None)
+            lines = next(
+                (
+                    f['coverage'] for f in report['source_files']
+                    if f['name'] == foo
+                ), None,
+            )
             assert sum(int(bool(x)) for x in lines) == hits
 
     @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
