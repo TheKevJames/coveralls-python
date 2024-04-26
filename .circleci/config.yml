@@ -67,7 +67,6 @@ jobs:
       - run: echo "$QUAY_PASS" | docker login quay.io --username "$QUAY_USER" --password-stdin
       - docker/build:
           local_image_name: "<<parameters.ident>>:${CIRCLE_SHA1:0:10}"
-          path: "docker-<<parameters.ident>>"
       - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "thekevjames/<<parameters.ident>>:<<parameters.tag>>"
       - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "thekevjames/<<parameters.ident>>:latest"
       - run: docker tag "<<parameters.ident>>:${CIRCLE_SHA1:0:10}" "quay.io/thekevjames/<<parameters.ident>>:<<parameters.tag>>"
