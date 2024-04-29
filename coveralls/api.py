@@ -2,9 +2,7 @@ import codecs
 import json
 import logging
 import os
-import random
 import re
-import sys
 
 import coverage
 import requests
@@ -107,6 +105,8 @@ class Coveralls:
         return 'circleci', job, number, pr
 
     def load_config_from_github(self):
+        # See https://github.com/lemurheavy/coveralls-public/issues/1710
+
         # Github tokens and standard Coveralls tokens are almost but not quite
         # the same -- forceibly using Github's flow seems to be more stable
         self.config['repo_token'] = os.environ.get('GITHUB_TOKEN')
@@ -115,11 +115,24 @@ class Coveralls:
         if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
             pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
 
-        # N.B. some users require this to be 'github' and some require it to
-        # be 'github-actions'. Defaulting to 'github-actions' as it seems more
-        # common -- users can specify the service name manually to override
-        # this.
-        return 'github-actions', None, os.environ.get('GITHUB_RUN_ID'), pr
+        # TODO: coveralls suggests using the RUN_ID for both these values:
+        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1539203555
+        # However, they also suggest following this successful config approach:
+        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1913696022
+        # which instead sets:
+        # COVERALLS_SERVICE_JOB_ID: $GITHUB_RUN_ID
+        # COVERALLS_SERVICE_NUMBER: $GITHUB_WORKFLOW-$GITHUB_RUN_NUMBER
+        # should we do the same?
+        job = os.environ.get('GITHUB_RUN_ID')
+        number = os.environ.get('GITHUB_RUN_ID')
+
+        # N.B. per Coveralls:
+        # > When you want to identify the repo at Coveralls by its
+        # > GITHUB_TOKEN, you should choose github, and when you want to
+        # > identify it by its Coveralls Repo Token, you should choose
+        # > github-action.
+        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1539203555
+        return 'github', job, number, pr
 
     @staticmethod
     def load_config_from_jenkins():
@@ -189,9 +202,6 @@ class Coveralls:
         elif os.environ.get('CIRCLECI'):
             name, job, number, pr = self.load_config_from_circle()
         elif os.environ.get('GITHUB_ACTIONS'):
-            # N.B. Github Actions fails if this is not set even when null.
-            # Other services fail if this is set to null. Sigh.
-            self.config['service_job_id'] = None
             name, job, number, pr = self.load_config_from_github()
         elif os.environ.get('JENKINS_HOME'):
             name, job, number, pr = self.load_config_from_jenkins()
@@ -271,32 +281,18 @@ class Coveralls:
             endpoint, files={'json_file': json_string}, verify=verify,
         )
 
-        # check and adjust/resubmit if submission looks like it failed due to
-        # resubmission (non-unique)
         if response.status_code == 422:
-            # attach a random value to ensure uniqueness
-            # TODO: an auto-incrementing integer might be easier to reason
-            # about if we could fetch the previous value
-            # N.B. Github Actions fails if this is not set to null.
-            # Other services fail if this is set to null. Sigh x2.
-            if os.environ.get('GITHUB_REPOSITORY'):
-                new_id = None
-            else:
-                new_id = '-'.join((
-                    self.config.get('service_job_id', '42'),
-                    str(random.randint(0, sys.maxsize)),
-                ))
-            print(f'resubmitting with id {new_id}')
-
-            self.config['service_job_id'] = new_id
-            self._data = None  # force create_report to use updated data
-            json_string = self.create_report()
-
-            response = requests.post(
-                endpoint,
-                files={'json_file': json_string},
-                verify=verify,
-            )
+            if self.config['service_name'].startswith('github'):
+                print(
+                    'Received 422 submitting job via Github Actions. By '
+                    'default, coveralls-python uses the "github" service '
+                    'name, which requires you to set the $GITHUB_TOKEN '
+                    'environment variable. If you want to use a '
+                    'COVERALLS_REPO_TOKEN instead, please manually override '
+                    '$COVERALLS_SERVICE_NAME to "github-actions". For more '
+                    'info, see https://coveralls-python.readthedocs.io/en'
+                    '/latest/usage/configuration.html#github-actions-support',
+                )
 
         try:
             response.raise_for_status()

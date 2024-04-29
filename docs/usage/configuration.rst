@@ -74,24 +74,27 @@ Github Actions support
 Coveralls natively supports jobs running on Github Actions. You can directly
 pass the default-provided secret GITHUB_TOKEN::
 
+    run: coveralls
     env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    run: |
-        coveralls --service=github
 
 Passing a coveralls.io token via the ``COVERALLS_REPO_TOKEN`` environment variable
 (or via the ``repo_token`` parameter in the config file) is not needed for
-Github Actions.
+Github Actions by default (eg. with the default value of ``--service=github``).
 
-Sometimes Github Actions gets a little picky about the service name which needs
-to be used in various cases. If you run into issues, try setting the
-``COVERALLS_SERVICE_NAME`` explicitly to either ``github`` or
-``github-actions``. It seems to be the case that you should use the
-``--service=github`` value if you are also planning to use the ``GITHUB_TOKEN``
-env var, and ``github-actions`` (which is the default) in any other case, but
-we've have conflicting reports on this: YMMV! See
-`#452 <https://github.com/TheKevJames/coveralls-python/issues/252>`_ for more
-info.
+Github Actions can get a bit finicky as to how coverage is submitted. If you
+find yourself getting 422 error responses, you can also try specifying the
+``github-actions`` service name instead. If you do so, you will need to proved
+a ``COVERALLS_REPO_TOKEN`` *instead* of a ``GITHUB_TOKEN``::
+
+    run: coveralls --service=github-actions
+    env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+If you're still having issues after tryingt both of the above, please read through
+the following issues for more information:
+`#252 <https://github.com/TheKevJames/coveralls-python/issues/252>`_ and
+`coveralls-public#1710 <https://github.com/lemurheavy/coveralls-public/issues/1710>`_.
 
 For parallel builds, you have to add a final step to let coveralls.io know the
 parallel build is finished::
@@ -110,7 +113,7 @@ parallel build is finished::
           - name: Test
             run: ./run_tests.sh ${{ matrix.test-name }}
           - name: Upload coverage data to coveralls.io
-            run: coveralls --service=github
+            run: coveralls
             env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
@@ -124,7 +127,7 @@ parallel build is finished::
         - name: Install coveralls
           run: pip3 install --upgrade coveralls
         - name: Finished
-          run: coveralls --service=github --finish
+          run: coveralls --finish
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
