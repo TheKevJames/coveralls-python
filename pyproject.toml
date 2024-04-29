@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "coveralls"
-version = "3.4.0a1"
+version = "4.0.0"
 description = "Show coverage stats online via coveralls.io"
 readme = "README.rst"
 

@@ -20,6 +20,8 @@ Conda should automatically create a PR on their `coveralls-feedstock`_ shortly w
 #. Comment on your own PR with: "@conda-forge-admin, please rerender".
 #. Merge along with the automated commit from Conda.
 
+Note that the ``clog`` command comes from ``cargo install clog-cli``.
+
 .. _GitHub release: https://github.com/TheKevJames/coveralls-python/releases/new
 .. _coveralls-feedstock: https://github.com/conda-forge/coveralls-feedstock
 .. _coveralls: https://pypi.org/project/coveralls/

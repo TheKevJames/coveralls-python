@@ -1,3 +1,33 @@
+<a name="4.0.0"></a>
+## 4.0.0 (2024-04-29)
+
+#### BREAKING CHANGES
+
+When ``config.ignore_errors`` is Falsey, failures to parse Pyhton files or
+look up file sources will now interrupt and early exit collection, which
+matches default ``coverage`` behaviour. Previously, we had manually muted
+these errors and/or only errored after collecting multiple failures.
+
+#### Features
+
+* support ``pyproject.toml`` packages by default (via ``coverage[toml]``) ([962e2242](962e2242))
+* add ``python-coveralls`` entrypoint ([3d8d56e4](3d8d56e4))
+
+#### Bug Fixes
+
+* fixup default support for Github Actions (#427, #385) ([44e95634](44e95634)) -- thanks @andy-maier
+* fail and report on *all* errors, not just those derived from ``CoverallsException`` ([be446287](be446287))
+
+#### Internal
+
+* support ``coverage`` v7.0 - v7.4 ([8fb36645](8fb36645))
+* support Python 3.11 and 3.12 ([8dbce919](8dbce919))
+* fixup docs for tox v3 and v4 support (#371) ([05bb20d8](05bb20d8)) -- thanks @masonf
+* drop support for Python3.7 and below
+* drop support for ``coverage`` v4.x ([752f52a0](752f52a0))
+* auto-build and publish ``docker`` images
+* refactor: more closely match ``coverage`` public interface (#421)
+
 <a name="3.3.1"></a>
 ## 3.3.1 (2021-11-11)
 
