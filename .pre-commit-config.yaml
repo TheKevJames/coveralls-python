@@ -46,7 +46,7 @@ repos:
         exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.1.1
+    rev: v3.2.0
     hooks:
     # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
       - id: pylint
