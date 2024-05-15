@@ -5,14 +5,26 @@ import tempfile
 import unittest
 from unittest import mock
 
+import pytest
+
 import coveralls.git
 from coveralls.exception import CoverallsException
+from coveralls.git import run_command
+
 
 GIT_COMMIT_MSG = 'first commit'
 GIT_EMAIL = 'me@here.com'
 GIT_NAME = 'Daniël'
 GIT_REMOTE = 'origin'
 GIT_URL = 'https://github.com/username/Hello-World.git'
+
+
+def in_git_dir() -> bool:
+    try:
+        run_command('git', 'rev-parse')
+        return True
+    except Exception:
+        return False
 
 
 class GitTest(unittest.TestCase):
@@ -76,6 +88,7 @@ class GitTest(unittest.TestCase):
 
 
 class GitLogTest(GitTest):
+    @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     def test_gitlog(self):
         git_info = coveralls.git.gitlog('%H')
         assert re.match(r'^[a-f0-9]{40}$', git_info)
@@ -143,6 +156,7 @@ class GitInfoTest(unittest.TestCase):
 
 
 class GitInfoOverridesTest(unittest.TestCase):
+    @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
@@ -155,6 +169,7 @@ class GitInfoOverridesTest(unittest.TestCase):
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'fixup-branch'
 
+    @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
@@ -167,6 +182,7 @@ class GitInfoOverridesTest(unittest.TestCase):
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'master'
 
+    @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
