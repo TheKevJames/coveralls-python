@@ -3,10 +3,12 @@
 
 #### BREAKING CHANGES
 
-When ``config.ignore_errors`` is Falsey, failures to parse Pyhton files or
+When ``config.ignore_errors`` is Falsey, failures to parse Python files or
 look up file sources will now interrupt and early exit collection, which
 matches default ``coverage`` behaviour. Previously, we had manually muted
 these errors and/or only errored after collecting multiple failures.
+
+[See the coverage.py docs](https://coverage.readthedocs.io/en/7.5.1/config.html#report-ignore-errors) for setting this option.
 
 #### Features
 
