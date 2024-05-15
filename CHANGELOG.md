@@ -1,3 +1,11 @@
+<a name="4.0.1"></a>
+## 4.0.1 (2024-05-15)
+
+#### Internal
+
+* support ``coverage`` v7.5+ (#442) ([f41dca5](f41dca5))
+* skip tests which require running in a git repo when ``.git`` is missing (#443) ([b566fc3](b566fc3))
+
 <a name="4.0.0"></a>
 ## 4.0.0 (2024-04-29)
 
