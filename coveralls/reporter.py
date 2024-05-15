@@ -80,7 +80,15 @@ class CoverallReporter:
         3. branch-number
         4. hits (we only get 1/0 from coverage.py)
         """
-        if not analysis.has_arcs():
+        # pylint: disable=too-complex
+        has_arcs: bool
+        try:
+            has_arcs = analysis.has_arcs()
+        except TypeError:
+            # coverage v7.5+
+            has_arcs = analysis.has_arcs
+
+        if not has_arcs:
             return []
 
         missing_arcs: Dict[int, List[int]] = analysis.missing_branch_arcs()
@@ -120,9 +128,7 @@ class CoverallReporter:
             posix_filename = posix_filename[len(self.base_dir):]
         posix_filename = self.src_dir + posix_filename
 
-        source = analysis.file_reporter.source()
-
-        token_lines = analysis.file_reporter.source_token_lines()
+        token_lines = cu.source_token_lines()
         coverage_lines = [
             self.get_hits(i, analysis)
             for i, _ in enumerate(token_lines, 1)
@@ -130,7 +136,7 @@ class CoverallReporter:
 
         results = {
             'name': posix_filename,
-            'source': source,
+            'source': cu.source(),
             'coverage': coverage_lines,
         }
 
