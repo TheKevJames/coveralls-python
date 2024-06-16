@@ -142,7 +142,7 @@ repos:
 #           - -iTRY301
 #         files: coveralls/.*
   - repo: https://github.com/hhatto/autopep8
-    rev: v2.2.0
+    rev: v2.3.0
     hooks:
       - id: autopep8
         args: [-a, -i, -p2]
