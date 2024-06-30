@@ -127,7 +127,7 @@ repos:
           # renovate: datasource=pypi depName=flake8-builtins
           - flake8-builtins==2.5.0
           # renovate: datasource=pypi depName=flake8-comprehensions
-          - flake8-comprehensions==3.14.0
+          - flake8-comprehensions==3.15.0
         files: coveralls/.*
 # TODO: debug why CoverallsException breaks this
 #   - repo: https://github.com/guilatrova/tryceratops
