@@ -45,7 +45,7 @@ responses = "0.25.0"
 [tool.poetry.group.docs]
 optional = true
 [tool.poetry.group.docs.dependencies]
-sphinx = { version = "7.4.4", python = ">=3.9" }
+sphinx = { version = "7.4.6", python = ">=3.9" }
 
 [tool.poetry.extras]
 yaml = ["pyyaml"]
