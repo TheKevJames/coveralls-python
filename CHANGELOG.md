@@ -1,4 +1,10 @@
 <a name="4.0.1"></a>
+## 4.0.2 (unreleased)
+
+#### Bug Fixes
+
+* Upper limits are incorrect in requires-python (#449)
+
 ## 4.0.1 (2024-05-15)
 
 #### Internal
