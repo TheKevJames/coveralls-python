@@ -11,7 +11,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.2.0
+    rev: v3.3.0
     hooks:
       - id: conventional-pre-commit
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -46,7 +46,7 @@ repos:
         exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.2
+    rev: v3.2.6
     hooks:
     # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
       - id: pylint
@@ -85,7 +85,7 @@ repos:
         args: [--py38-plus]
         exclude: nonunicode/.*
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
+    rev: v3.16.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -127,7 +127,7 @@ repos:
           # renovate: datasource=pypi depName=flake8-builtins
           - flake8-builtins==2.5.0
           # renovate: datasource=pypi depName=flake8-comprehensions
-          - flake8-comprehensions==3.14.0
+          - flake8-comprehensions==3.15.0
         files: coveralls/.*
 # TODO: debug why CoverallsException breaks this
 #   - repo: https://github.com/guilatrova/tryceratops
@@ -142,7 +142,7 @@ repos:
 #           - -iTRY301
 #         files: coveralls/.*
   - repo: https://github.com/hhatto/autopep8
-    rev: v2.2.0
+    rev: v2.3.1
     hooks:
       - id: autopep8
         args: [-a, -i, -p2]
@@ -155,7 +155,7 @@ repos:
           - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
+    rev: 7.1.0
     hooks:
       - id: flake8
         additional_dependencies: *flake8deps
@@ -195,7 +195,7 @@ repos:
 
 # json
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.28.4
+    rev: 0.29.1
     hooks:
       - id: check-github-workflows
       - id: check-renovate
