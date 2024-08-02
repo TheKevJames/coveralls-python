@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: snok/install-poetry@v1.3.4
+      - uses: snok/install-poetry@v1.4.1
         with:
           # TODO: renovate
           version: 1.8.2
