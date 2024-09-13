@@ -2,7 +2,7 @@ import json
 import os
 import pathlib
 import subprocess
-import unittest
+import unittest.mock
 
 from coveralls import Coveralls
 
@@ -55,3 +55,32 @@ class EncodingTest(unittest.TestCase):
             '    return 1'
         )
         assert 'branches' not in result[0]
+
+    def test_debug_bad_encoding(self):
+        data = {
+            'source_files': [
+                {
+                    'name': 'bad_file.py',
+                    'source': 'def foo():\n    return "foo"\n',
+                    'coverage': [1, 1, 1],
+                },
+            ],
+        }
+
+        original_json_dumps = json.dumps
+
+        def mock_json_dumps(value):
+            if value == 'def foo():\n    return "foo"\n':
+                raise UnicodeDecodeError('utf8', b'', 0, 1, 'bad data')
+
+            return original_json_dumps(value)
+
+        with unittest.mock.patch(
+                'coveralls.api.json.dumps',
+                side_effect=mock_json_dumps,
+        ), unittest.mock.patch(
+                'coveralls.api.log',
+        ) as mock_log:
+            Coveralls.debug_bad_encoding(data)
+            mock_log.error.assert_called()
+            assert mock_log.error.call_args_list[0][0][1] == 'bad_file.py'

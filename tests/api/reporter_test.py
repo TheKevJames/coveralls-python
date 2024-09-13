@@ -3,7 +3,7 @@ import os
 import pathlib
 import subprocess
 import textwrap
-import unittest
+import unittest.mock
 
 import pytest
 
@@ -253,3 +253,17 @@ class ReporterTest(unittest.TestCase):
                 match=r"Couldn't parse .* as Python",
         ):
             Coveralls(repo_token='xxx').get_coverage()
+
+    @unittest.mock.patch('requests.post')
+    def test_submit_report_422_github(self, mock_post):
+        response_mock = unittest.mock.Mock()
+        response_mock.status_code = 422
+        mock_post.return_value = response_mock
+
+        cov = Coveralls(repo_token='test_token', service_name='github')
+        cov.config['service_name'] = 'github'
+
+        with unittest.mock.patch('builtins.print') as mock_print:
+            cov.submit_report('{}')
+            mock_print.assert_called()
+            assert '422' in mock_print.call_args_list[0][0][0]
