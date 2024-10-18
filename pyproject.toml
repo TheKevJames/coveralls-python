@@ -31,7 +31,7 @@ coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.13"
+python = ">=3.8"
 coverage = { version = ">=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1", extras = ["toml"] }
 docopt = ">=0.6.1,<0.7.0"
 requests = ">=1.0.0,<3.0.0"
