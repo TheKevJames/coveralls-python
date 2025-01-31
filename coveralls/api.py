@@ -195,24 +195,24 @@ class Coveralls:
         # We load them first and allow more specific vars to overwrite
         self.load_config_from_generic_ci_environment()
 
-        if os.environ.get('APPVEYOR'):
-            name, job, number, pr = self.load_config_from_appveyor()
-        elif os.environ.get('BUILDKITE'):
-            name, job, number, pr = self.load_config_from_buildkite()
-        elif os.environ.get('CIRCLECI'):
-            name, job, number, pr = self.load_config_from_circle()
-        elif os.environ.get('GITHUB_ACTIONS'):
-            name, job, number, pr = self.load_config_from_github()
-        elif os.environ.get('JENKINS_HOME'):
-            name, job, number, pr = self.load_config_from_jenkins()
-        elif os.environ.get('TRAVIS'):
-            self._token_required = False
-            name, job, number, pr = self.load_config_from_travis()
-        elif os.environ.get('SEMAPHORE'):
-            name, job, number, pr = self.load_config_from_semaphore()
+        ci_handlers = {
+            'APPVEYOR': (self.load_config_from_appveyor, None),
+            'BUILDKITE': (self.load_config_from_buildkite, None),
+            'CIRCLECI': (self.load_config_from_circle, None),
+            'GITHUB_ACTIONS': (self.load_config_from_github, None),
+            'JENKINS_HOME': (self.load_config_from_jenkins, None),
+            'TRAVIS': (self.load_config_from_travis, lambda: setattr(self, '_token_required', False)),
+            'SEMAPHORE': (self.load_config_from_semaphore, None),
+        }
+
+        for env_var, (handler, pre_action) in ci_handlers.items():
+            if os.environ.get(env_var):
+                if pre_action:
+                    pre_action()
+                name, job, number, pr = handler()
+                break
         else:
             name, job, number, pr = self.load_config_from_unknown()
-
         self.config.setdefault('service_name', name)
         if job:
             self.config['service_job_id'] = job

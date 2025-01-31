@@ -32,32 +32,33 @@ def gitlog(fmt: str) -> str:
     )
 
 
-def git_branch() -> Optional[str]:
-    branch = None
-    if os.environ.get('GITHUB_ACTIONS'):
-        github_ref = os.environ.get('GITHUB_REF')
-        if (
-            github_ref.startswith('refs/heads/')
-            or github_ref.startswith('refs/tags/')
-        ):
-            # E.g. in push events.
-            branch = github_ref.split('/', 2)[-1]
-        else:
-            # E.g. in pull_request events.
-            branch = os.environ.get('GITHUB_HEAD_REF')
-    else:
-        branch = (
-            os.environ.get('APPVEYOR_REPO_BRANCH')
-            or os.environ.get('BUILDKITE_BRANCH')
-            or os.environ.get('CI_BRANCH')
-            or os.environ.get('CIRCLE_BRANCH')
-            or os.environ.get('GIT_BRANCH')
-            or os.environ.get('TRAVIS_BRANCH')
-            or os.environ.get('BRANCH_NAME')
-            or run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD')
-        )
+def get_github_branch() -> Optional[str]:
+    github_ref = os.environ.get('GITHUB_REF')
+    if github_ref and (github_ref.startswith('refs/heads/') or github_ref.startswith('refs/tags/')):
+        return github_ref.split('/', 2)[-1]
+    return os.environ.get('GITHUB_HEAD_REF')
 
-    return branch
+def get_ci_branch() -> Optional[str]:
+    return (
+        os.environ.get('APPVEYOR_REPO_BRANCH')
+        or os.environ.get('BUILDKITE_BRANCH')
+        or os.environ.get('CI_BRANCH')
+        or os.environ.get('CIRCLE_BRANCH')
+        or os.environ.get('GIT_BRANCH')
+        or os.environ.get('TRAVIS_BRANCH')
+        or os.environ.get('BRANCH_NAME')
+    )
+
+def get_git_branch() -> Optional[str]:
+    try:
+        return run_command('git', 'rev-parse', '--abbrev-ref', 'HEAD')
+    except Exception:
+        return None
+
+def git_branch() -> Optional[str]:
+    if os.environ.get('GITHUB_ACTIONS'):
+        return get_github_branch()
+    return get_ci_branch() or get_git_branch()
 
 
 def git_info() -> Dict[str, Dict[str, Any]]:

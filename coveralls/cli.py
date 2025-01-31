@@ -47,62 +47,70 @@ from .api import Coveralls
 
 log = logging.getLogger('coveralls')
 
+def handle_debug(coverallz):
+    log.info('Testing coveralls-python...')
+    coverallz.wear(dry_run=True)
 
-def main(argv=None):
-    # pylint: disable=too-complex
-    version = importlib.metadata.version('coveralls')
-    options = docopt.docopt(__doc__, argv=argv, version=version)
-    if options['debug']:
-        options['--verbose'] = True
+def handle_output(coverallz, output_file):
+    log.info('Write coverage report to file...')
+    coverallz.save_report(output_file)
 
+def handle_submit(coverallz, submit_file):
+    with open(submit_file) as report_file:
+        coverallz.submit_report(report_file.read())
+
+def handle_finish(coverallz):
+    log.info('Finishing parallel jobs...')
+    coverallz.parallel_finish()
+    log.info('Done')
+
+def handle_default(coverallz):
+    log.info('Submitting coverage to coveralls.io...')
+    result = coverallz.wear()
+    log.info('Coverage submitted!')
+    log.debug(result)
+    if result:
+        log.info(result.get('message'))
+        log.info(result.get('url'))
+def setup_coveralls(options):
     level = logging.DEBUG if options['--verbose'] else logging.INFO
     log.addHandler(logging.StreamHandler())
     log.setLevel(level)
 
     token_required = not options['debug'] and not options['--output']
 
+    return Coveralls(
+        token_required,
+        config_file=options['--rcfile'],
+        service_name=options['--service'],
+        base_dir=options.get('--basedir') or '',
+        src_dir=options.get('--srcdir') or '',
+    )
+def main(argv=None):
+    version = importlib.metadata.version('coveralls')
+    options = docopt.docopt(__doc__, argv=argv, version=version)
+    if options['debug']:
+        options['--verbose'] = True
+
     try:
-        coverallz = Coveralls(
-            token_required,
-            config_file=options['--rcfile'],
-            service_name=options['--service'],
-            base_dir=options.get('--basedir') or '',
-            src_dir=options.get('--srcdir') or '',
-        )
+        coverallz = setup_coveralls(options)
 
-        if options['--merge']:
-            coverallz.merge(options['--merge'])
+        action_handlers = {
+            '--merge': lambda: coverallz.merge(options['--merge']),
+            'debug': lambda: handle_debug(coverallz),
+            '--output': lambda: handle_output(coverallz, options['--output']),
+            '--submit': lambda: handle_submit(coverallz, options['--submit']),
+            '--finish': lambda: handle_finish(coverallz),
+        }
 
-        if options['debug']:
-            log.info('Testing coveralls-python...')
-            coverallz.wear(dry_run=True)
-            return
+        for action, handler in action_handlers.items():
+            if options.get(action):
+                handler()
+                return
 
-        if options['--output']:
-            log.info('Write coverage report to file...')
-            coverallz.save_report(options['--output'])
-            return
+        handle_default(coverallz)
 
-        if options['--submit']:
-            with open(options['--submit']) as report_file:
-                coverallz.submit_report(report_file.read())
-            return
-
-        if options['--finish']:
-            log.info('Finishing parallel jobs...')
-            coverallz.parallel_finish()
-            log.info('Done')
-            return
-
-        log.info('Submitting coverage to coveralls.io...')
-        result = coverallz.wear()
-
-        log.info('Coverage submitted!')
-        log.debug(result)
-        if result:
-            log.info(result.get('message'))
-            log.info(result.get('url'))
-    except KeyboardInterrupt:  # pragma: no cover
+    except KeyboardInterrupt:  
         log.info('Aborted')
     except Exception as e:
         log.exception('Error running coveralls: %s', e)
