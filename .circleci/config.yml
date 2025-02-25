@@ -31,11 +31,11 @@ executors:
     resource_class: small
   pypy737:  # py38
     docker:
-      - image: pypy:3-7.3.7-slim
+      - image: pypy:3-bookworm
     resource_class: small
   pypy7311:  # py38+py39
     docker:
-      - image: pypy:3-7.3.11-slim
+      - image: pypy:3-7.3.18
     resource_class: small
   pypy73:  # py39+py310
     docker:
