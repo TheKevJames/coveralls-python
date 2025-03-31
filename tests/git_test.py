@@ -11,7 +11,6 @@ import coveralls.git
 from coveralls.exception import CoverallsException
 from coveralls.git import run_command
 
-
 GIT_COMMIT_MSG = 'first commit'
 GIT_EMAIL = 'me@here.com'
 GIT_NAME = 'Daniël'
@@ -46,15 +45,21 @@ class GitTest(unittest.TestCase):
         subprocess.call(['git', 'init'], cwd=self.dir)
         subprocess.call(
             [
-                'git', 'config', 'user.name',
+                'git',
+                'config',
+                'user.name',
                 f'"{GIT_NAME}"',
-            ], cwd=self.dir,
+            ],
+            cwd=self.dir,
         )
         subprocess.call(
             [
-                'git', 'config', 'user.email',
+                'git',
+                'config',
+                'user.email',
                 f'"{GIT_EMAIL}"',
-            ], cwd=self.dir,
+            ],
+            cwd=self.dir,
         )
         subprocess.call(['git', 'add', 'README'], cwd=self.dir)
         subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=self.dir)
@@ -78,10 +83,12 @@ class GitTest(unittest.TestCase):
                     'message': GIT_COMMIT_MSG,
                     'committer_name': GIT_NAME,
                 },
-                'remotes': [{
-                    'url': GIT_URL,
-                    'name': GIT_REMOTE,
-                }],
+                'remotes': [
+                    {
+                        'url': GIT_URL,
+                        'name': GIT_REMOTE,
+                    },
+                ],
                 'branch': 'master',
             },
         }
@@ -114,7 +121,8 @@ class GitInfoTest(unittest.TestCase):
         os.chdir(self.dir)
 
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
             'GIT_BRANCH': 'master',
             'GIT_AUTHOR_NAME': GIT_NAME,
@@ -124,7 +132,8 @@ class GitInfoTest(unittest.TestCase):
             'GIT_MESSAGE': GIT_COMMIT_MSG,
             'GIT_URL': GIT_URL,
             'GIT_REMOTE': GIT_REMOTE,
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_gitinfo_envvars(self):
         git_info = coveralls.git.git_info()
@@ -140,10 +149,12 @@ class GitInfoTest(unittest.TestCase):
                     'message': GIT_COMMIT_MSG,
                     'committer_name': GIT_NAME,
                 },
-                'remotes': [{
-                    'url': GIT_URL,
-                    'name': GIT_REMOTE,
-                }],
+                'remotes': [
+                    {
+                        'url': GIT_URL,
+                        'name': GIT_REMOTE,
+                    },
+                ],
                 'branch': 'master',
             },
         }
@@ -158,12 +169,14 @@ class GitInfoTest(unittest.TestCase):
 class GitInfoOverridesTest(unittest.TestCase):
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/pull/1234/merge',
             'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
             'GITHUB_HEAD_REF': 'fixup-branch',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_gitinfo_github_pr(self):
         git_info = coveralls.git.git_info()
@@ -171,12 +184,14 @@ class GitInfoOverridesTest(unittest.TestCase):
 
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/heads/master',
             'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
             'GITHUB_HEAD_REF': '',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_gitinfo_github_branch(self):
         git_info = coveralls.git.git_info()
@@ -184,12 +199,14 @@ class GitInfoOverridesTest(unittest.TestCase):
 
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/tags/v1.0',
             'GITHUB_SHA': 'bb0e00166b28f49db04d6a8b8cb4bddb5afa529f',
             'GITHUB_HEAD_REF': '',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_gitinfo_github_tag(self):
         git_info = coveralls.git.git_info()

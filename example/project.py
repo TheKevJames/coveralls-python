@@ -3,11 +3,12 @@ def hello():
 
 
 class Foo:
-    """ Bar """
+    """Bar"""
 
 
 def baz():
     print('this is not tested')
+
 
 def branch(cond1, cond2):
     if cond1:

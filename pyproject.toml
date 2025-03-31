@@ -1,17 +1,34 @@
-[tool.poetry]
+[project]
 name = "coveralls"
-version = "4.0.1"
+version = "4.1.0"
 description = "Show coverage stats online via coveralls.io"
+authors = [{name="Kevin James", email="coveralls-python@thekev.in"}]
 readme = "README.rst"
+license = {text="MIT"}
+dynamic = ["classifiers"]
+requires-python = ">=3.9"
+dependencies = [
+    "coverage[toml] (>=6.1.2,<8.0.0)",
+    "docopt-ng (>=0.6.1,<1.0.0)",
+    "requests (>=1.0.0,<3.0.0)"
+]
 
+[project.optional-dependencies]
+yaml = ["pyyaml (>=3.10,<7.0)"]
+
+[project.urls]
+Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
 repository = "http://github.com/TheKevJames/coveralls-python"
-authors = ["Kevin James <coveralls-python@thekev.in>"]
-license = "MIT"
+Docs = "https://coveralls-python.rtfd.io/"
 
+[project.scripts]
+coveralls = "coveralls.cli:main"
+python-coveralls = "coveralls.cli:main"
+
+[tool.poetry]
 packages = [
     { include = "coveralls" },
 ]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Testing",
@@ -22,33 +39,18 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-[tool.poetry.urls]
-Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
-Docs = "https://coveralls-python.rtfd.io/"
-
-[tool.poetry.scripts]
-coveralls = "coveralls.cli:main"
-python-coveralls = "coveralls.cli:main"
-
-[tool.poetry.dependencies]
-python = ">=3.8,<3.13"
-coverage = { version = ">=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1", extras = ["toml"] }
-docopt-ng = ">=0.6.1,<1.0.0"
-requests = ">=1.0.0,<3.0.0"
-
-pyyaml = { version = ">=3.10,<7.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
-pytest = "8.3.5"
-responses = "0.25.0"
+pytest = ">=8.3.5"
+responses = ">=0.25.0"
+mypy = ">=1.15.0"
+types-requests = ">=2.32.0.20250328"
+types-pyyaml = ">=6.0.12.20250326"
 
 [tool.poetry.group.docs]
 optional = true
 [tool.poetry.group.docs.dependencies]
-sphinx = { version = "7.4.7", python = ">=3.9" }
-
-[tool.poetry.extras]
-yaml = ["pyyaml"]
+sphinx = ">=7.4.7"
 
 [tool.pytest.ini_options]
 # addopts = "-Werror"
@@ -58,6 +60,10 @@ filterwarnings = [
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
 
+[tool.mypy]
+python_version = "3.9"
+ignore_missing_imports = true
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"

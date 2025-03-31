@@ -7,7 +7,6 @@ from coveralls.exception import CoverallsException
 
 
 class CoverallsExceptionTest(unittest.TestCase):
-
     _caplog = None
 
     @pytest.fixture(autouse=True)
@@ -21,8 +20,7 @@ class CoverallsExceptionTest(unittest.TestCase):
             raise CoverallsException('Some exception')
         except CoverallsException as e:
             logging.exception('Found exception')
-            assert 'raise CoverallsException(' in \
-                self._caplog.text
+            assert 'raise CoverallsException(' in self._caplog.text
             exc_value = str(e)
 
         assert exc_value == 'Some exception'

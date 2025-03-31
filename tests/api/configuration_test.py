@@ -4,10 +4,11 @@ import unittest
 from unittest import mock
 
 import pytest
+
 try:
     import yaml
 except ImportError:
-    yaml = None
+    yaml = None  # type:ignore
 
 from coveralls import Coveralls
 from coveralls.api import log
@@ -46,18 +47,21 @@ class Configuration(unittest.TestCase):
             cover = Coveralls()
 
         logger.assert_called_once_with(
-            'PyYAML is not installed, skipping %s.', cover.config_filename,
+            'PyYAML is not installed, skipping %s.',
+            cover.config_filename,
         )
 
 
 @mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfiguration(unittest.TestCase):
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'TRAVIS': 'True',
             'TRAVIS_JOB_ID': '777',
             'COVERALLS_REPO_TOKEN': 'yyy',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_repo_token_from_env(self):
         cover = Coveralls()
@@ -85,7 +89,8 @@ class NoConfiguration(unittest.TestCase):
         )
 
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'APPVEYOR': 'True',
             'APPVEYOR_BUILD_ID': '1234567',
             'APPVEYOR_PULL_REQUEST_NUMBER': '1234',
@@ -99,7 +104,8 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_pull_request'] == '1234'
 
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'BUILDKITE': 'True',
             'BUILDKITE_JOB_ID': '1234567',
             'BUILDKITE_PULL_REQUEST': '1234',
@@ -113,7 +119,8 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_pull_request'] == '1234'
 
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'BUILDKITE': 'True',
             'BUILDKITE_JOB_ID': '1234567',
             'BUILDKITE_PULL_REQUEST': 'false',
@@ -214,10 +221,12 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_pull_request'] == '9999'
 
     @mock.patch.dict(
-        os.environ, {
+        os.environ,
+        {
             'TRAVIS': 'True',
             'TRAVIS_JOB_ID': '777',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_travis_no_config(self):
         cover = Coveralls()

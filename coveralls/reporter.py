@@ -1,17 +1,19 @@
+from __future__ import annotations
+
 import collections
 import logging
 import os
-from typing import Dict
-from typing import List
-from typing import Optional
+from typing import Any
+from typing import TYPE_CHECKING
 
-import coverage
 from coverage.plugin import FileReporter
 from coverage.report import get_analysis_to_report
 from coverage.results import Analysis
 
 from .exception import CoverallsException
 
+if TYPE_CHECKING:
+    from coverage import Coverage
 
 log = logging.getLogger('coveralls.reporter')
 
@@ -20,15 +22,15 @@ class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
     def __init__(
-            self,
-            cov: coverage.Coverage,
-            base_dir: str = '',
-            src_dir: str = '',
+        self,
+        cov: Coverage,
+        base_dir: str = '',
+        src_dir: str = '',
     ) -> None:
         self.base_dir = self.sanitize_dir(base_dir)
         self.src_dir = self.sanitize_dir(src_dir)
 
-        self.coverage = []
+        self.coverage: list[dict[str, Any]] = []
         self.report(cov)
 
     @staticmethod
@@ -39,9 +41,9 @@ class CoverallReporter:
                 directory += '/'
         return directory
 
-    def report(self, cov: coverage.Coverage) -> None:
+    def report(self, cov: Coverage) -> None:
         try:
-            for (fr, analysis) in get_analysis_to_report(cov, None):
+            for fr, analysis in get_analysis_to_report(cov, None):
                 self.parse_file(fr, analysis)
         except Exception as e:
             # As of coverage v6.2, this is a coverage.exceptions.NoDataError
@@ -51,7 +53,7 @@ class CoverallReporter:
             raise CoverallsException(f'Got coverage library error: {e}') from e
 
     @staticmethod
-    def get_hits(line_num: int, analysis: Analysis) -> Optional[int]:
+    def get_hits(line_num: int, analysis: Analysis) -> int | None:
         """
         Source file stats for each line.
 
@@ -70,7 +72,7 @@ class CoverallReporter:
         return 1
 
     @staticmethod
-    def get_arcs(analysis: Analysis) -> List[int]:
+    def get_arcs(analysis: Analysis) -> list[int]:
         """
         Hit stats for each branch.
 
@@ -83,7 +85,7 @@ class CoverallReporter:
         # pylint: disable=too-complex
         has_arcs: bool
         try:
-            has_arcs = analysis.has_arcs()
+            has_arcs = analysis.has_arcs()  # type:ignore
         except TypeError:
             # coverage v7.5+
             has_arcs = analysis.has_arcs
@@ -91,13 +93,13 @@ class CoverallReporter:
         if not has_arcs:
             return []
 
-        missing_arcs: Dict[int, List[int]] = analysis.missing_branch_arcs()
+        missing_arcs: dict[int, list[int]] = analysis.missing_branch_arcs()
         try:
             # coverage v6.3+
             executed_arcs = analysis.executed_branch_arcs()
         except AttributeError:
             # COPIED ~VERBATIM
-            executed = analysis.arcs_executed()
+            executed = analysis.arcs_executed()  # type:ignore
             lines = analysis._branch_lines()  # pylint: disable=W0212
             branch_lines = set(lines)
             eba = collections.defaultdict(list)
@@ -107,7 +109,7 @@ class CoverallReporter:
             # END COPY
             executed_arcs = eba
 
-        branches: List[int] = []
+        branches: list[int] = []
         for l1, l2s in executed_arcs.items():
             for l2 in l2s:
                 branches.extend((l1, 0, abs(l2), 1))
@@ -130,8 +132,7 @@ class CoverallReporter:
 
         token_lines = cu.source_token_lines()
         coverage_lines = [
-            self.get_hits(i, analysis)
-            for i, _ in enumerate(token_lines, 1)
+            self.get_hits(i, analysis) for i, _ in enumerate(token_lines, 1)
         ]
 
         results = {
