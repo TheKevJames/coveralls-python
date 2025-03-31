@@ -11,7 +11,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.3.0
+    rev: v3.6.0
     hooks:
       - id: conventional-pre-commit
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -46,7 +46,7 @@ repos:
         exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.6
+    rev: v3.2.7
     hooks:
     # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
       - id: pylint
@@ -79,7 +79,7 @@ repos:
       - id: remove-tabs
         exclude: 'Makefile'
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
       - id: reorder-python-imports
         args: [--py38-plus]
@@ -155,7 +155,7 @@ repos:
           - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
+    rev: 7.1.2
     hooks:
       - id: flake8
         additional_dependencies: *flake8deps
@@ -195,13 +195,13 @@ repos:
 
 # json
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.1
+    rev: 0.30.0
     hooks:
       - id: check-github-workflows
       - id: check-renovate
         additional_dependencies:
           # renovate: datasource=pypi depName=pyjson5
-          - pyjson5==1.6.6
+          - pyjson5==1.6.8
 
 # docker
   - repo: https://github.com/AleksaC/hadolint-py

@@ -87,7 +87,7 @@ jobs:
   # See thekevjames/tools
   docker-readme-build:
     docker:
-      - image: pandoc/core:3.2.1
+      - image: pandoc/core:3.6.4
     steps:
       - run: apk add --no-cache --no-progress ca-certificates openssl
       - run: mkdir /meta
@@ -102,7 +102,7 @@ jobs:
   # TODO: this should be doable with curl or python...
   docker-readme-push:
     docker:
-      - image: node:22.5.1-alpine
+      - image: node:23.10.0-alpine
     parameters:
       ident:
         type: string

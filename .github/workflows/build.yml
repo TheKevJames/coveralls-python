@@ -12,11 +12,11 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4.2.2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: snok/install-poetry@v1.3.4
+      - uses: snok/install-poetry@v1.4.1
         with:
           # TODO: renovate
           version: 1.8.2
