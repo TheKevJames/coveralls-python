@@ -83,12 +83,10 @@ class CoverallReporter:
         4. hits (we only get 1/0 from coverage.py)
         """
         # pylint: disable=too-complex
-        has_arcs: bool
-        try:
-            has_arcs = analysis.has_arcs()  # type:ignore
-        except TypeError:
-            # coverage v7.5+
-            has_arcs = analysis.has_arcs
+        has_arcs: bool = analysis.has_arcs
+        if callable(has_arcs):
+            # coverage < 7.5
+            has_arcs = has_arcs()
 
         if not has_arcs:
             return []
@@ -99,7 +97,7 @@ class CoverallReporter:
             executed_arcs = analysis.executed_branch_arcs()
         except AttributeError:
             # COPIED ~VERBATIM
-            executed = analysis.arcs_executed()  # type:ignore
+            executed = getattr(analysis, 'arcs_executed')()
             lines = analysis._branch_lines()  # pylint: disable=W0212
             branch_lines = set(lines)
             eba = collections.defaultdict(list)
