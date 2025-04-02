@@ -8,7 +8,6 @@ import responses
 import coveralls.cli
 from coveralls.exception import CoverallsException
 
-
 EXC = CoverallsException('bad stuff happened')
 
 
@@ -53,8 +52,10 @@ def test_debug_no_token(mock_wear, mock_log):
 @responses.activate
 def test_finish(mock_log):
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'done': True}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'done': True},
+        status=200,
     )
     expected_json = {
         'repo_token': 'xxx',
@@ -82,8 +83,10 @@ def test_finish(mock_log):
 @responses.activate
 def test_finish_exception(mock_log):
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'error': 'Mocked'}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'error': 'Mocked'},
+        status=200,
     )
     expected_json = {
         'payload': {
@@ -95,12 +98,14 @@ def test_finish_exception(mock_log):
     with pytest.raises(SystemExit):
         coveralls.cli.main(argv=['--finish'])
 
-    mock_log.assert_has_calls([
-        mock.call(
-            'Error running coveralls: %s',
-            CoverallsException(msg),
-        ),
-    ])
+    mock_log.assert_has_calls(
+        [
+            mock.call(
+                'Error running coveralls: %s',
+                CoverallsException(msg),
+            ),
+        ],
+    )
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
 
@@ -110,8 +115,10 @@ def test_finish_exception(mock_log):
 @responses.activate
 def test_finish_exception_without_error(mock_log):
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={},
+        status=200,
     )
     expected_json = {
         'payload': {
@@ -123,12 +130,14 @@ def test_finish_exception_without_error(mock_log):
     with pytest.raises(SystemExit):
         coveralls.cli.main(argv=['--finish'])
 
-    mock_log.assert_has_calls([
-        mock.call(
-            'Error running coveralls: %s',
-            CoverallsException(msg),
-        ),
-    ])
+    mock_log.assert_has_calls(
+        [
+            mock.call(
+                'Error running coveralls: %s',
+                CoverallsException(msg),
+            ),
+        ],
+    )
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
 
@@ -152,7 +161,8 @@ def test_real(mock_wear, mock_log):
 def test_rcfile(mock_coveralls):
     coveralls.cli.main(argv=['--rcfile=coveragerc'])
     mock_coveralls.assert_called_with(
-        True, config_file='coveragerc',
+        True,
+        config_file='coveragerc',
         service_name=None,
         base_dir='',
         src_dir='',
@@ -164,7 +174,8 @@ def test_rcfile(mock_coveralls):
 def test_service_name(mock_coveralls):
     coveralls.cli.main(argv=['--service=travis-pro'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True,
+        config_file='.coveragerc',
         service_name='travis-pro',
         base_dir='',
         src_dir='',
@@ -210,7 +221,8 @@ def test_submit(mock_submit):
 def test_base_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--basedir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True,
+        config_file='.coveragerc',
         service_name=None,
         base_dir='foo',
         src_dir='',
@@ -221,7 +233,8 @@ def test_base_dir_arg(mock_coveralls):
 def test_src_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--srcdir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True,
+        config_file='.coveragerc',
         service_name=None,
         base_dir='',
         src_dir='foo',

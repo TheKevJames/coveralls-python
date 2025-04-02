@@ -7,7 +7,6 @@ import pytest
 from coveralls import Coveralls
 from coveralls.exception import CoverallsException
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
 
@@ -44,41 +43,70 @@ class ReporterTest(unittest.TestCase):
     def make_test_results(with_branches=False, name_prefix=''):
         results = (
             {
-            'source': (
-                'def hello():\n'
-                '    print(\'world\')\n\n\n'
-                'class Foo:\n'
-                '    """ Bar """\n\n\n'
-                'def baz():\n'
-                '    print(\'this is not tested\')\n\n'
-                'def branch(cond1, cond2):\n'
-                '    if cond1:\n'
-                '        print(\'condition tested both ways\')\n'
-                '    if cond2:\n'
-                '        print(\'condition not tested both ways\')\n'
-            ),
-            'name': f'{name_prefix}project.py',
-            'coverage': [
-                1, 1, None, None, 1, None, None,
-                None, 1, 0, None, 1, 1, 1, 1, 1,
-            ],
-            }, {
-            'source': (
-                'from project import branch\n'
-                'from project import hello\n\n'
-                "if __name__ == '__main__':\n"
-                '    hello()\n'
-                '    branch(False, True)\n'
-                '    branch(True, True)\n'
-            ),
-            'name': f'{name_prefix}runtests.py',
-            'coverage': [1, 1, None, 1, 1, 1, 1],
+                'source': (
+                    'def hello():\n'
+                    "    print('world')\n\n\n"
+                    'class Foo:\n'
+                    '    """ Bar """\n\n\n'
+                    'def baz():\n'
+                    "    print('this is not tested')\n\n"
+                    'def branch(cond1, cond2):\n'
+                    '    if cond1:\n'
+                    "        print('condition tested both ways')\n"
+                    '    if cond2:\n'
+                    "        print('condition not tested both ways')\n"
+                ),
+                'name': f'{name_prefix}project.py',
+                'coverage': [
+                    1,
+                    1,
+                    None,
+                    None,
+                    1,
+                    None,
+                    None,
+                    None,
+                    1,
+                    0,
+                    None,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
+                ],
+            },
+            {
+                'source': (
+                    'from project import branch\n'
+                    'from project import hello\n\n'
+                    "if __name__ == '__main__':\n"
+                    '    hello()\n'
+                    '    branch(False, True)\n'
+                    '    branch(True, True)\n'
+                ),
+                'name': f'{name_prefix}runtests.py',
+                'coverage': [1, 1, None, 1, 1, 1, 1],
             },
         )
         if with_branches:
             results[0]['branches'] = [
-                13, 0, 14, 1, 13, 0, 15, 1, 15, 0, 16, 1,
-                15, 0, 12, 0,
+                13,
+                0,
+                14,
+                1,
+                13,
+                0,
+                15,
+                1,
+                15,
+                0,
+                16,
+                1,
+                15,
+                0,
+                12,
+                0,
             ]
             results[1]['branches'] = [4, 0, 5, 1, 4, 0, 1, 0]
         return results
@@ -86,9 +114,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'runtests.py',
-            ], cwd=EXAMPLE_DIR,
+            ],
+            cwd=EXAMPLE_DIR,
         )
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -100,9 +131,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_no_base_dir_arg(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -117,9 +151,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_base_dir_arg(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -137,9 +174,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_base_dir_trailing_sep(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -157,9 +197,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_src_dir_arg(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -177,9 +220,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_src_dir_trailing_sep(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -197,9 +243,12 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_both_base_dir_and_src_dir_args(self):
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -218,9 +267,13 @@ class ReporterTest(unittest.TestCase):
     def test_reporter_with_branches(self):
         subprocess.call(
             [
-                'coverage', 'run', '--branch', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--branch',
+                '--omit=**/.tox/*',
                 'runtests.py',
-            ], cwd=EXAMPLE_DIR,
+            ],
+            cwd=EXAMPLE_DIR,
         )
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -238,9 +291,12 @@ class ReporterTest(unittest.TestCase):
             f.write('print("Python rocks!")\n')
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'extra.py',
-            ], cwd=EXAMPLE_DIR,
+            ],
+            cwd=EXAMPLE_DIR,
         )
         try:
             os.remove('extra.py')
@@ -255,15 +311,18 @@ class ReporterTest(unittest.TestCase):
             f.write('print("Python rocks!")\n')
         subprocess.call(
             [
-                'coverage', 'run', '--omit=**/.tox/*',
+                'coverage',
+                'run',
+                '--omit=**/.tox/*',
                 'extra.py',
-            ], cwd=EXAMPLE_DIR,
+            ],
+            cwd=EXAMPLE_DIR,
         )
         with open('extra.py', 'w') as f:
             f.write("<h1>This isn't python!</h1>\n")
 
         with pytest.raises(
-                CoverallsException,
-                match=r"Couldn't parse .* as Python",
+            CoverallsException,
+            match=r"Couldn't parse .* as Python",
         ):
             Coveralls(repo_token='xxx').get_coverage()

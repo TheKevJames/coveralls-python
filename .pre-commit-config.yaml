@@ -7,15 +7,15 @@ default_install_hook_types:
   - pre-commit
 
 default_language_version:
-    python: python3.8
+    python: python3.9
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.6.0
+    rev: v4.0.0
     hooks:
       - id: conventional-pre-commit
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v5.0.0
     hooks:
       - id: check-case-conflict
       - id: check-executables-have-shebangs
@@ -46,7 +46,7 @@ repos:
         exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.7
+    rev: v3.3.6
     hooks:
     # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
       - id: pylint
@@ -73,7 +73,7 @@ repos:
           - -d disallowed-name  # TODO: fix
           - -d unspecified-encoding  # TODO: reevaluate
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5  # TODO: v1.5.2+ requires newer pre-commit, need to drop py3.8?
+    rev: v1.5.5
     hooks:
       - id: remove-crlf
       - id: remove-tabs
@@ -82,10 +82,10 @@ repos:
     rev: v3.14.0
     hooks:
       - id: reorder-python-imports
-        args: [--py38-plus]
+        args: [--py39-plus]
         exclude: nonunicode/.*
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.16.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -95,24 +95,25 @@ repos:
     hooks:
       - id: add-trailing-comma
         exclude: nonunicode/.*
-# TODO: add type hints
-#   - repo: https://github.com/pre-commit/mirrors-mypy
-#     rev: v1.9.0
-#     hooks:
-#       - id: mypy
-#         require_serial: True
-#         # N.B. mypy requires an installed version of whatever third-party
-#         # library it is asked to check against. In practice, that means
-#         # whenever we see an error telling us to do so, we should add the
-#         # relevant library to `additional_dependencies`.
-#         # Note that some libraries keep their type hints in packages named
-#         # `types-$lib` or `$lib-stubs`.
-#         additional_dependencies: []
-#         args:
-#           - --show-error-codes
-#           - --strict
-#           - --strict-equality
-#           - --warn-unreachable
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.15.0
+    hooks:
+      - id: mypy
+        require_serial: True
+        # N.B. mypy requires an installed version of whatever third-party
+        # library it is asked to check against. In practice, that means
+        # whenever we see an error telling us to do so, we should add the
+        # relevant library to `additional_dependencies`.
+        # Note that some libraries keep their type hints in packages named
+        # `types-$lib` or `$lib-stubs`.
+        additional_dependencies: ["types-requests", "types-pyyaml"]
+        args:
+          - --show-error-codes
+          - --strict-equality
+          - --warn-unreachable
+          - --ignore-missing-imports
+          # TODO: uncomment this arg after type hints improved
+          # - --strict
   - repo: https://github.com/asottile/yesqa
     rev: v1.5.0
     hooks:
@@ -142,7 +143,7 @@ repos:
 #           - -iTRY301
 #         files: coveralls/.*
   - repo: https://github.com/hhatto/autopep8
-    rev: v2.3.1
+    rev: v2.3.2
     hooks:
       - id: autopep8
         args: [-a, -i, -p2]
@@ -155,7 +156,7 @@ repos:
           - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.2
+    rev: 7.2.0
     hooks:
       - id: flake8
         additional_dependencies: *flake8deps
@@ -195,7 +196,7 @@ repos:
 
 # json
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.30.0
+    rev: 0.32.1
     hooks:
       - id: check-github-workflows
       - id: check-renovate
@@ -205,7 +206,7 @@ repos:
 
 # docker
   - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.12.1-beta
+    rev: v2.12.1b3
     hooks:
       - id: hadolint
         args:

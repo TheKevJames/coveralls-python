@@ -44,7 +44,6 @@ import docopt
 
 from .api import Coveralls
 
-
 log = logging.getLogger('coveralls')
 
 

@@ -1,3 +1,15 @@
+<a name="4.1.0"></a>
+## 4.1.0
+
+#### BREAKING CHANGES
+
+* Drop support for Python3.8
+
+#### Internal
+
+* Add type hints check to pre-commit config
+* Only tests ``coverage`` v6.1.2+
+
 <a name="4.0.1"></a>
 ## 4.0.1 (2024-05-15)
 
