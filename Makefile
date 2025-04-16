@@ -11,10 +11,10 @@ help:
 	@echo  "    lint    Auto-formats the code and check type hints"
 
 up:
-	poetry run fast upgrade
+	poetry run poetry update --verbose
 
 deps:
-	poetry install --all-extras
+	poetry install --all-extras --verbose
 
 _style:
 	$(MAKE) _check

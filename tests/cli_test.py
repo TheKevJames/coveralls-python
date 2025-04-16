@@ -71,7 +71,7 @@ def test_finish(mock_log, respx_mock):
         ],
     )
     assert route.call_count == 1
-    assert req_json(route.calls[0].request) == expected_json
+    assert req_json(route.calls.last.request) == expected_json
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
