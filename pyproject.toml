@@ -42,9 +42,9 @@ classifiers = [
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3.5"
-responses = ">=0.25.0"
 mypy = ">=1.15.0"
 types-pyyaml = ">=6.0.12.20250326"
+respx = ">=0.22.0"
 
 [tool.poetry.group.docs]
 optional = true

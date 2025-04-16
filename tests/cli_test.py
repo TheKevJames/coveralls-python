@@ -3,7 +3,7 @@ import os
 from unittest import mock
 
 import pytest
-import responses
+from httpx import Response
 
 import coveralls.cli
 from coveralls.exception import CoverallsException
@@ -16,7 +16,7 @@ EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
 
 
 def req_json(request):
-    return json.loads(request.body.decode('utf-8'))
+    return json.loads(request.content.decode('utf-8'))
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
@@ -49,13 +49,9 @@ def test_debug_no_token(mock_wear, mock_log):
     clear=True,
 )
 @mock.patch.object(coveralls.cli.log, 'info')
-@responses.activate
-def test_finish(mock_log):
-    responses.add(
-        responses.POST,
-        'https://coveralls.io/webhook',
-        json={'done': True},
-        status=200,
+def test_finish(mock_log, respx_mock):
+    route = respx_mock.post('https://coveralls.io/webhook').mock(
+        return_value=Response(200, json={'done': True}),
     )
     expected_json = {
         'repo_token': 'xxx',
@@ -74,19 +70,15 @@ def test_finish(mock_log):
             mock.call('Done'),
         ],
     )
-    assert len(responses.calls) == 1
-    assert req_json(responses.calls[0].request) == expected_json
+    assert route.call_count == 1
+    assert req_json(route.calls[0].request) == expected_json
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch.object(coveralls.cli.log, 'exception')
-@responses.activate
-def test_finish_exception(mock_log):
-    responses.add(
-        responses.POST,
-        'https://coveralls.io/webhook',
-        json={'error': 'Mocked'},
-        status=200,
+def test_finish_exception(mock_log, respx_mock):
+    responses = respx_mock.post('https://coveralls.io/webhook').mock(
+        return_value=Response(200, json={'error': 'Mocked'}),
     )
     expected_json = {
         'payload': {
@@ -112,13 +104,9 @@ def test_finish_exception(mock_log):
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch.object(coveralls.cli.log, 'exception')
-@responses.activate
-def test_finish_exception_without_error(mock_log):
-    responses.add(
-        responses.POST,
-        'https://coveralls.io/webhook',
-        json={},
-        status=200,
+def test_finish_exception_without_error(mock_log, respx_mock):
+    responses = respx_mock.post('https://coveralls.io/webhook').mock(
+        return_value=Response(200, json={}),
     )
     expected_json = {
         'payload': {
