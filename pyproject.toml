@@ -1,6 +1,6 @@
 [project]
 name = "coveralls"
-version = "4.1.0"
+version = "4.1.1"
 description = "Show coverage stats online via coveralls.io"
 authors = [{name="Kevin James", email="coveralls-python@thekev.in"}]
 readme = "README.rst"
@@ -10,7 +10,7 @@ requires-python = ">=3.9"
 dependencies = [
     "coverage[toml] (>=6.1.2,<8.0.0)",
     "docopt-ng (>=0.6.1,<1.0.0)",
-    "requests (>=1.0.0,<3.0.0)"
+    "httpx (>=0.28.1,<0.29.0)"
 ]
 
 [project.optional-dependencies]
@@ -44,7 +44,6 @@ classifiers = [
 pytest = ">=8.3.5"
 responses = ">=0.25.0"
 mypy = ">=1.15.0"
-types-requests = ">=2.32.0.20250328"
 types-pyyaml = ">=6.0.12.20250326"
 
 [tool.poetry.group.docs]
@@ -59,6 +58,23 @@ filterwarnings = [
     # cov5 and cov6 are deprecated on py3.12+
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
+
+[tool.ruff]
+line-length=79
+
+[tool.ruff.format]
+# The quote style preserve leaves the quotes of all strings unchanged.
+quote-style = "preserve"
+exclude = ["example/project.py", "nonunicode/nonunicode.py", "nonunicode/malformed.py"]
+
+[tool.ruff.lint]
+extend-select = [
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+]
+exclude = ["nonunicode/nonunicode.py"]
 
 [tool.mypy]
 python_version = "3.9"

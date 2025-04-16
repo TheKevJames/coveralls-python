@@ -97,7 +97,7 @@ class CoverallReporter:
             executed_arcs = analysis.executed_branch_arcs()
         except AttributeError:
             # COPIED ~VERBATIM
-            executed = getattr(analysis, 'arcs_executed')()
+            executed = analysis.arcs_executed()  # type:ignore[operator]
             lines = analysis._branch_lines()  # pylint: disable=W0212
             branch_lines = set(lines)
             eba = collections.defaultdict(list)

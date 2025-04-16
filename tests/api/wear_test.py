@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import tempfile
@@ -16,13 +17,11 @@ EXPECTED = {
 }
 
 
-@mock.patch('coveralls.api.requests')
+@mock.patch('coveralls.api.httpx')
 class WearTest(unittest.TestCase):
     def setUp(self):
-        try:
+        with contextlib.suppress(Exception):
             os.remove('.coverage')
-        except Exception:
-            pass
 
     def test_wet_run(self, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED

@@ -1,3 +1,4 @@
+import contextlib
 import os
 import subprocess
 import unittest
@@ -30,14 +31,10 @@ class ReporterTest(unittest.TestCase):
     def setUp(self):
         os.chdir(EXAMPLE_DIR)
 
-        try:
+        with contextlib.suppress(Exception):
             os.remove('.coverage')
-        except Exception:
-            pass
-        try:
+        with contextlib.suppress(Exception):
             os.remove('extra.py')
-        except Exception:
-            pass
 
     @staticmethod
     def make_test_results(with_branches=False, name_prefix=''):
@@ -298,10 +295,8 @@ class ReporterTest(unittest.TestCase):
             ],
             cwd=EXAMPLE_DIR,
         )
-        try:
+        with contextlib.suppress(Exception):
             os.remove('extra.py')
-        except Exception:
-            pass
 
         with pytest.raises(CoverallsException, match='No source for code'):
             Coveralls(repo_token='xxx').get_coverage()

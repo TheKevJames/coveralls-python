@@ -29,7 +29,7 @@ class CoverallsExceptionTest(unittest.TestCase):
         exc1 = CoverallsException('Value1')
         exc2 = CoverallsException('Value1')
         assert exc1 == exc2
-        assert not exc1 == 35  # pylint: disable=unneeded-not
+        assert (exc1 == 35) is False  # pylint: disable=unneeded-not
         assert exc1 is not exc2
 
     def test_ne(self):

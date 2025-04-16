@@ -5,7 +5,7 @@ import os
 import re
 
 import coverage
-import requests
+import httpx
 
 from .exception import CoverallsException
 from .git import git_info
@@ -276,24 +276,27 @@ class Coveralls:
     def submit_report(self, json_string):
         endpoint = f"{self._coveralls_host.rstrip('/')}/api/v1/jobs"
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(
+        response = httpx.post(
             endpoint,
             files={'json_file': json_string},
             verify=verify,
         )
 
-        if response.status_code == 422:
-            if self.config['service_name'].startswith('github'):
-                print(
-                    'Received 422 submitting job via Github Actions. By '
-                    'default, coveralls-python uses the "github" service '
-                    'name, which requires you to set the $GITHUB_TOKEN '
-                    'environment variable. If you want to use a '
-                    'COVERALLS_REPO_TOKEN instead, please manually override '
-                    '$COVERALLS_SERVICE_NAME to "github-actions". For more '
-                    'info, see https://coveralls-python.readthedocs.io/en'
-                    '/latest/usage/configuration.html#github-actions-support',
-                )
+        if response.status_code == 422 and self.config[
+            'service_name'
+        ].startswith(
+            'github',
+        ):
+            print(
+                'Received 422 submitting job via Github Actions. By '
+                'default, coveralls-python uses the "github" service '
+                'name, which requires you to set the $GITHUB_TOKEN '
+                'environment variable. If you want to use a '
+                'COVERALLS_REPO_TOKEN instead, please manually override '
+                '$COVERALLS_SERVICE_NAME to "github-actions". For more '
+                'info, see https://coveralls-python.readthedocs.io/en'
+                '/latest/usage/configuration.html#github-actions-support',
+            )
 
         try:
             response.raise_for_status()
@@ -322,7 +325,7 @@ class Coveralls:
 
         endpoint = f"{self._coveralls_host.rstrip('/')}/webhook"
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(endpoint, json=payload, verify=verify)
+        response = httpx.post(endpoint, json=payload, verify=verify)
         try:
             response.raise_for_status()
             response = response.json()

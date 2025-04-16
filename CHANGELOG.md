@@ -1,3 +1,10 @@
+<a name="4.1.1"></a>
+## 4.1.1
+
+#### Internal
+
+* Use `httpx` to replace  `requests`
+
 <a name="4.1.0"></a>
 ## 4.1.0
 

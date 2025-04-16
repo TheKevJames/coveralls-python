@@ -69,7 +69,8 @@ class IntegrationTest(unittest.TestCase):
 
             lines = next(
                 (
-                    f['coverage'] for f in report['source_files']
+                    f['coverage']
+                    for f in report['source_files']
                     if f['name'] == foo
                 ),
                 None,
