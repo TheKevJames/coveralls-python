@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import tempfile
@@ -10,20 +11,17 @@ import pytest
 import coveralls
 from coveralls.api import log
 
-
 EXPECTED = {
     'message': 'Job #7.1 - 44.58% Covered',
     'url': 'https://coveralls.io/jobs/5869',
 }
 
 
-@mock.patch('coveralls.api.requests')
+@mock.patch('coveralls.api.httpx')
 class WearTest(unittest.TestCase):
     def setUp(self):
-        try:
+        with contextlib.suppress(Exception):
             os.remove('.coverage')
-        except Exception:
-            pass
 
     def test_wet_run(self, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED
@@ -71,8 +69,8 @@ class WearTest(unittest.TestCase):
             assert source_files == []
 
             logger.assert_called_once_with(
-                'No data to be merged; does the json file contain '
-                '"source_files" data?',
+                'No data to be merged; '
+                'does the json file contain "source_files" data?',
             )
 
     def test_dry_run(self, mock_requests):
@@ -112,20 +110,24 @@ class WearTest(unittest.TestCase):
         {
             'COVERALLS_HOST': 'https://coveralls.my-enterprise.info',
             'COVERALLS_SKIP_SSL_VERIFY': '1',
-        }, clear=True,
+        },
+        clear=True,
     )
     def test_coveralls_host_env_var_overrides_api_url(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
             'https://coveralls.my-enterprise.info/api/v1/jobs',
-            files=mock.ANY, verify=False,
+            files=mock.ANY,
+            verify=False,
         )
 
     @mock.patch.dict(os.environ, {}, clear=True)
     def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
-            'https://coveralls.io/api/v1/jobs', files=mock.ANY, verify=True,
+            'https://coveralls.io/api/v1/jobs',
+            files=mock.ANY,
+            verify=True,
         )
 
     @mock.patch.dict(os.environ, {}, clear=True)

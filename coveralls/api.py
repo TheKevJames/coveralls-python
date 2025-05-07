@@ -5,12 +5,11 @@ import os
 import re
 
 import coverage
-import requests
+import httpx
 
 from .exception import CoverallsException
 from .git import git_info
 from .reporter import CoverallReporter
-
 
 log = logging.getLogger('coveralls.api')
 
@@ -96,9 +95,8 @@ class Coveralls:
 
     @staticmethod
     def load_config_from_circle():
-        number = (
-            os.environ.get('CIRCLE_WORKFLOW_ID')
-            or os.environ.get('CIRCLE_BUILD_NUM')
+        number = os.environ.get('CIRCLE_WORKFLOW_ID') or os.environ.get(
+            'CIRCLE_BUILD_NUM',
         )
         pr = (os.environ.get('CI_PULL_REQUEST') or '').split('/')[-1] or None
         job = os.environ.get('CIRCLE_NODE_INDEX')
@@ -250,6 +248,7 @@ class Coveralls:
             with open(fname) as config:
                 try:
                     import yaml  # pylint: disable=import-outside-toplevel
+
                     self.config.update(yaml.safe_load(config))
                 except ImportError:
                     log.warning(
@@ -275,24 +274,29 @@ class Coveralls:
         return self.submit_report(json_string)
 
     def submit_report(self, json_string):
-        endpoint = f'{self._coveralls_host.rstrip("/")}/api/v1/jobs'
+        endpoint = f"{self._coveralls_host.rstrip('/')}/api/v1/jobs"
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(
-            endpoint, files={'json_file': json_string}, verify=verify,
+        response = httpx.post(
+            endpoint,
+            files={'json_file': json_string},
+            verify=verify,
         )
 
-        if response.status_code == 422:
-            if self.config['service_name'].startswith('github'):
-                print(
-                    'Received 422 submitting job via Github Actions. By '
-                    'default, coveralls-python uses the "github" service '
-                    'name, which requires you to set the $GITHUB_TOKEN '
-                    'environment variable. If you want to use a '
-                    'COVERALLS_REPO_TOKEN instead, please manually override '
-                    '$COVERALLS_SERVICE_NAME to "github-actions". For more '
-                    'info, see https://coveralls-python.readthedocs.io/en'
-                    '/latest/usage/configuration.html#github-actions-support',
-                )
+        if response.status_code == 422 and self.config[
+            'service_name'
+        ].startswith(
+            'github',
+        ):
+            print(
+                'Received 422 submitting job via Github Actions. By '
+                'default, coveralls-python uses the "github" service '
+                'name, which requires you to set the $GITHUB_TOKEN '
+                'environment variable. If you want to use a '
+                'COVERALLS_REPO_TOKEN instead, please manually override '
+                '$COVERALLS_SERVICE_NAME to "github-actions". For more '
+                'info, see https://coveralls-python.readthedocs.io/en'
+                '/latest/usage/configuration.html#github-actions-support',
+            )
 
         try:
             response.raise_for_status()
@@ -319,9 +323,9 @@ class Coveralls:
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
-        endpoint = f'{self._coveralls_host.rstrip("/")}/webhook'
+        endpoint = f"{self._coveralls_host.rstrip('/')}/webhook"
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(endpoint, json=payload, verify=verify)
+        response = httpx.post(endpoint, json=payload, verify=verify)
         try:
             response.raise_for_status()
             response = response.json()
@@ -331,8 +335,9 @@ class Coveralls:
             ) from e
 
         if 'error' in response:
-            e = response['error']
-            raise CoverallsException(f'Parallel finish failed: {e}')
+            raise CoverallsException(
+                f"Parallel finish failed: {response['error']}",
+            )
 
         if 'done' not in response or not response['done']:
             raise CoverallsException('Parallel finish failed')
@@ -358,7 +363,8 @@ class Coveralls:
         log.debug('==\nReporting %s files\n==\n', len(data['source_files']))
         for source_file in data['source_files']:
             log.debug(
-                '%s - %d/%d', source_file['name'],
+                '%s - %d/%d',
+                source_file['name'],
                 sum(filter(None, source_file['coverage'])),
                 len(source_file['coverage']),
             )
