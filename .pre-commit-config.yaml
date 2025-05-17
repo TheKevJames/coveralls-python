@@ -101,6 +101,7 @@ repos:
 #     hooks:
 #       - id: mypy
 #         require_serial: True
+#         language: python
 #         # N.B. mypy requires an installed version of whatever third-party
 #         # library it is asked to check against. In practice, that means
 #         # whenever we see an error telling us to do so, we should add the
@@ -117,16 +118,13 @@ repos:
     rev: v1.5.0
     hooks:
       - id: yesqa
+        language: python
         # N.B. keep these in sync with flake8, otherwise yesqa will remove
         # required noqa's related to these plugins
         additional_dependencies: &flake8deps
-          # renovate: datasource=pypi depName=flake8-2020
           - flake8-2020==1.8.1
-          # renovate: datasource=pypi depName=flake8-broken-line
           - flake8-broken-line==1.0.0
-          # renovate: datasource=pypi depName=flake8-builtins
           - flake8-builtins==2.5.0
-          # renovate: datasource=pypi depName=flake8-comprehensions
           - flake8-comprehensions==3.15.0
         files: coveralls/.*
 # TODO: debug why CoverallsException breaks this
@@ -158,6 +156,7 @@ repos:
     rev: 7.1.2
     hooks:
       - id: flake8
+        language: python
         additional_dependencies: *flake8deps
         args:
           # https://www.flake8rules.com/
@@ -199,8 +198,8 @@ repos:
     hooks:
       - id: check-github-workflows
       - id: check-renovate
+        language: python
         additional_dependencies:
-          # renovate: datasource=pypi depName=pyjson5
           - pyjson5==1.6.9
 
 # docker
