@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  docker: talkiq/docker@3
-  linter: talkiq/linter@4
+  docker: talkiq/docker@3.1.0
+  linter: talkiq/linter@4.0.0
 
 executors:
   docker-git:
