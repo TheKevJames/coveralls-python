@@ -11,7 +11,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.3.0
+    rev: v3.6.0
     hooks:
       - id: conventional-pre-commit
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -46,7 +46,7 @@ repos:
         exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.2.6
+    rev: v3.2.7
     hooks:
     # TODO: pylint-import-modules support for pylint v3 (or alternative linter)
       - id: pylint
@@ -79,7 +79,7 @@ repos:
       - id: remove-tabs
         exclude: 'Makefile'
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.13.0
+    rev: v3.14.0
     hooks:
       - id: reorder-python-imports
         args: [--py38-plus]
@@ -101,6 +101,7 @@ repos:
 #     hooks:
 #       - id: mypy
 #         require_serial: True
+#         language: python
 #         # N.B. mypy requires an installed version of whatever third-party
 #         # library it is asked to check against. In practice, that means
 #         # whenever we see an error telling us to do so, we should add the
@@ -117,16 +118,13 @@ repos:
     rev: v1.5.0
     hooks:
       - id: yesqa
+        language: python
         # N.B. keep these in sync with flake8, otherwise yesqa will remove
         # required noqa's related to these plugins
         additional_dependencies: &flake8deps
-          # renovate: datasource=pypi depName=flake8-2020
           - flake8-2020==1.8.1
-          # renovate: datasource=pypi depName=flake8-broken-line
           - flake8-broken-line==1.0.0
-          # renovate: datasource=pypi depName=flake8-builtins
           - flake8-builtins==2.5.0
-          # renovate: datasource=pypi depName=flake8-comprehensions
           - flake8-comprehensions==3.15.0
         files: coveralls/.*
 # TODO: debug why CoverallsException breaks this
@@ -155,9 +153,10 @@ repos:
           - --ignore=D1,D203,D205,D212,D400,D401,D404,D407,D412,D413
         files: coveralls/.*
   - repo: https://github.com/PyCQA/flake8
-    rev: 7.1.0
+    rev: 7.1.2
     hooks:
       - id: flake8
+        language: python
         additional_dependencies: *flake8deps
         args:
           # https://www.flake8rules.com/
@@ -195,13 +194,13 @@ repos:
 
 # json
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.29.1
+    rev: 0.30.0
     hooks:
       - id: check-github-workflows
       - id: check-renovate
+        language: python
         additional_dependencies:
-          # renovate: datasource=pypi depName=pyjson5
-          - pyjson5==1.6.6
+          - pyjson5==1.6.9
 
 # docker
   - repo: https://github.com/AleksaC/hadolint-py

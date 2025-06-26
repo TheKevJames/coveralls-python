@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  docker: talkiq/docker@3
-  linter: talkiq/linter@4
+  docker: talkiq/docker@3.1.0
+  linter: talkiq/linter@4.0.0
 
 executors:
   docker-git:
@@ -87,7 +87,7 @@ jobs:
   # See thekevjames/tools
   docker-readme-build:
     docker:
-      - image: pandoc/core:3.2.1
+      - image: pandoc/core:3.7.0
     steps:
       - run: apk add --no-cache --no-progress ca-certificates openssl
       - run: mkdir /meta
@@ -102,7 +102,7 @@ jobs:
   # TODO: this should be doable with curl or python...
   docker-readme-push:
     docker:
-      - image: node:22.5.1-alpine
+      - image: node:23.11.1-alpine
     parameters:
       ident:
         type: string
