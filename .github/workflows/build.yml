@@ -19,7 +19,7 @@ jobs:
       - uses: snok/install-poetry@v1.4.1
         with:
           # TODO: renovate
-          version: 1.8.2
+          version: 2.1.3
       - run: poetry build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
