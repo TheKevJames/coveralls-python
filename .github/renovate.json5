@@ -1,13 +1,6 @@
 {
-  "extends": ["github>thekevjames/tools:personal"],
-  "packageRules": [
-    {
-      "matchFileNames": ["pyproject.toml"],
-      "rangeStrategy": "widen",
-    },
-    {
-      "matchDepTypes": ["dev", "devDependencies"],
-      "rangeStrategy": "pin",
-    },
-  ],
+    "extends": [
+        "github>thekevjames/tools:personal",
+        "github>thekevjames/tools//renovate/version-as-lib.json5",
+    ],
 }
