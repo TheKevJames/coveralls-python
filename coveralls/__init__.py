@@ -2,5 +2,5 @@ import importlib.metadata
 
 from .api import Coveralls
 
-__version__ = importlib.metadata.version('coveralls')
+__version__ = "4.1.1"
 __all__ = ['Coveralls']

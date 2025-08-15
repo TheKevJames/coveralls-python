@@ -1,16 +1,24 @@
 [project]
 name = "coveralls"
-version = "4.1.1"
+dynamic = [ "version" ]
 description = "Show coverage stats online via coveralls.io"
 authors = [{name="Kevin James", email="coveralls-python@thekev.in"}]
 readme = "README.rst"
 license = {text="MIT"}
-dynamic = ["classifiers"]
 requires-python = ">=3.9"
 dependencies = [
     "coverage[toml] (>=6.1.2,<8.0.0)",
     "docopt-ng (>=0.6.1,<1.0.0)",
     "httpx (>=0.28.1,<0.29.0)"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Topic :: Software Development :: Testing",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
 [project.optional-dependencies]
@@ -26,31 +34,23 @@ coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
 
 [tool.poetry]
+version = "0.0.0"
 packages = [
     { include = "coveralls" },
 ]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Topic :: Software Development :: Testing",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+
+[dependency-groups]
+dev = [
+    "mypy >=1.15.0",
+    "types-pyyaml >=6.0.12.20250326",
 ]
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.3.5"
-mypy = ">=1.15.0"
-types-pyyaml = ">=6.0.12.20250326"
-respx = ">=0.22.0"
-responses = ">=0.25.8"
-
-[tool.poetry.group.docs]
-optional = true
-[tool.poetry.group.docs.dependencies]
-sphinx = ">=7.4.7"
+test = [
+    "pytest >=8.3.5",
+    "respx >=0.22.0",
+]
+docs = [
+    "sphinx >=7.4.7"
+]
 
 [tool.pytest.ini_options]
 # addopts = "-Werror"
@@ -78,9 +78,15 @@ extend-select = [
 exclude = ["nonunicode/nonunicode.py"]
 
 [tool.mypy]
+pretty = true
 python_version = "3.9"
+check_untyped_defs = true
 ignore_missing_imports = true
+warn_unused_ignores = true
 
 [build-system]
-requires = ["poetry-core>=2.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+version = {source="file", path="coveralls/__init__.py"}

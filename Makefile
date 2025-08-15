@@ -11,10 +11,10 @@ help:
 	@echo  "    lint    Auto-formats the code and check type hints"
 
 up:
-	poetry run poetry update --verbose
+	uv lock --upgrade
 
 deps:
-	poetry install --all-extras --verbose
+	uv sync --all-extras --all-groups --inexact --verbose
 
 _style:
 	$(MAKE) _check
@@ -29,11 +29,12 @@ _lint:
 lint: deps _lint
 
 _test:
-	poetry run pytest
+	pytest
 test: deps _test
 
 _build:
-	poetry build --clean
+	rm -fR dist/
+	uv build
 build: deps _build
 
 ci: check _build _test
