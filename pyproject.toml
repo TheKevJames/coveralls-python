@@ -1,17 +1,16 @@
-[tool.poetry]
+[project]
 name = "coveralls"
-version = "4.0.1"
+dynamic = [ "version" ]
 description = "Show coverage stats online via coveralls.io"
+authors = [{name="Kevin James", email="coveralls-python@thekev.in"}]
 readme = "README.rst"
-
-repository = "http://github.com/TheKevJames/coveralls-python"
-authors = ["Kevin James <coveralls-python@thekev.in>"]
-license = "MIT"
-
-packages = [
-    { include = "coveralls" },
+license = {text="MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "coverage[toml] (>=6.1.2,<8.0.0)",
+    "docopt-ng (>=0.6.1,<1.0.0)",
+    "httpx (>=0.28.1,<0.29.0)"
 ]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Testing",
@@ -22,33 +21,36 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 
-[tool.poetry.urls]
+[project.optional-dependencies]
+yaml = ["pyyaml (>=3.10,<7.0)"]
+
+[project.urls]
 Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
+repository = "http://github.com/TheKevJames/coveralls-python"
 Docs = "https://coveralls-python.rtfd.io/"
 
-[tool.poetry.scripts]
+[project.scripts]
 coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
 
-[tool.poetry.dependencies]
-python = ">=3.8,<3.13"
-coverage = { version = ">=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1", extras = ["toml"] }
-docopt = ">=0.6.1,<0.7.0"
-requests = ">=1.0.0,<3.0.0"
+[tool.poetry]
+version = "0.0.0"
+packages = [
+    { include = "coveralls" },
+]
 
-pyyaml = { version = ">=3.10,<7.0", optional = true }
-
-[tool.poetry.group.dev.dependencies]
-pytest = "8.3.5"
-responses = "0.25.8"
-
-[tool.poetry.group.docs]
-optional = true
-[tool.poetry.group.docs.dependencies]
-sphinx = { version = "7.4.7", python = ">=3.9" }
-
-[tool.poetry.extras]
-yaml = ["pyyaml"]
+[dependency-groups]
+dev = [
+    "mypy >=1.15.0",
+    "types-pyyaml >=6.0.12.20250326",
+]
+test = [
+    "pytest >=8.3.5",
+    "respx >=0.22.0",
+]
+docs = [
+    "sphinx >=7.4.7"
+]
 
 [tool.pytest.ini_options]
 # addopts = "-Werror"
@@ -58,6 +60,33 @@ filterwarnings = [
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
 
+[tool.ruff]
+line-length=79
+
+[tool.ruff.format]
+# The quote style preserve leaves the quotes of all strings unchanged.
+quote-style = "preserve"
+exclude = ["example/project.py", "nonunicode/nonunicode.py", "nonunicode/malformed.py"]
+
+[tool.ruff.lint]
+extend-select = [
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # https://docs.astral.sh/ruff/rules/#pyupgrade-up
+]
+exclude = ["nonunicode/nonunicode.py"]
+
+[tool.mypy]
+pretty = true
+python_version = "3.9"
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+version = {source="file", path="coveralls/__init__.py"}

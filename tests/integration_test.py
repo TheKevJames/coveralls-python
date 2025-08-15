@@ -2,10 +2,9 @@ import os
 import subprocess
 import sys
 import tempfile
-import unittest
+import unittest.mock
 
 from coveralls import Coveralls
-
 
 COVERAGE_CODE_STANZA = """
 import sys
@@ -49,10 +48,15 @@ class IntegrationTest(unittest.TestCase):
                     ),
                 )
 
-            subprocess.check_call([
-                sys.executable, '-m', 'coverage', 'run',
-                test_file,
-            ])
+            subprocess.check_call(
+                [
+                    sys.executable,
+                    '-m',
+                    'coverage',
+                    'run',
+                    test_file,
+                ],
+            )
 
             coverallz = Coveralls(repo_token='xxx')
             report = coverallz.create_data()
@@ -65,9 +69,11 @@ class IntegrationTest(unittest.TestCase):
 
             lines = next(
                 (
-                    f['coverage'] for f in report['source_files']
+                    f['coverage']
+                    for f in report['source_files']
                     if f['name'] == foo
-                ), None,
+                ),
+                None,
             )
             assert sum(int(bool(x)) for x in lines) == hits
 

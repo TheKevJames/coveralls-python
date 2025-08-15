@@ -5,7 +5,6 @@ import unittest
 
 from coveralls import Coveralls
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
 
@@ -14,6 +13,7 @@ class EncodingTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.old_cwd = os.getcwd()
+        os.chdir(NONUNICODE_DIR)
 
     @classmethod
     def tearDownClass(cls):
@@ -21,7 +21,6 @@ class EncodingTest(unittest.TestCase):
 
     @staticmethod
     def test_non_unicode():
-        os.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'nonunicode.py'],
             cwd=NONUNICODE_DIR,
@@ -31,13 +30,12 @@ class EncodingTest(unittest.TestCase):
         expected_json_part = (
             '"source": "# coding: iso-8859-15\\n\\n'
             'def hello():\\n'
-            '    print(\'I like P\\u00f3lya distribution.\')'
+            "    print('I like P\\u00f3lya distribution.')"
         )
         assert expected_json_part in actual_json
 
     @staticmethod
     def test_malformed_encoding_declaration_py3_or_coverage4():
-        os.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'malformed.py'],
             cwd=NONUNICODE_DIR,
@@ -49,8 +47,6 @@ class EncodingTest(unittest.TestCase):
         assert result[0]['coverage'] == [None, None, 1, 0]
         assert result[0]['name'] == 'malformed.py'
         assert result[0]['source'].strip() == (
-            '# -*- cоding: utf-8 -*-\n\n'
-            'def hello():\n'
-            '    return 1'
+            '# -*- cоding: utf-8 -*-\n\ndef hello():\n    return 1'
         )
         assert 'branches' not in result[0]

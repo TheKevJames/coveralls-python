@@ -1,12 +1,11 @@
+from __future__ import annotations
+
 import logging
 import os
 import subprocess
 from typing import Any
-from typing import Dict
-from typing import Optional
 
 from .exception import CoverallsException
-
 
 log = logging.getLogger('coveralls.git')
 
@@ -28,16 +27,22 @@ def run_command(*args: str) -> str:
 
 def gitlog(fmt: str) -> str:
     return run_command(
-        'git', '--no-pager', 'log', '-1', f'--pretty=format:{fmt}',
+        'git',
+        '--no-pager',
+        'log',
+        '-1',
+        f'--pretty=format:{fmt}',
     )
 
 
-def git_branch() -> Optional[str]:
+def git_branch() -> str | None:
     branch = None
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
-        if (
-            github_ref.startswith('refs/heads/')
+        if github_ref and (
+            github_ref.startswith(
+                'refs/heads/',
+            )
             or github_ref.startswith('refs/tags/')
         ):
             # E.g. in push events.
@@ -60,7 +65,7 @@ def git_branch() -> Optional[str]:
     return branch
 
 
-def git_info() -> Dict[str, Dict[str, Any]]:
+def git_info() -> dict[str, dict[str, Any]]:
     """
     A hash of Git data that can be used to display more information to users.
 
@@ -82,6 +87,8 @@ def git_info() -> Dict[str, Dict[str, Any]]:
             }]
         }
     """
+    head: dict[str, str | None]
+    remotes: list[dict[str, str | None]]
     try:
         branch = git_branch()
         head = {
@@ -111,14 +118,17 @@ def git_info() -> Dict[str, Dict[str, Any]]:
             'committer_email': os.environ.get('GIT_COMMITTER_EMAIL'),
             'message': os.environ.get('GIT_MESSAGE'),
         }
-        remotes = [{
-            'name': os.environ.get('GIT_REMOTE'),
-            'url': os.environ.get('GIT_URL'),
-        }]
+        remotes = [
+            {
+                'name': os.environ.get('GIT_REMOTE'),
+                'url': os.environ.get('GIT_URL'),
+            },
+        ]
         if not all(head.values()):
             log.warning(
                 'Failed collecting git data. Are you running coveralls inside '
-                'a git repository? Is git installed?', exc_info=ex,
+                'a git repository? Is git installed?',
+                exc_info=ex,
             )
             return {}
 
