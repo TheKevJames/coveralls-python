@@ -24,15 +24,6 @@ dependencies = [
 [project.optional-dependencies]
 pyyaml = ["pyyaml (>=3.10,<7.0)"]
 
-[dependency-groups]
-dev = [
-    "pytest == 8.3.5",
-    "responses == 0.25.7",
-]
-docs = [
-    "sphinx == 7.4.7; python_version >= '3.9'",
-]
-
 [project.urls]
 repository = "http://github.com/TheKevJames/coveralls-python"
 Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
@@ -46,6 +37,25 @@ python-coveralls = "coveralls.cli:main"
 packages = [
     { include = "coveralls" },
 ]
+
+[tool.poetry.dependencies]
+coverage = { version = ">=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1", extras = ["toml"] }
+docopt = ">=0.6.1,<0.7.0"
+requests = ">=1.0.0,<3.0.0"
+
+pyyaml = { version = ">=3.10,<7.0", optional = true }
+
+[tool.poetry.group.dev.dependencies]
+pytest = "8.3.5"
+responses = "0.25.8"
+
+[tool.poetry.group.docs]
+optional = true
+[tool.poetry.group.docs.dependencies]
+sphinx = { version = "7.4.7", python = ">=3.9" }
+
+[tool.poetry.extras]
+yaml = ["pyyaml"]
 
 [tool.pytest.ini_options]
 # addopts = "-Werror"
