@@ -1,17 +1,10 @@
-[tool.poetry]
+[project]
 name = "coveralls"
 version = "4.0.1"
 description = "Show coverage stats online via coveralls.io"
 readme = "README.rst"
-
-repository = "http://github.com/TheKevJames/coveralls-python"
-authors = ["Kevin James <coveralls-python@thekev.in>"]
+authors = [{name="Kevin James", email="coveralls-python@thekev.in"}]
 license = "MIT"
-
-packages = [
-    { include = "coveralls" },
-]
-
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Testing",
@@ -21,17 +14,31 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
+requires-python = ">=3.8"
+dependencies = [
+    "coverage[toml] (>=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1)",
+    "docopt (>=0.6.1,<0.7.0)",
+    "requests (>=1.0.0,<3.0.0)"
+]
 
-[tool.poetry.urls]
+[project.optional-dependencies]
+pyyaml = ["pyyaml (>=3.10,<7.0)"]
+
+[project.urls]
+repository = "http://github.com/TheKevJames/coveralls-python"
 Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
 Docs = "https://coveralls-python.rtfd.io/"
 
-[tool.poetry.scripts]
+[project.scripts]
 coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
 
+[tool.poetry]
+packages = [
+    { include = "coveralls" },
+]
+
 [tool.poetry.dependencies]
-python = ">=3.8,<3.13"
 coverage = { version = ">=5.0,<8.0,!=6.0.*,!=6.1,!=6.1.1", extras = ["toml"] }
 docopt = ">=0.6.1,<0.7.0"
 requests = ">=1.0.0,<3.0.0"
@@ -59,5 +66,5 @@ filterwarnings = [
 ]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
