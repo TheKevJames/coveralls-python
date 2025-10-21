@@ -896,5 +896,5 @@ yaml = ["pyyaml"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8,<3.13"
-content-hash = "8d045c12f3b2bb173b03224a682f82356aae02d666c7353eaa120113b907275a"
+python-versions = ">=3.8,<3.15"
+content-hash = "4df560f0b74fd39f535d6d6aefb876413ca103aa2a87e594dc306a7727da068a"
