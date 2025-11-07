@@ -1,9 +1,6 @@
 import collections
 import logging
 import os
-from typing import Dict
-from typing import List
-from typing import Optional
 
 import coverage
 from coverage.plugin import FileReporter
@@ -51,7 +48,7 @@ class CoverallReporter:
             raise CoverallsException(f'Got coverage library error: {e}') from e
 
     @staticmethod
-    def get_hits(line_num: int, analysis: Analysis) -> Optional[int]:
+    def get_hits(line_num: int, analysis: Analysis) -> int | None:
         """
         Source file stats for each line.
 
@@ -70,7 +67,7 @@ class CoverallReporter:
         return 1
 
     @staticmethod
-    def get_arcs(analysis: Analysis) -> List[int]:
+    def get_arcs(analysis: Analysis) -> list[int]:
         """
         Hit stats for each branch.
 
@@ -91,7 +88,7 @@ class CoverallReporter:
         if not has_arcs:
             return []
 
-        missing_arcs: Dict[int, List[int]] = analysis.missing_branch_arcs()
+        missing_arcs: dict[int, list[int]] = analysis.missing_branch_arcs()
         try:
             # coverage v6.3+
             executed_arcs = analysis.executed_branch_arcs()
@@ -107,7 +104,7 @@ class CoverallReporter:
             # END COPY
             executed_arcs = eba
 
-        branches: List[int] = []
+        branches: list[int] = []
         for l1, l2s in executed_arcs.items():
             for l2 in l2s:
                 branches.extend((l1, 0, abs(l2), 1))

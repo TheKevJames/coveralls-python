@@ -2,8 +2,6 @@ import logging
 import os
 import subprocess
 from typing import Any
-from typing import Dict
-from typing import Optional
 
 from .exception import CoverallsException
 
@@ -32,7 +30,7 @@ def gitlog(fmt: str) -> str:
     )
 
 
-def git_branch() -> Optional[str]:
+def git_branch() -> str | None:
     branch = None
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
@@ -60,7 +58,7 @@ def git_branch() -> Optional[str]:
     return branch
 
 
-def git_info() -> Dict[str, Dict[str, Any]]:
+def git_info() -> dict[str, dict[str, Any]]:
     """
     A hash of Git data that can be used to display more information to users.
 

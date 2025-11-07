@@ -9,14 +9,6 @@ executors:
     docker:
       - image: docker:25.0.5-git
     resource_class: medium
-  py38:
-    docker:
-      - image: python:3.8-alpine
-    resource_class: small
-  py39:
-    docker:
-      - image: python:3.9-alpine
-    resource_class: small
   py310:
     docker:
       - image: python:3.10-alpine
@@ -29,15 +21,15 @@ executors:
     docker:
       - image: python:3.12-alpine
     resource_class: small
-  pypy737:  # py38
+  py313:
     docker:
-      - image: pypy:3-7.3.7-slim
+      - image: python:3.13-alpine
     resource_class: small
-  pypy7311:  # py38+py39
+  py314:
     docker:
-      - image: pypy:3-7.3.11-slim
+      - image: python:3.14-alpine
     resource_class: small
-  pypy73:  # py39+py310
+  pypy73:  # py310
     docker:
       - image: pypy:3-7.3-slim
     resource_class: small
@@ -162,16 +154,14 @@ workflows:
   test:
     jobs:
       - linter/pre-commit:
-          executor: py38
+          executor: py310
           pre-steps:
             - run: apk add --no-cache git
       - toxpy:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
-              executor: [py38, py39, py310, py311, py312]
+              executor: [py310, py311, py312, py313, py314]
       - toxpypy:
-          name: test-<<matrix.executor>>
-          matrix:
-            parameters:
-              executor: [pypy737, pypy7311, pypy73]
+          name: test-pypy73
+          executor: pypy73

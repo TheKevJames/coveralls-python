@@ -7,7 +7,7 @@ default_install_hook_types:
   - pre-commit
 
 default_language_version:
-    python: python3.8
+    python: python3.10
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
@@ -73,7 +73,7 @@ repos:
           - -d disallowed-name  # TODO: fix
           - -d unspecified-encoding  # TODO: reevaluate
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5  # TODO: v1.5.2+ requires newer pre-commit, need to drop py3.8?
+    rev: v1.5.5
     hooks:
       - id: remove-crlf
       - id: remove-tabs
@@ -82,13 +82,13 @@ repos:
     rev: v3.14.0
     hooks:
       - id: reorder-python-imports
-        args: [--py38-plus]
+        args: [--py310-plus]
         exclude: nonunicode/.*
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.16.0
     hooks:
       - id: pyupgrade
-        args: [--py38-plus]
+        args: [--py310-plus]
         exclude: nonunicode/.*
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.1.0
