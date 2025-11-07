@@ -1,3 +1,10 @@
+<a name="4.0.2"></a>
+## 4.0.2 (2025-11-07)
+
+#### Internal
+
+* update python support: drop EOL'd versions (3.8, 3.9), begin testing on new versions (3.13, 3.14), and mark explicit future compatibility up to <4.0
+
 <a name="4.0.1"></a>
 ## 4.0.1 (2024-05-15)
 
