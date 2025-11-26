@@ -79,7 +79,7 @@ repos:
       - id: remove-tabs
         exclude: 'Makefile'
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.14.0
+    rev: v3.16.0
     hooks:
       - id: reorder-python-imports
         args: [--py310-plus]
