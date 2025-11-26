@@ -39,7 +39,7 @@ requests = ">=1.0.0,<3.0.0"
 pyyaml = { version = ">=3.10,<7.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
-pytest = "8.4.2"
+pytest = "9.0.1"
 responses = "0.25.8"
 
 [tool.poetry.group.docs]
