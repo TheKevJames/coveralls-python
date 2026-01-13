@@ -73,7 +73,7 @@ repos:
           - -d disallowed-name  # TODO: fix
           - -d unspecified-encoding  # TODO: reevaluate
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+    rev: v1.5.6
     hooks:
       - id: remove-crlf
       - id: remove-tabs
