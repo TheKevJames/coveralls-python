@@ -1,6 +1,7 @@
 import collections
 import logging
 import os
+from typing import Any
 
 import coverage
 from coverage.plugin import FileReporter
@@ -25,7 +26,7 @@ class CoverallReporter:
         self.base_dir = self.sanitize_dir(base_dir)
         self.src_dir = self.sanitize_dir(src_dir)
 
-        self.coverage = []
+        self.coverage: list[dict[str, Any]] = []
         self.report(cov)
 
     @staticmethod
@@ -80,7 +81,7 @@ class CoverallReporter:
         # pylint: disable=too-complex
         has_arcs: bool
         try:
-            has_arcs = analysis.has_arcs()
+            has_arcs = analysis.has_arcs()  # type: ignore[operator]
         except TypeError:
             # coverage v7.5+
             has_arcs = analysis.has_arcs
@@ -94,7 +95,7 @@ class CoverallReporter:
             executed_arcs = analysis.executed_branch_arcs()
         except AttributeError:
             # COPIED ~VERBATIM
-            executed = analysis.arcs_executed()
+            executed = analysis.arcs_executed()  # type: ignore[operator]
             lines = analysis._branch_lines()  # pylint: disable=W0212
             branch_lines = set(lines)
             eba = collections.defaultdict(list)

@@ -7,7 +7,7 @@ import pytest
 try:
     import yaml
 except ImportError:
-    yaml = None
+    yaml = None  # type: ignore[assignment]
 
 from coveralls import Coveralls
 from coveralls.api import log

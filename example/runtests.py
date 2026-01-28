@@ -1,4 +1,4 @@
-from project import branch
+from project import branch  # type: ignore[import-not-found]
 from project import hello
 
 if __name__ == '__main__':

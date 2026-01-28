@@ -71,7 +71,7 @@ repos:
           - -d ungrouped-imports  # conflicts with reorder-python-imports
           - -d wrong-import-order  # conflicts with reorder-python-imports
           - -d bad-file-encoding  # TODO: fix?
-          - -d unspecified-encoding  # TODO: reevaluate
+          - -d unspecified-encoding  # TODO: fix?
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.6
     hooks:
@@ -95,25 +95,29 @@ repos:
     hooks:
       - id: add-trailing-comma
         exclude: nonunicode/.*
-# TODO: add type hints
-#   - repo: https://github.com/pre-commit/mirrors-mypy
-#     rev: v1.19.1
-#     hooks:
-#       - id: mypy
-#         require_serial: True
-#         language: python
-#         # N.B. mypy requires an installed version of whatever third-party
-#         # library it is asked to check against. In practice, that means
-#         # whenever we see an error telling us to do so, we should add the
-#         # relevant library to `additional_dependencies`.
-#         # Note that some libraries keep their type hints in packages named
-#         # `types-$lib` or `$lib-stubs`.
-#         additional_dependencies: []
-#         args:
-#           - --show-error-codes
-#           - --strict
-#           - --strict-equality
-#           - --warn-unreachable
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
+    hooks:
+      - id: mypy
+        require_serial: True
+        language: python
+        # N.B. mypy requires an installed version of whatever third-party
+        # library it is asked to check against. In practice, that means
+        # whenever we see an error telling us to do so, we should add the
+        # relevant library to `additional_dependencies`.
+        # Note that some libraries keep their type hints in packages named
+        # `types-$lib` or `$lib-stubs`.
+        additional_dependencies:
+          - coverage==7.13.2
+          - pytest==9.0.2
+          - responses==0.25.8
+          - types-pyyaml==6.0.3
+          - types-requests==2.32.4.20260107
+        args:
+          - --show-error-codes
+          # - --strict  # TODO: enable
+          - --strict-equality
+          - --warn-unreachable
   - repo: https://github.com/asottile/yesqa
     rev: v1.5.0
     hooks:

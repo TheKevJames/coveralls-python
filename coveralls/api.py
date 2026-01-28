@@ -331,8 +331,8 @@ class Coveralls:
             ) from e
 
         if 'error' in response:
-            e = response['error']
-            raise CoverallsException(f'Parallel finish failed: {e}')
+            exc = response['error']
+            raise CoverallsException(f'Parallel finish failed: {exc}')
 
         if 'done' not in response or not response['done']:
             raise CoverallsException('Parallel finish failed')

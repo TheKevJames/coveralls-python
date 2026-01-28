@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 import tempfile
-import unittest
+import unittest.mock
 
 from coveralls import Coveralls
 

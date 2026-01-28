@@ -35,8 +35,11 @@ def git_branch() -> str | None:
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
         if (
-            github_ref.startswith('refs/heads/')
-            or github_ref.startswith('refs/tags/')
+            github_ref
+            and (
+                github_ref.startswith('refs/heads/')
+                or github_ref.startswith('refs/tags/')
+            )
         ):
             # E.g. in push events.
             branch = github_ref.split('/', 2)[-1]
@@ -80,6 +83,9 @@ def git_info() -> dict[str, dict[str, Any]]:
             }]
         }
     """
+    head: dict[str, str | None]
+    remotes: list[dict[str, str | None]]
+
     try:
         branch = git_branch()
         head = {
@@ -113,7 +119,7 @@ def git_info() -> dict[str, dict[str, Any]]:
             'name': os.environ.get('GIT_REMOTE'),
             'url': os.environ.get('GIT_URL'),
         }]
-        if not all(head.values()):
+        if not all(head.values()) or not all(remotes[0].values()):
             log.warning(
                 'Failed collecting git data. Are you running coveralls inside '
                 'a git repository? Is git installed?', exc_info=ex,
