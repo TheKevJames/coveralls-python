@@ -1,4 +1,5 @@
 import os
+import pathlib
 import subprocess
 import sys
 import tempfile
@@ -30,7 +31,7 @@ class IntegrationTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):
@@ -41,13 +42,12 @@ class IntegrationTest(unittest.TestCase):
             os.chdir(tempdir)
 
             test_file = os.path.join(tempdir, 'test.py')
-            with open(test_file, 'w') as f:
-                f.write(
-                    COVERAGE_CODE_STANZA.format(
-                        COVERAGE_TEMPLATE_PATH,
-                        num,
-                    ),
-                )
+            pathlib.Path(test_file).write_text(
+                COVERAGE_CODE_STANZA.format(
+                    COVERAGE_TEMPLATE_PATH,
+                    num,
+                ),
+            )
 
             subprocess.check_call([
                 sys.executable, '-m', 'coverage', 'run',

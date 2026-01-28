@@ -2,6 +2,7 @@ import codecs
 import json
 import logging
 import os
+import pathlib
 import re
 
 import coverage
@@ -245,22 +246,23 @@ class Coveralls:
 
     def load_config_from_file(self):
         try:
-            fname = os.path.join(os.getcwd(), self.config_filename)
+            import yaml  # pylint: disable=import-outside-toplevel
+        except ImportError:
+            log.warning(
+                'PyYAML is not installed, skipping %s.',
+                self.config_filename,
+            )
+            return
 
-            with open(fname) as config:
-                try:
-                    import yaml  # pylint: disable=import-outside-toplevel
-                    self.config.update(yaml.safe_load(config))
-                except ImportError:
-                    log.warning(
-                        'PyYAML is not installed, skipping %s.',
-                        self.config_filename,
-                    )
-        except OSError:
+        try:
+            config = (pathlib.Path.cwd() / self.config_filename).read_text()
+        except FileNotFoundError:
             log.debug(
                 'Missing %s file. Using only env variables.',
                 self.config_filename,
             )
+        else:
+            self.config.update(yaml.safe_load(config))
 
     def merge(self, path):
         reader = codecs.getreader('utf-8')
@@ -371,8 +373,7 @@ class Coveralls:
         except coverage.CoverageException:
             log.exception('Failure to gather coverage:')
         else:
-            with open(file_path, 'w') as report_file:
-                report_file.write(report)
+            pathlib.Path(file_path).write_text(report)
 
     def create_data(self, extra=None):
         r"""

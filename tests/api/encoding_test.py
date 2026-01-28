@@ -1,5 +1,6 @@
 import json
 import os
+import pathlib
 import subprocess
 import unittest
 
@@ -13,7 +14,7 @@ NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
 class EncodingTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):

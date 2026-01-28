@@ -1,9 +1,9 @@
 import os
+import pathlib
 import re
 import subprocess
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 import pytest
 
@@ -30,7 +30,7 @@ def in_git_dir() -> bool:
 class GitTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):
@@ -63,7 +63,11 @@ class GitTest(unittest.TestCase):
             cwd=self.dir,
         )
 
-    @mock.patch.dict(os.environ, {'TRAVIS_BRANCH': 'master'}, clear=True)
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'TRAVIS_BRANCH': 'master'},
+        clear=True,
+    )
     def test_git(self):
         git_info = coveralls.git.git_info()
         commit_id = git_info['git']['head'].pop('id')
@@ -103,7 +107,7 @@ class GitLogTest(GitTest):
 class GitInfoTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):
@@ -113,7 +117,7 @@ class GitInfoTest(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
         os.chdir(self.dir)
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'GIT_ID': '5e837ce92220be64821128a70f6093f836dd2c05',
             'GIT_BRANCH': 'master',
@@ -157,7 +161,7 @@ class GitInfoTest(unittest.TestCase):
 
 class GitInfoOverridesTest(unittest.TestCase):
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/pull/1234/merge',
@@ -170,7 +174,7 @@ class GitInfoOverridesTest(unittest.TestCase):
         assert git_info['git']['branch'] == 'fixup-branch'
 
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/heads/master',
@@ -183,7 +187,7 @@ class GitInfoOverridesTest(unittest.TestCase):
         assert git_info['git']['branch'] == 'master'
 
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'GITHUB_ACTIONS': 'true',
             'GITHUB_REF': 'refs/tags/v1.0',

@@ -1,7 +1,7 @@
 import os
+import pathlib
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 import pytest
 try:
@@ -13,11 +13,11 @@ from coveralls import Coveralls
 from coveralls.api import log
 
 
-@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class Configuration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):
@@ -31,7 +31,7 @@ class Configuration(unittest.TestCase):
             fp.write('service_name: jenkins\n')
 
     @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
-    @mock.patch.dict(os.environ, {}, clear=True)
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_local_with_config(self):
         cover = Coveralls()
         assert cover.config['service_name'] == 'jenkins'
@@ -39,10 +39,14 @@ class Configuration(unittest.TestCase):
         assert 'service_job_id' not in cover.config
 
     @pytest.mark.skipif(yaml is not None, reason='requires no PyYAML')
-    @mock.patch.dict(os.environ, {'COVERALLS_REPO_TOKEN': 'xxx'}, clear=True)
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'COVERALLS_REPO_TOKEN': 'xxx'},
+        clear=True,
+    )
     def test_local_with_config_without_yaml_module(self):
         """test local with config in yaml, but without yaml-installed"""
-        with mock.patch.object(log, 'warning') as logger:
+        with unittest.mock.patch.object(log, 'warning') as logger:
             cover = Coveralls()
 
         logger.assert_called_once_with(
@@ -50,9 +54,9 @@ class Configuration(unittest.TestCase):
         )
 
 
-@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class NoConfiguration(unittest.TestCase):
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'TRAVIS': 'True',
             'TRAVIS_JOB_ID': '777',
@@ -65,7 +69,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '777'
         assert cover.config['repo_token'] == 'yyy'
 
-    @mock.patch.dict(os.environ, {}, clear=True)
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_misconfigured(self):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
@@ -75,7 +79,11 @@ class NoConfiguration(unittest.TestCase):
             '.coveralls.mock or set the COVERALLS_REPO_TOKEN env var.'
         )
 
-    @mock.patch.dict(os.environ, {'GITHUB_ACTIONS': 'true'}, clear=True)
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'GITHUB_ACTIONS': 'true'},
+        clear=True,
+    )
     def test_misconfigured_github(self):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
@@ -84,7 +92,7 @@ class NoConfiguration(unittest.TestCase):
             'Running on Github Actions but GITHUB_TOKEN is not set.',
         )
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'APPVEYOR': 'True',
             'APPVEYOR_BUILD_ID': '1234567',
@@ -98,7 +106,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '1234567'
         assert cover.config['service_pull_request'] == '1234'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'BUILDKITE': 'True',
             'BUILDKITE_JOB_ID': '1234567',
@@ -112,7 +120,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '1234567'
         assert cover.config['service_pull_request'] == '1234'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'BUILDKITE': 'True',
             'BUILDKITE_JOB_ID': '1234567',
@@ -126,7 +134,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '1234567'
         assert 'service_pull_request' not in cover.config
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'CIRCLECI': 'True',
@@ -141,7 +149,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_number'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'CIRCLECI': 'True',
@@ -158,7 +166,7 @@ class NoConfiguration(unittest.TestCase):
         )
         assert cover.config['service_job_id'] == '15'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'GITHUB_ACTIONS': 'true',
@@ -178,7 +186,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_number'] == '123456789'
         assert cover.config['service_job_id'] == '123456789'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'GITHUB_ACTIONS': 'true',
@@ -198,7 +206,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '987654321'
         assert 'service_pull_request' not in cover.config
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'JENKINS_HOME': '/var/lib/jenkins',
@@ -213,7 +221,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '888'
         assert cover.config['service_pull_request'] == '9999'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ, {
             'TRAVIS': 'True',
             'TRAVIS_JOB_ID': '777',
@@ -225,7 +233,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_id'] == '777'
         assert 'repo_token' not in cover.config
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'SEMAPHORE': 'True',
@@ -242,7 +250,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_number'] == '36980c73'
         assert cover.config['service_pull_request'] == '9999'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'SEMAPHORE': 'True',
@@ -259,7 +267,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_number'] == 'b86b3adf'
         assert cover.config['service_pull_request'] == '9999'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'CI_NAME': 'generic-ci',
@@ -279,7 +287,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_branch'] == 'fixup-branch'
         assert cover.config['service_pull_request'] == '1234'
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'CI_NAME': 'generic-ci',
@@ -299,7 +307,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_branch'] == 'fixup-branch'
         assert 'service_pull_request' not in cover.config
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'COVERALLS_HOST': 'aaa',
@@ -322,7 +330,7 @@ class NoConfiguration(unittest.TestCase):
         assert cover.config['service_job_number'] == '1234'
 
 
-@mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class CLIConfiguration(unittest.TestCase):
     def test_load_config(self):
         # pylint: disable=protected-access

@@ -1,8 +1,9 @@
+import contextlib
 import json
 import os
+import pathlib
 import tempfile
-import unittest
-from unittest import mock
+import unittest.mock
 
 import coverage
 import pytest
@@ -17,13 +18,11 @@ EXPECTED = {
 }
 
 
-@mock.patch('coveralls.api.requests')
+@unittest.mock.patch('coveralls.api.requests')
 class WearTest(unittest.TestCase):
     def setUp(self):
-        try:
-            os.remove('.coverage')
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            pathlib.Path('.coverage').unlink()
 
     def test_wet_run(self, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED
@@ -62,7 +61,7 @@ class WearTest(unittest.TestCase):
             coverage_file.write(b'{"random": "stuff"}')
             coverage_file.seek(0)
 
-            with mock.patch.object(log, 'warning') as logger:
+            with unittest.mock.patch.object(log, 'warning') as logger:
                 api = coveralls.Coveralls(repo_token='xxx')
                 api.merge(coverage_file.name)
                 result = api.create_report()
@@ -84,7 +83,7 @@ class WearTest(unittest.TestCase):
     def test_repo_token_in_not_compromised_verbose(self, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED
 
-        with mock.patch.object(log, 'debug') as logger:
+        with unittest.mock.patch.object(log, 'debug') as logger:
             coveralls.Coveralls(repo_token='xxx').wear(dry_run=True)
 
         assert 'xxx' not in logger.call_args[0][0]
@@ -97,7 +96,7 @@ class WearTest(unittest.TestCase):
         with pytest.raises(coveralls.exception.CoverallsException):
             coveralls.Coveralls(repo_token='xxx').wear()
 
-    @mock.patch('coveralls.reporter.CoverallReporter.report')
+    @unittest.mock.patch('coveralls.reporter.CoverallReporter.report')
     def test_no_coverage(self, report_files, mock_requests):
         mock_requests.post.return_value.json.return_value = EXPECTED
         report_files.side_effect = coverage.CoverageException(
@@ -107,7 +106,7 @@ class WearTest(unittest.TestCase):
         with pytest.raises(coverage.CoverageException):
             coveralls.Coveralls(repo_token='xxx').wear()
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {
             'COVERALLS_HOST': 'https://coveralls.my-enterprise.info',
@@ -118,17 +117,19 @@ class WearTest(unittest.TestCase):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
             'https://coveralls.my-enterprise.info/api/v1/jobs',
-            files=mock.ANY, verify=False,
+            files=unittest.mock.ANY, verify=False,
         )
 
-    @mock.patch.dict(os.environ, {}, clear=True)
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
-            'https://coveralls.io/api/v1/jobs', files=mock.ANY, verify=True,
+            'https://coveralls.io/api/v1/jobs',
+            files=unittest.mock.ANY,
+            verify=True,
         )
 
-    @mock.patch.dict(os.environ, {}, clear=True)
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_submit_report_resubmission(self, mock_requests):
         # This would trigger the resubmission condition
         mock_requests.post.return_value.status_code = 422
@@ -140,7 +141,7 @@ class WearTest(unittest.TestCase):
 
         assert result == EXPECTED
 
-    @mock.patch.dict(
+    @unittest.mock.patch.dict(
         os.environ,
         {'GITHUB_REPOSITORY': 'test/repo'},
         clear=True,

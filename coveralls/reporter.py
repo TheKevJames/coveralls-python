@@ -117,11 +117,8 @@ class CoverallReporter:
 
     def parse_file(self, cu: FileReporter, analysis: Analysis) -> None:
         """Generate data for single file."""
-        filename = cu.relative_filename()
-
         # ensure results are properly merged between platforms
-        posix_filename = filename.replace(os.path.sep, '/')
-
+        posix_filename = cu.relative_filename().replace(os.path.sep, '/')
         if self.base_dir and posix_filename.startswith(self.base_dir):
             posix_filename = posix_filename[len(self.base_dir):]
         posix_filename = self.src_dir + posix_filename

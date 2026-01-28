@@ -1,5 +1,8 @@
+import contextlib
 import os
+import pathlib
 import subprocess
+import textwrap
 import unittest
 
 import pytest
@@ -22,7 +25,7 @@ def assert_coverage(actual, expected):
 class ReporterTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.old_cwd = os.getcwd()
+        cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
     def tearDownClass(cls):
@@ -31,48 +34,36 @@ class ReporterTest(unittest.TestCase):
     def setUp(self):
         os.chdir(EXAMPLE_DIR)
 
-        try:
-            os.remove('.coverage')
-        except Exception:
-            pass
-        try:
-            os.remove('extra.py')
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            pathlib.Path('.coverage').unlink()
+
+        with contextlib.suppress(Exception):
+            pathlib.Path('extra.py').unlink()
 
     @staticmethod
     def make_test_results(with_branches=False, name_prefix=''):
         results = (
             {
-            'source': (
-                'def hello():\n'
-                '    print(\'world\')\n\n\n'
-                'class Foo:\n'
-                '    """ Bar """\n\n\n'
-                'def unused_method():\n'
-                '    print(\'this is not tested\')\n\n'
-                'def branch(cond1, cond2):\n'
-                '    if cond1:\n'
-                '        print(\'condition tested both ways\')\n'
-                '    if cond2:\n'
-                '        print(\'condition not tested both ways\')\n'
-            ),
-            'name': f'{name_prefix}project.py',
-            'coverage': [
-                1, 1, None, None, 1, None, None,
-                None, 1, 0, None, 1, 1, 1, 1, 1,
-            ],
+                'source': (
+                    pathlib.Path(EXAMPLE_DIR) / 'project.py'
+                ).read_text(),
+                'name': f'{name_prefix}project.py',
+                'coverage': [
+                    1, 1, None, None, 1, None, None,
+                    None, 1, 0, None, 1, 1, 1, 1, 1,
+                ],
             }, {
-            'source': (
-                'from project import branch\n'
-                'from project import hello\n\n'
-                "if __name__ == '__main__':\n"
-                '    hello()\n'
-                '    branch(False, True)\n'
-                '    branch(True, True)\n'
-            ),
-            'name': f'{name_prefix}runtests.py',
-            'coverage': [1, 1, None, 1, 1, 1, 1],
+                'source': textwrap.dedent("""
+                from project import branch  # type: ignore[import-not-found]
+                from project import hello
+
+                if __name__ == '__main__':
+                    hello()
+                    branch(False, True)
+                    branch(True, True)
+                """),
+                'name': f'{name_prefix}runtests.py',
+                'coverage': [1, 1, None, 1, 1, 1, 1],
             },
         )
         if with_branches:
@@ -234,33 +225,28 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[1], expected_results[1])
 
     def test_missing_file(self):
-        with open('extra.py', 'w') as f:
-            f.write('print("Python rocks!")\n')
+        pathlib.Path('extra.py').write_text('print("Python rocks!")\n')
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
                 'extra.py',
             ], cwd=EXAMPLE_DIR,
         )
-        try:
-            os.remove('extra.py')
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            pathlib.Path('extra.py').unlink()
 
         with pytest.raises(CoverallsException, match='No source for code'):
             Coveralls(repo_token='xxx').get_coverage()
 
     def test_not_python(self):
-        with open('extra.py', 'w') as f:
-            f.write('print("Python rocks!")\n')
+        pathlib.Path('extra.py').write_text('print("Python rocks!")\n')
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
                 'extra.py',
             ], cwd=EXAMPLE_DIR,
         )
-        with open('extra.py', 'w') as f:
-            f.write("<h1>This isn't python!</h1>\n")
+        pathlib.Path('extra.py').write_text("<h1>This isn't python!</h1>\n")
 
         with pytest.raises(
                 CoverallsException,

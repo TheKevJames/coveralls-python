@@ -1,4 +1,5 @@
-import os
+import contextlib
+import pathlib
 
 import pytest
 
@@ -6,7 +7,5 @@ import pytest
 @pytest.fixture(scope='session', autouse=True)
 def nuke_coverage():
     for folder in ('.', './example', './nonunicode'):
-        try:
-            os.remove(f'{folder}/.coverage')
-        except FileNotFoundError:
-            pass
+        with contextlib.suppress(FileNotFoundError):
+            pathlib.Path(f'{folder}/.coverage').unlink()

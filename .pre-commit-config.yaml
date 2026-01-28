@@ -171,14 +171,13 @@ repos:
           # IMR241: When using 'from', import submodules not elements.
           - --ignore=E501,E741,W503,IMR200,IMR241
         files: coveralls/.*
-# TODO: enable refurb
-#   - repo: https://github.com/dosisod/refurb
-#     rev: v2.2.0
-#     hooks:
-#       - id: refurb
-#         args:
-#           - --python-version
-#           - '3.10'
+  - repo: https://github.com/dosisod/refurb
+    rev: v2.2.0
+    hooks:
+      - id: refurb
+        args:
+          - --python-version
+          - '3.10'
   - repo: local
     hooks:
       - id: poetry-check
