@@ -156,7 +156,7 @@ workflows:
       - linter/pre-commit:
           executor: py310
           pre-steps:
-            - run: apk add --no-cache git
+            - run: apk add --no-cache bash git
       - toxpy:
           name: test-<<matrix.executor>>
           matrix:
