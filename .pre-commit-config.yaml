@@ -183,7 +183,7 @@ repos:
       - id: poetry-check
         name: check pyproject.toml validity
         description: 'Validate the structure of the pyproject.toml file'
-        entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
+        entry: sh -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
         language: python
         additional_dependencies:
           - poetry==2.3.1

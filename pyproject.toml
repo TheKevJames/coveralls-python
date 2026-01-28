@@ -50,6 +50,14 @@ sphinx = { version = "7.4.7", python = ">=3.9" }
 [tool.poetry.extras]
 yaml = ["pyyaml"]
 
+[[tool.mypy.overrides]]
+# TODO: the below libraries don't have type hints
+# https://mypy.readthedocs.io/en/stable/running_mypy.html#ignore-missing-imports
+module = [
+    "docopt.*",
+]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 # addopts = "-Werror"
 filterwarnings = [
