@@ -71,7 +71,6 @@ repos:
           - -d ungrouped-imports  # conflicts with reorder-python-imports
           - -d wrong-import-order  # conflicts with reorder-python-imports
           - -d bad-file-encoding  # TODO: fix?
-          - -d disallowed-name  # TODO: fix
           - -d unspecified-encoding  # TODO: reevaluate
   - repo: https://github.com/Lucas-C/pre-commit-hooks
     rev: v1.5.6

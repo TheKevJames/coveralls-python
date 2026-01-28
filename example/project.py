@@ -6,7 +6,7 @@ class Foo:
     """ Bar """
 
 
-def baz():
+def unused_method():
     print('this is not tested')
 
 def branch(cond1, cond2):

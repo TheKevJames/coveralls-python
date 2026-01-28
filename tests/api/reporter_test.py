@@ -49,7 +49,7 @@ class ReporterTest(unittest.TestCase):
                 '    print(\'world\')\n\n\n'
                 'class Foo:\n'
                 '    """ Bar """\n\n\n'
-                'def baz():\n'
+                'def unused_method():\n'
                 '    print(\'this is not tested\')\n\n'
                 'def branch(cond1, cond2):\n'
                 '    if cond1:\n'

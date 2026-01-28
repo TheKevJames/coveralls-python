@@ -11,8 +11,8 @@ COVERAGE_CODE_STANZA = """
 import sys
 sys.path.append('{}')
 
-import foo
-foo.test_func({:d})
+import inttest
+inttest.test_func({:d})
 """
 
 COVERAGE_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'data')
@@ -60,13 +60,13 @@ class IntegrationTest(unittest.TestCase):
 
             source_files = {f['name'] for f in report['source_files']}
             print(source_files)
-            foo = os.path.join(COVERAGE_TEMPLATE_PATH, 'foo.py')
-            self.assertIn(foo, source_files)
+            inttest = os.path.join(COVERAGE_TEMPLATE_PATH, 'inttest.py')
+            self.assertIn(inttest, source_files)
 
             lines = next(
                 (
                     f['coverage'] for f in report['source_files']
-                    if f['name'] == foo
+                    if f['name'] == inttest
                 ), None,
             )
             assert sum(int(bool(x)) for x in lines) == hits
