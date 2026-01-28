@@ -3,4 +3,11 @@
         "github>thekevjames/tools:personal",
         "github>thekevjames/tools//renovate/version-as-lib.json5",
     ],
+    "packageRules": [
+        {
+            // TODO: bump whenever we drop support for a python version
+            "matchPackageNames": ["sphinx"],
+            "allowedVersions": "< 8.2.0",
+        },
+    ],
 }
