@@ -11,7 +11,7 @@ default_language_version:
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.6.0
+    rev: v4.3.0
     hooks:
       - id: conventional-pre-commit
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -55,6 +55,7 @@ repos:
           - --max-complexity=10
           - --max-line-length=79
           - --max-module-lines=500
+          - --max-positional-arguments=10
           - --max-args=10
           - --score=n
           # TODO: narrow these down
@@ -97,7 +98,7 @@ repos:
         exclude: nonunicode/.*
 # TODO: add type hints
 #   - repo: https://github.com/pre-commit/mirrors-mypy
-#     rev: v1.9.0
+#     rev: v1.19.1
 #     hooks:
 #       - id: mypy
 #         require_serial: True
@@ -124,12 +125,13 @@ repos:
         additional_dependencies: &flake8deps
           - flake8-2020==1.8.1
           - flake8-broken-line==1.0.0
-          - flake8-builtins==2.5.0
+          - flake8-builtins==3.1.0
           - flake8-comprehensions==3.17.0
+          - flake8-import-restrictions==2.1
         files: coveralls/.*
 # TODO: debug why CoverallsException breaks this
 #   - repo: https://github.com/guilatrova/tryceratops
-#     rev: v2.3.2
+#     rev: v2.4.1
 #     hooks:
 #       - id: tryceratops
 #         args:
@@ -156,17 +158,35 @@ repos:
     rev: 7.3.0
     hooks:
       - id: flake8
-        language: python
         additional_dependencies: *flake8deps
         args:
           # https://www.flake8rules.com/
           # E501: Line too long. Covered by autopep8.
           # E741: Do not use variables named 'I', 'O', or 'l'.
           # W503: Line break occurred before a binary operator. Breaks PEP8.
-          - --ignore=E501,E741,W503
+          # IMR200: Imports should only happen on module level, not locally. Covered by pylint.
+          # IMR241: When using 'from', import submodules not elements.
+          - --ignore=E501,E741,W503,IMR200,IMR241
         files: coveralls/.*
+# TODO: enable refurb
+#   - repo: https://github.com/dosisod/refurb
+#     rev: v2.2.0
+#     hooks:
+#       - id: refurb
+#         args:
+#           - --python-version
+#           - '3.10'
   - repo: local
     hooks:
+      - id: poetry-check
+        name: check pyproject.toml validity
+        description: 'Validate the structure of the pyproject.toml file'
+        entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
+        language: python
+        additional_dependencies:
+          - poetry==2.3.1
+        pass_filenames: true
+        files: 'pyproject\.toml$'
       - id: pyproject-use-version-ranges
         name: avoid using carets for version ranges
         description: 'Avoid using carets for version ranges'
@@ -196,6 +216,7 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.36.1
     hooks:
+      - id: check-circle-ci
       - id: check-github-workflows
       - id: check-renovate
         language: python
@@ -204,10 +225,8 @@ repos:
 
 # docker
   - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.12.1-beta
+    rev: v2.14.0
     hooks:
       - id: hadolint
         args:
-          # unignore 3042 after https://github.com/hadolint/hadolint/issues/497
           - --ignore=DL3025
-          - --ignore=DL3042
