@@ -7,7 +7,7 @@ default_install_hook_types:
   - pre-commit
 
 default_language_version:
-    python: python3.10
+    python: python3.14
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
