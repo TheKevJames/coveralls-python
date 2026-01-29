@@ -15,11 +15,12 @@ jobs:
       - uses: actions/checkout@v6.0.2
       - uses: actions/setup-python@v6
         with:
+          # renovate: datasource=docker depName=python
           python-version: '3.12'
       - uses: snok/install-poetry@v1.4.1
         with:
-          # TODO: renovate
-          version: 1.8.2
+          # renovate: datasource=pypi depName=poetry
+          version: 2.3.1
       - run: poetry build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

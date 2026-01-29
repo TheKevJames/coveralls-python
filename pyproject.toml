@@ -25,6 +25,7 @@ classifiers = [
 [tool.poetry.urls]
 Changelog = "https://github.com/TheKevJames/coveralls-python/blob/master/CHANGELOG.md"
 Docs = "https://coveralls-python.rtfd.io/"
+Repository = "https://github.com/TheKevJames/coveralls-python"
 
 [tool.poetry.scripts]
 coveralls = "coveralls.cli:main"
