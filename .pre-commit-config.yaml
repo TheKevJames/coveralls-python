@@ -111,7 +111,7 @@ repos:
           - coverage==7.13.2
           - pytest==9.0.2
           - responses==0.25.8
-          - types-pyyaml==6.0.3
+          - types-pyyaml==6.0.12.20250915
           - types-requests==2.32.4.20260107
         args:
           - --show-error-codes
