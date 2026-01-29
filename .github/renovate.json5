@@ -3,4 +3,16 @@
         "github>thekevjames/tools:personal",
         "github>thekevjames/tools//renovate/version-as-lib.json5",
     ],
+    "packageRules": [
+        {
+            "matchFileNames": [
+                ".pre-commit-config.yaml",
+            ],
+            "matchDepNames": [
+                "python",
+                "python/cpython",
+            ],
+            "allowedVersions": "3.10",
+        },
+    ],
 }
