@@ -108,7 +108,7 @@ repos:
         # Note that some libraries keep their type hints in packages named
         # `types-$lib` or `$lib-stubs`.
         additional_dependencies:
-          - coverage==7.13.2
+          - coverage==7.13.3
           - pytest==9.0.2
           - responses==0.25.8
           - types-pyyaml==6.0.12.20250915
