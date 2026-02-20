@@ -110,7 +110,7 @@ repos:
         additional_dependencies:
           - coverage==7.13.4
           - pytest==9.0.2
-          - responses==0.25.8
+          - responses==0.26.0
           - types-pyyaml==6.0.12.20250915
           - types-requests==2.32.4.20260107
         args:
