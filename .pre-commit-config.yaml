@@ -172,7 +172,7 @@ repos:
           - --ignore=E501,E741,W503,IMR200,IMR241
         files: coveralls/.*
   - repo: https://github.com/dosisod/refurb
-    rev: v2.2.0
+    rev: v2.3.0
     hooks:
       - id: refurb
         args:
