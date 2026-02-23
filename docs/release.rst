@@ -3,6 +3,8 @@ Release
 
 This project is released on PyPI as `coveralls`_, as well as on `quay`_ and `dockerhub`_.
 
+TODO: migrate from clog-cli to git-cliff.
+
 To cut a new release, ensure the latest master passes all tests. Then, create a release commit:
 
 #. Update the ``CHANGELOG.md`` with the new version (``clog -C CHANGELOG.md -F --setversion x.y.z``).
