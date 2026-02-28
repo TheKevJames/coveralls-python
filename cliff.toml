@@ -1,0 +1,52 @@
+[changelog]
+body = """
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**breaking**] {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}
+"""
+trim = true
+render_always = true
+postprocessors = [
+    { pattern = '<REPO>', replace = "https://github.com/TheKevJames/coveralls-python" },
+]
+# output = "CHANGELOG.md"
+
+[git]
+conventional_commits = true
+filter_unconventional = false
+require_conventional = false
+split_commits = false
+commit_preprocessors = [
+    { pattern = "(?s)\n.*$", replace = "" },
+]
+protect_breaking_commits = false
+commit_parsers = [
+    { message = "^feat", group = "<!-- 0 -->Features" },
+    { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
+    { message = "^perf", group = "<!-- 2 -->Performance" },
+    { message = "^doc", group = "<!-- 3 -->Documentation" },
+    { message = "^refactor", group = "<!-- 3 -->Internal" },
+    { message = "^test", group = "<!-- 3 -->Internal" },
+    { message = "^chore\\(release\\): ", skip = true },
+    { message = "^chore\\(deps.*\\)", skip = true },
+    { message = "^chore", group = "<!-- 3 -->Internal" },
+    { message = ".*", group = "<!-- 4 -->Other Changes" },
+]
+filter_commits = false
+fail_on_unmatched_commit = false
+link_parsers = []
+use_branch_tags = false
+topo_order = false
+topo_order_commits = true
+sort_commits = "oldest"
+recurse_submodules = false

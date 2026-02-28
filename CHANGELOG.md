@@ -1,3 +1,17 @@
+<a name="4.1.0"></a>
+## 4.1.0 (2026-02-28)
+
+### Features
+
+- *(deps)* Migrate from docopt to typer (no more deprecation warnings in recent Python versions!)
+
+### Internal
+
+- *(api)* Add more tests to improve coverage
+- *(mypy)* Enable (non-strict) type checking
+- *(lint)* Enable refurb
+- *(renovate)* Pin max compatible sphinx version
+
 <a name="4.0.2"></a>
 ## 4.0.2 (2025-11-07)
 
