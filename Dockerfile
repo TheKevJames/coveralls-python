@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=pypi depName=coveralls
-ARG COVERALLS_VERSION=4.0.2
+ARG COVERALLS_VERSION=4.1.0
 # renovate: datasource=repology depName=alpine_3_23/git versioning=loose
 ARG GIT_VERSION=2.49.1-r0
 
