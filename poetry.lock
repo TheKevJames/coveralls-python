@@ -801,7 +801,7 @@ name = "snowballstemmer"
 version = "3.0.1"
 description = "This package provides 32 stemmers for 30 languages generated from Snowball algorithms."
 optional = false
-python-versions = "!=3.0.*,!=3.1.*,!=3.2.*"
+python-versions = "!=3.0.*, !=3.1.*, !=3.2.*"
 groups = ["docs"]
 markers = "python_version >= \"3.12\""
 files = [
@@ -1060,5 +1060,5 @@ yaml = ["pyyaml"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.10,<4.0"
-content-hash = "2624d2e4193470a3a841c3b400042e3e45437be15011d4a10d1dee9e92746762"
+python-versions = ">=3.10"
+content-hash = "0c66a9e694b50396a5bc497e83b8273d96ca671106b25de85eca3ac56246faa9"
