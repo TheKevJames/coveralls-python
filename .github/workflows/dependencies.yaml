@@ -3,6 +3,7 @@ on: [pull_request]
 
 permissions:
   contents: read
+  pull-requests: write
 
 jobs:
   dependency-review:
@@ -12,3 +13,11 @@ jobs:
         uses: actions/checkout@v6.0.2
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@v4.9.0
+        with:
+          fail-on-severity: low
+          fail-on-scopes: runtime,development,unknown
+          license-check: false
+          vulnerability-check: true
+          comment-summary-in-pr: on-failure
+          show-openssf-scorecard: false
+          show-patched-versions: true
