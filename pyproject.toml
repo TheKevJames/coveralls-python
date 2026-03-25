@@ -5,9 +5,10 @@ description = "Show coverage stats online via coveralls.io"
 readme = "README.rst"
 requires-python = ">=3.10"
 
-repository = "http://github.com/TheKevJames/coveralls-python"
-authors = [{ name="Kevin James", email="coveralls-python@thekev.in" }]
-license = { text="MIT" }
+authors = [
+    { name="Kevin James", email="coveralls-python@thekev.in" },
+]
+license = { text = "MIT" }
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -32,7 +33,6 @@ Repository = "https://github.com/TheKevJames/coveralls-python"
 [project.scripts]
 coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
-
 
 [project.optional-dependencies]
 yaml = ["pyyaml (>=3.10,<7.0)"]

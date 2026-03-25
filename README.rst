@@ -62,9 +62,9 @@ to support version checks (see `the PyPA docs`_), then installing the latest
 compatible version should do the trick automatically! If you're even more
 outdated than that, please pin to ``coveralls<2``.
 
-If you're in an outdated environment and experiencing an issue, you're welcome
-to open a ticket -- but please mention your environment! I'm willing to
-backport fixes to the 1.x branch if the need is great enough.
+Support for outdated environments is not guaranteed; please mention your
+environment if you open a ticket. I will consider backporting fixes to the 1.x
+branch if the need is great enough.
 
 .. _Docs: http://coveralls-python.readthedocs.io/en/latest/
 .. _coverage.py: https://coverage.readthedocs.io/en/latest/
