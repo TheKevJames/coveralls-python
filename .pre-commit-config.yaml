@@ -187,7 +187,7 @@ repos:
         entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
         language: python
         additional_dependencies:
-          - poetry==2.3.2
+          - poetry==2.3.3
         pass_filenames: true
         files: 'pyproject\.toml$'
       - id: pyproject-use-version-ranges
