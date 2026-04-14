@@ -109,7 +109,7 @@ repos:
         # `types-$lib` or `$lib-stubs`.
         additional_dependencies:
           - coverage==7.13.5
-          - pytest==9.0.2
+          - pytest==9.0.3
           - responses==0.26.0
           - types-pyyaml==6.0.12.20260408
           - types-requests==2.33.0.20260408
