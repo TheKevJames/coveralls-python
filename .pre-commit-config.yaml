@@ -112,7 +112,7 @@ repos:
           - pytest==9.0.3
           - responses==0.26.0
           - types-pyyaml==6.0.12.20260508
-          - types-requests==2.33.0.20260503
+          - types-requests==2.33.0.20260508
           - typer==0.25.1
         args:
           - --show-error-codes
