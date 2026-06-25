@@ -97,9 +97,10 @@ def git_info() -> dict[str, dict[str, Any]]:
             'message': gitlog('%s'),
         }
         remotes = [
-            {'name': line.split()[0], 'url': line.split()[1]}
+            {'name': parts[0], 'url': parts[1]}
             for line in run_command('git', 'remote', '-v').splitlines()
-            if '(fetch)' in line
+            if '(fetch)' in line and len(line.split()) >= 2
+            for parts in [line.split()]
         ]
     except (CoverallsException, OSError) as ex:
         # When git is not available, try env vars as per Coveralls docs:
