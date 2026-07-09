@@ -39,7 +39,7 @@ yaml = ["pyyaml (>=3.10,<7.0)"]
 
 [dependency-groups]
 dev = [
-    "pytest ==9.0.2",
+    "pytest ==9.0.3",
     "responses ==0.26.0"
 ]
 docs = ["sphinx ==9.1.0; python_version >='3.12'"]
