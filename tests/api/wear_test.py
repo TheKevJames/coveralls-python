@@ -122,6 +122,20 @@ class WearTest(unittest.TestCase):
         )
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_host_and_skip_ssl_verify_via_override(self, mock_requests):
+        # host/skip_ssl_verify are first-class Config fields, settable through
+        # any channel -- here as explicit overrides, not just env vars.
+        coveralls.Coveralls(
+            repo_token='xxx',
+            host='https://coveralls.my-enterprise.info',
+            skip_ssl_verify=True,
+        ).wear(dry_run=False)
+        mock_requests.post.assert_called_once_with(
+            'https://coveralls.my-enterprise.info/api/v1/jobs',
+            files=unittest.mock.ANY, verify=False, timeout=(10, 60),
+        )
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_api_call_uses_default_host_if_no_env_var_set(self, mock_requests):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
