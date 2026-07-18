@@ -1,0 +1,20 @@
+tests/api/wear_test.py
+  s_aea5193df500cb::t_6feb6ad8183158 125-137
+  s_aea5193df500cb::t_cfe16613cfb154 124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d58f974f2faad35311e9e4031a7115c6bd100bd3",
+  "prompts": {},
+  "sessions": {
+    "s_aea5193df500cb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7558-b415-7ba1-8080-878d32b878c0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
