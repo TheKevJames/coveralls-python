@@ -103,8 +103,10 @@ Sample ``.coveralls.yml`` file::
     The config-file keys ``coveralls_host`` and ``config_file`` were renamed to
     ``host`` and ``rcfile`` respectively, so that every setting has one
     consistent name across the config file, environment variables, and CLI
-    flags. Update any existing ``.coveralls.yml`` accordingly; unknown keys are
-    now ignored with a warning.
+    flags. The old spellings still work (both in ``.coveralls.yml`` and as
+    ``Coveralls()`` keyword arguments) but are deprecated and emit a warning;
+    they will be removed in a future release. Other unrecognised keys are
+    ignored with a warning.
 
 Github Actions support
 ----------------------

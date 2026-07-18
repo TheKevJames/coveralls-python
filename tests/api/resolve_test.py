@@ -292,3 +292,53 @@ def test_file_source_without_yaml_warns():
 
 def test_resolve_returns_config_instance():
     assert isinstance(resolve_config(), Config)
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_deprecated_override_keys_still_work():
+    with unittest.mock.patch.object(log, 'warning') as warning:
+        config = resolve_config(
+            repo_token='x',
+            coveralls_host='https://old.example.com',
+            config_file='custom.rc',
+        )
+    assert config.host == 'https://old.example.com'
+    assert config.rcfile == 'custom.rc'
+    warning.assert_any_call(
+        '%r is deprecated and will be removed in a future release; use %r '
+        'instead (in %s).', 'coveralls_host', 'host', 'arguments',
+    )
+    warning.assert_any_call(
+        '%r is deprecated and will be removed in a future release; use %r '
+        'instead (in %s).', 'config_file', 'rcfile', 'arguments',
+    )
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_deprecated_key_does_not_override_explicit_canonical():
+    config = resolve_config(
+        repo_token='x',
+        host='https://new.example.com',
+        coveralls_host='https://old.example.com',
+    )
+    assert config.host == 'https://new.example.com'
+
+
+@pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_deprecated_file_keys_still_work(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / '.coveralls.mock').write_text(
+        'repo_token: xxx\n'
+        'coveralls_host: https://old.example.com\n'
+        'config_file: custom.rc\n',
+    )
+    with unittest.mock.patch.object(log, 'warning') as warning:
+        config = resolve('.coveralls.mock', {})
+
+    assert config.host == 'https://old.example.com'
+    assert config.rcfile == 'custom.rc'
+    warning.assert_any_call(
+        '%r is deprecated and will be removed in a future release; use %r '
+        'instead (in %s).', 'coveralls_host', 'host', '.coveralls.mock',
+    )

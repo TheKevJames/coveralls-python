@@ -132,6 +132,14 @@ class Config:
 
 _FIELD_NAMES = frozenset(f.name for f in dataclasses.fields(Config))
 
+# Config keys (in the config file or as Coveralls() kwargs) that were renamed
+# for naming consistency. The old spelling still works but warns, mirroring the
+# deprecated CLI flag aliases.
+DEPRECATED_KEYS = {
+    'coveralls_host': 'host',
+    'config_file': 'rcfile',
+}
+
 
 def _pr_from_path(value: str | None) -> str | None:
     """Extract a trailing PR number from a URL/path such as ``.../pull/42``."""
@@ -282,6 +290,25 @@ def _from_environment() -> dict[str, Any]:
     return config
 
 
+def _apply_deprecated_keys(
+    data: Mapping[str, Any], *, source: str,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in data.items():
+        canonical = DEPRECATED_KEYS.get(key)
+        if canonical is None:
+            result[key] = value
+            continue
+        log.warning(
+            '%r is deprecated and will be removed in a future release; use '
+            '%r instead (in %s).', key, canonical, source,
+        )
+        # An explicit canonical key in the same source takes precedence.
+        if canonical not in data:
+            result[canonical] = value
+    return result
+
+
 def _filter_known(data: Mapping[str, Any], *, source: str) -> dict[str, Any]:
     known = {}
     for key, value in data.items():
@@ -309,7 +336,10 @@ def _from_file(config_filename: str) -> dict[str, Any]:
         )
         return {}
 
-    return _filter_known(yaml.safe_load(content) or {}, source=config_filename)
+    data = _apply_deprecated_keys(
+        yaml.safe_load(content) or {}, source=config_filename,
+    )
+    return _filter_known(data, source=config_filename)
 
 
 def resolve(config_filename: str, overrides: Mapping[str, Any]) -> Config:
@@ -321,6 +351,7 @@ def resolve(config_filename: str, overrides: Mapping[str, Any]) -> Config:
     is special: any source may waive the requirement but none may re-impose
     it, so it is AND-ed across sources rather than last-wins.
     """
+    overrides = _apply_deprecated_keys(overrides, source='arguments')
     cleaned = {
         key: value for key,
         value in overrides.items() if value is not None
