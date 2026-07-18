@@ -1,0 +1,25 @@
+tests/api/resolve_test.py
+  s_aea5193df500cb::t_9cd330077f37c5 1-242,245-294
+  s_aea5193df500cb::t_7185c3e544598f 243-244
+coveralls/configuration.py
+  s_aea5193df500cb::t_12e0171cf8010f 326-327
+  s_aea5193df500cb::t_62d26565aa6f4e 143-144,163,338
+  s_aea5193df500cb::t_39dccde93e0a56 2-6,12-16,131-142,145-162,164-323,328-337,339-345
+  s_aea5193df500cb::t_6410c62823c1ea 324-325
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0effa7f81c8b725cb4b30fd750e77c3a3832ab6f",
+  "prompts": {},
+  "sessions": {
+    "s_aea5193df500cb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7558-b415-7ba1-8080-878d32b878c0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
