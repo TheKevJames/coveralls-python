@@ -24,7 +24,7 @@ def req_json(request):
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug(mock_wear, mock_log):
-    coveralls.cli.main(argv=['--debug'])
+    coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
 
@@ -33,9 +33,23 @@ def test_debug(mock_wear, mock_log):
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug_no_token(mock_wear, mock_log):
-    coveralls.cli.main(argv=['--debug'])
+    coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_debug_accepts_options(mock_coveralls):
+    # the debug subcommand shares the full option set with the default command
+    coveralls.cli.main(argv=['debug', '--rcfile=coveragerc', '--host=h'])
+    mock_coveralls.assert_called_with(
+        False, rcfile='coveragerc',
+        service_name=None,
+        base_dir=None,
+        src_dir=None,
+        host='h',
+    )
 
 
 @mock.patch.dict(

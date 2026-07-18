@@ -20,7 +20,7 @@ with coverage stats, so please make sure you're not ruining your own security!
 
 Usage patterns:
   coveralls [OPTIONS]
-  coveralls --debug [OPTIONS]
+  coveralls debug [OPTIONS]
 
 Example:
   $ coveralls
@@ -185,141 +185,145 @@ def _run(
         sys.exit(1)
 
 
-@app.callback(invoke_without_command=True)
-def coveralls(
-    debug: Annotated[
-        bool,
-        typer.Option('--debug', help=DEBUG_HELP),
-    ] = False,
-    service_name: Annotated[
-        str | None,
-        typer.Option(
-            '--service-name',
-            help='Provide an alternative service name to submit.',
-        ),
-    ] = None,
-    service: Annotated[
-        str | None,
-        typer.Option(
-            '--service',
-            hidden=True,
-            help='Deprecated alias for --service-name.',
-        ),
-    ] = None,
-    rcfile: Annotated[
-        str,
-        typer.Option('--rcfile', help='Specify coverage.py configuration.'),
-    ] = '.coveragerc',
-    base_dir: Annotated[
-        str | None,
-        typer.Option(
-            '--base-dir',
-            help='Base directory that is removed from reported paths.',
-        ),
-    ] = None,
-    basedir: Annotated[
-        str | None,
-        typer.Option(
-            '--basedir', hidden=True,
-            help='Deprecated alias for --base-dir.',
-        ),
-    ] = None,
-    src_dir: Annotated[
-        str | None,
-        typer.Option(
-            '--src-dir',
-            help='Source directory added to reported paths.',
-        ),
-    ] = None,
-    srcdir: Annotated[
-        str | None,
-        typer.Option(
-            '--srcdir', hidden=True,
-            help='Deprecated alias for --src-dir.',
-        ),
-    ] = None,
-    output: Annotated[
-        str | None,
-        typer.Option(
-            '--output',
-            help="Write report to file. Doesn't send anything.",
-        ),
-    ] = None,
-    submit: Annotated[
-        str | None,
-        typer.Option('--submit', help='Upload a previously generated file.'),
-    ] = None,
-    merge: Annotated[
-        str | None,
-        typer.Option(
-            '--merge',
-            help='Merge report from file when submitting.',
-        ),
-    ] = None,
-    finish: Annotated[
-        bool,
-        typer.Option('--finish', help='Finish parallel jobs.'),
-    ] = False,
-    parallel: Annotated[
-        bool,
-        typer.Option(
-            '--parallel',
-            help='Submit as one of several parallel jobs to be merged.',
-        ),
-    ] = False,
-    host: Annotated[
-        str | None,
-        typer.Option('--host', help='Coveralls API host base URL.'),
-    ] = None,
-    skip_ssl_verify: Annotated[
-        bool,
-        typer.Option(
-            '--skip-ssl-verify',
-            help='Skip verification of the SSL certificate of the host.',
-        ),
-    ] = False,
-    verbose: Annotated[
-        bool,
-        typer.Option(
-            '-v',
-            '--verbose',
-            help='Print extra info, always enabled when debugging.',
-        ),
-    ] = False,
-    timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--timeout',
-            help='Connect and read timeout, in seconds (default: 10/60).',
-        ),
-    ] = None,
-    connect_timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--connect-timeout',
-            help='Connect timeout, in seconds (default: 10).',
-        ),
-    ] = None,
-    read_timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--read-timeout',
-            help='Read timeout, in seconds (default: 60).',
-        ),
-    ] = None,
-    version: Annotated[
-        bool | None,
-        typer.Option(
-            '--version',
-            callback=_show_version,
-            help='Display the version and exit.',
-            is_eager=True,
-        ),
-    ] = None,
+# Shared option specs, defined once and referenced by both the default command
+# and the ``debug`` subcommand so the two entry points cannot drift apart.
+_ServiceName = Annotated[
+    str | None,
+    typer.Option(
+        '--service-name',
+        help='Provide an alternative service name to submit.',
+    ),
+]
+_Service = Annotated[
+    str | None,
+    typer.Option(
+        '--service', hidden=True, help='Deprecated alias for --service-name.',
+    ),
+]
+_Rcfile = Annotated[
+    str,
+    typer.Option('--rcfile', help='Specify coverage.py configuration.'),
+]
+_BaseDir = Annotated[
+    str | None,
+    typer.Option(
+        '--base-dir',
+        help='Base directory that is removed from reported paths.',
+    ),
+]
+_Basedir = Annotated[
+    str | None,
+    typer.Option(
+        '--basedir', hidden=True, help='Deprecated alias for --base-dir.',
+    ),
+]
+_SrcDir = Annotated[
+    str | None,
+    typer.Option(
+        '--src-dir', help='Source directory added to reported paths.',
+    ),
+]
+_Srcdir = Annotated[
+    str | None,
+    typer.Option(
+        '--srcdir', hidden=True, help='Deprecated alias for --src-dir.',
+    ),
+]
+_Output = Annotated[
+    str | None,
+    typer.Option(
+        '--output', help="Write report to file. Doesn't send "
+        'anything.',
+    ),
+]
+_Submit = Annotated[
+    str | None,
+    typer.Option('--submit', help='Upload a previously generated file.'),
+]
+_Merge = Annotated[
+    str | None,
+    typer.Option('--merge', help='Merge report from file when submitting.'),
+]
+_Finish = Annotated[
+    bool,
+    typer.Option('--finish', help='Finish parallel jobs.'),
+]
+_Parallel = Annotated[
+    bool,
+    typer.Option(
+        '--parallel',
+        help='Submit as one of several parallel jobs to be merged.',
+    ),
+]
+_Host = Annotated[
+    str | None,
+    typer.Option('--host', help='Coveralls API host base URL.'),
+]
+_SkipSslVerify = Annotated[
+    bool,
+    typer.Option(
+        '--skip-ssl-verify',
+        help='Skip verification of the SSL certificate of the host.',
+    ),
+]
+_Verbose = Annotated[
+    bool,
+    typer.Option(
+        '-v', '--verbose',
+        help='Print extra info, always enabled when debugging.',
+    ),
+]
+_Timeout = Annotated[
+    float | None,
+    typer.Option(
+        '--timeout',
+        help='Connect and read timeout, in seconds (default: 10/60).',
+    ),
+]
+_ConnectTimeout = Annotated[
+    float | None,
+    typer.Option(
+        '--connect-timeout', help='Connect timeout, in seconds (default: 10).',
+    ),
+]
+_ReadTimeout = Annotated[
+    float | None,
+    typer.Option(
+        '--read-timeout', help='Read timeout, in seconds (default: 60).',
+    ),
+]
+_Version = Annotated[
+    bool | None,
+    typer.Option(
+        '--version', callback=_show_version, is_eager=True,
+        help='Display the version and exit.',
+    ),
+]
+
+
+def _dispatch(
+    *,
+    is_debug: bool,
+    service_name: str | None,
+    service: str | None,
+    rcfile: str,
+    base_dir: str | None,
+    basedir: str | None,
+    src_dir: str | None,
+    srcdir: str | None,
+    output: str | None,
+    submit: str | None,
+    merge: str | None,
+    finish: bool,
+    parallel: bool,
+    host: str | None,
+    skip_ssl_verify: bool,
+    verbose: bool,
+    timeout: float | None,
+    connect_timeout: float | None,
+    read_timeout: float | None,
 ) -> None:
-    # pylint: disable=too-many-arguments,too-many-positional-arguments
-    # pylint: disable=too-many-locals
-    _ = version
+    # pylint: disable=too-many-arguments,too-many-locals
     service_name = _resolve_deprecated(
         service_name, service, '--service-name', '--service',
     )
@@ -329,11 +333,110 @@ def coveralls(
     src_dir = _resolve_deprecated(src_dir, srcdir, '--src-dir', '--srcdir')
 
     _run(
-        is_debug=debug,
+        is_debug=is_debug,
         service_name=service_name,
         rcfile=rcfile,
         base_dir=base_dir,
         src_dir=src_dir,
+        output=output,
+        submit=submit,
+        merge=merge,
+        finish=finish,
+        parallel=parallel,
+        host=host,
+        skip_ssl_verify=skip_ssl_verify,
+        verbose=verbose,
+        timeout=timeout,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
+    )
+
+
+@app.callback(invoke_without_command=True)
+def coveralls(
+    ctx: typer.Context,
+    service_name: _ServiceName = None,
+    service: _Service = None,
+    rcfile: _Rcfile = '.coveragerc',
+    base_dir: _BaseDir = None,
+    basedir: _Basedir = None,
+    src_dir: _SrcDir = None,
+    srcdir: _Srcdir = None,
+    output: _Output = None,
+    submit: _Submit = None,
+    merge: _Merge = None,
+    finish: _Finish = False,
+    parallel: _Parallel = False,
+    host: _Host = None,
+    skip_ssl_verify: _SkipSslVerify = False,
+    verbose: _Verbose = False,
+    timeout: _Timeout = None,
+    connect_timeout: _ConnectTimeout = None,
+    read_timeout: _ReadTimeout = None,
+    version: _Version = None,
+) -> None:
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
+    # pylint: disable=too-many-locals
+    if ctx.invoked_subcommand is not None:
+        return
+    _ = version
+    _dispatch(
+        is_debug=False,
+        service_name=service_name,
+        service=service,
+        rcfile=rcfile,
+        base_dir=base_dir,
+        basedir=basedir,
+        src_dir=src_dir,
+        srcdir=srcdir,
+        output=output,
+        submit=submit,
+        merge=merge,
+        finish=finish,
+        parallel=parallel,
+        host=host,
+        skip_ssl_verify=skip_ssl_verify,
+        verbose=verbose,
+        timeout=timeout,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
+    )
+
+
+@app.command(help=DEBUG_HELP)
+def debug(
+    service_name: _ServiceName = None,
+    service: _Service = None,
+    rcfile: _Rcfile = '.coveragerc',
+    base_dir: _BaseDir = None,
+    basedir: _Basedir = None,
+    src_dir: _SrcDir = None,
+    srcdir: _Srcdir = None,
+    output: _Output = None,
+    submit: _Submit = None,
+    merge: _Merge = None,
+    finish: _Finish = False,
+    parallel: _Parallel = False,
+    host: _Host = None,
+    skip_ssl_verify: _SkipSslVerify = False,
+    verbose: _Verbose = False,
+    timeout: _Timeout = None,
+    connect_timeout: _ConnectTimeout = None,
+    read_timeout: _ReadTimeout = None,
+    version: _Version = None,
+) -> None:
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
+    # pylint: disable=too-many-locals
+    _ = version
+    _dispatch(
+        is_debug=True,
+        service_name=service_name,
+        service=service,
+        rcfile=rcfile,
+        base_dir=base_dir,
+        basedir=basedir,
+        src_dir=src_dir,
+        srcdir=srcdir,
         output=output,
         submit=submit,
         merge=merge,
