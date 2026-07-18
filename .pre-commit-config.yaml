@@ -113,7 +113,7 @@ repos:
           - responses==0.26.2
           - types-pyyaml==6.0.12.20260518
           - types-requests==2.33.0.20260712
-          - typer==0.26.8
+          - typer==0.27.0
         args:
           - --show-error-codes
           # - --strict  # TODO: enable
