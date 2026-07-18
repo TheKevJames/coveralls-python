@@ -86,7 +86,7 @@ def _run(
     try:
         coverallz = Coveralls(
             token_required,
-            config_file=rcfile,
+            rcfile=rcfile,
             service_name=service,
             base_dir=basedir or '',
             src_dir=srcdir or '',

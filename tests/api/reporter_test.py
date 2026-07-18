@@ -261,7 +261,6 @@ class ReporterTest(unittest.TestCase):
         mock_post.return_value = response_mock
 
         cov = Coveralls(repo_token='test_token', service_name='github')
-        cov.config['service_name'] = 'github'
 
         with unittest.mock.patch('builtins.print') as mock_print:
             cov.submit_report('{}')

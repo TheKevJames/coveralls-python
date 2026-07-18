@@ -152,7 +152,7 @@ def test_real(mock_wear, mock_log):
 def test_rcfile(mock_coveralls):
     coveralls.cli.main(argv=['--rcfile=coveragerc'])
     mock_coveralls.assert_called_with(
-        True, config_file='coveragerc',
+        True, rcfile='coveragerc',
         service_name=None,
         base_dir='',
         src_dir='',
@@ -164,7 +164,7 @@ def test_rcfile(mock_coveralls):
 def test_service_name(mock_coveralls):
     coveralls.cli.main(argv=['--service=travis-pro'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True, rcfile='.coveragerc',
         service_name='travis-pro',
         base_dir='',
         src_dir='',
@@ -210,7 +210,7 @@ def test_submit(mock_submit):
 def test_base_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--basedir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True, rcfile='.coveragerc',
         service_name=None,
         base_dir='foo',
         src_dir='',
@@ -221,7 +221,7 @@ def test_base_dir_arg(mock_coveralls):
 def test_src_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--srcdir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
+        True, rcfile='.coveragerc',
         service_name=None,
         base_dir='',
         src_dir='foo',
