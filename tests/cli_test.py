@@ -24,7 +24,7 @@ def req_json(request):
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug(mock_wear, mock_log):
-    coveralls.cli.main(argv=['debug'])
+    coveralls.cli.main(argv=['--debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
 
@@ -33,7 +33,7 @@ def test_debug(mock_wear, mock_log):
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug_no_token(mock_wear, mock_log):
-    coveralls.cli.main(argv=['debug'])
+    coveralls.cli.main(argv=['--debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
 
@@ -154,21 +154,57 @@ def test_rcfile(mock_coveralls):
     mock_coveralls.assert_called_with(
         True, rcfile='coveragerc',
         service_name=None,
-        base_dir='',
-        src_dir='',
+        base_dir=None,
+        src_dir=None,
+        host=None,
     )
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
 def test_service_name(mock_coveralls):
-    coveralls.cli.main(argv=['--service=travis-pro'])
+    coveralls.cli.main(argv=['--service-name=travis-pro'])
     mock_coveralls.assert_called_with(
         True, rcfile='.coveragerc',
         service_name='travis-pro',
-        base_dir='',
-        src_dir='',
+        base_dir=None,
+        src_dir=None,
+        host=None,
     )
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_host_and_skip_ssl_verify_and_parallel(mock_coveralls):
+    coveralls.cli.main(
+        argv=[
+            '--host=https://enterprise.example.com',
+            '--skip-ssl-verify',
+            '--parallel',
+        ],
+    )
+    mock_coveralls.assert_called_with(
+        True, rcfile='.coveragerc',
+        service_name=None,
+        base_dir=None,
+        src_dir=None,
+        host='https://enterprise.example.com',
+        parallel=True,
+        skip_ssl_verify=True,
+    )
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_service_alias_warns(mock_coveralls, mock_warning):
+    coveralls.cli.main(argv=['--service=travis-pro'])
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--service', '--service-name',
+    )
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['service_name'] == 'travis-pro'
 
 
 @mock.patch.object(coveralls.cli.log, 'exception')
@@ -208,23 +244,25 @@ def test_submit(mock_submit):
 
 @mock.patch('coveralls.cli.Coveralls')
 def test_base_dir_arg(mock_coveralls):
-    coveralls.cli.main(argv=['--basedir=foo'])
+    coveralls.cli.main(argv=['--base-dir=foo'])
     mock_coveralls.assert_called_with(
         True, rcfile='.coveragerc',
         service_name=None,
         base_dir='foo',
-        src_dir='',
+        src_dir=None,
+        host=None,
     )
 
 
 @mock.patch('coveralls.cli.Coveralls')
 def test_src_dir_arg(mock_coveralls):
-    coveralls.cli.main(argv=['--srcdir=foo'])
+    coveralls.cli.main(argv=['--src-dir=foo'])
     mock_coveralls.assert_called_with(
         True, rcfile='.coveragerc',
         service_name=None,
-        base_dir='',
+        base_dir=None,
         src_dir='foo',
+        host=None,
     )
 
 

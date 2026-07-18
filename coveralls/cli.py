@@ -2,6 +2,7 @@ import importlib.metadata
 import logging
 import sys
 from typing import Annotated
+from typing import Any
 
 import typer
 
@@ -19,7 +20,7 @@ with coverage stats, so please make sure you're not ruining your own security!
 
 Usage patterns:
   coveralls [OPTIONS]
-  coveralls debug [OPTIONS]
+  coveralls --debug [OPTIONS]
 
 Example:
   $ coveralls
@@ -27,10 +28,10 @@ Example:
   Coverage submitted!
 """
 DEBUG_HELP = (
-    "Debug mode doesn't send anything, just outputs json to stdout. "
-    'It also forces verbose output. Please use debug mode when submitting '
-    'bug reports.'
+    "Don't send anything, just output json to stdout. Also forces verbose "
+    'output. Please use debug mode when submitting bug reports.'
 )
+
 
 app = typer.Typer(
     add_completion=True,
@@ -45,17 +46,75 @@ def _show_version(value: bool) -> None:
         raise typer.Exit()
 
 
+def _resolve_deprecated(
+    new: str | None, old: str | None,
+    new_flag: str, old_flag: str,
+) -> str | None:
+    """Prefer the canonical value, warning when the deprecated flag is used."""
+    if old is None:
+        return new
+    log.warning(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', old_flag, new_flag,
+    )
+    return new if new is not None else old
+
+
+def _build_overrides(
+    *,
+    rcfile: str,
+    service_name: str | None,
+    base_dir: str | None,
+    src_dir: str | None,
+    host: str | None,
+    parallel: bool,
+    skip_ssl_verify: bool,
+    timeout: float | None,
+    connect_timeout: float | None,
+    read_timeout: float | None,
+) -> dict[str, Any]:
+    """
+    Collect explicit CLI values into Config overrides.
+
+    None-valued options are safe to forward (resolve() drops them), but boolean
+    flags must only be forwarded when set so their False default cannot clobber
+    a value already resolved from env vars or the config file.
+    """
+    overrides: dict[str, Any] = {
+        'rcfile': rcfile,
+        'service_name': service_name,
+        'base_dir': base_dir,
+        'src_dir': src_dir,
+        'host': host,
+    }
+    for key, value in (
+        ('timeout', timeout),
+        ('connect_timeout', connect_timeout),
+        ('read_timeout', read_timeout),
+    ):
+        if value is not None:
+            overrides[key] = value
+    if parallel:
+        overrides['parallel'] = True
+    if skip_ssl_verify:
+        overrides['skip_ssl_verify'] = True
+    return overrides
+
+
 def _run(
     *,
     is_debug: bool,
-    service: str | None,
+    service_name: str | None,
     rcfile: str,
-    basedir: str | None,
+    base_dir: str | None,
+    src_dir: str | None,
     output: str | None,
-    srcdir: str | None,
     submit: str | None,
     merge: str | None,
     finish: bool,
+    parallel: bool,
+    host: str | None,
+    skip_ssl_verify: bool,
     verbose: bool,
     timeout: float | None,
     connect_timeout: float | None,
@@ -71,27 +130,21 @@ def _run(
 
     token_required = not is_debug and not output
 
-    # Only forward timeouts that were explicitly set so CLI defaults (None)
-    # don't clobber values already resolved from env vars or the config file.
-    timeout_kwargs = {
-        key: value
-        for key, value in (
-            ('timeout', timeout),
-            ('connect_timeout', connect_timeout),
-            ('read_timeout', read_timeout),
-        )
-        if value is not None
-    }
+    overrides = _build_overrides(
+        rcfile=rcfile,
+        service_name=service_name,
+        base_dir=base_dir,
+        src_dir=src_dir,
+        host=host,
+        parallel=parallel,
+        skip_ssl_verify=skip_ssl_verify,
+        timeout=timeout,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
+    )
 
     try:
-        coverallz = Coveralls(
-            token_required,
-            rcfile=rcfile,
-            service_name=service,
-            base_dir=basedir or '',
-            src_dir=srcdir or '',
-            **timeout_kwargs,
-        )
+        coverallz = Coveralls(token_required, **overrides)
 
         if merge:
             coverallz.merge(merge)
@@ -134,23 +187,55 @@ def _run(
 
 @app.callback(invoke_without_command=True)
 def coveralls(
-    ctx: typer.Context,
+    debug: Annotated[
+        bool,
+        typer.Option('--debug', help=DEBUG_HELP),
+    ] = False,
+    service_name: Annotated[
+        str | None,
+        typer.Option(
+            '--service-name',
+            help='Provide an alternative service name to submit.',
+        ),
+    ] = None,
     service: Annotated[
         str | None,
         typer.Option(
             '--service',
-            help='Provide an alternative service name to submit.',
+            hidden=True,
+            help='Deprecated alias for --service-name.',
         ),
     ] = None,
     rcfile: Annotated[
         str,
-        typer.Option('--rcfile', help='Specify configuration file.'),
+        typer.Option('--rcfile', help='Specify coverage.py configuration.'),
     ] = '.coveragerc',
+    base_dir: Annotated[
+        str | None,
+        typer.Option(
+            '--base-dir',
+            help='Base directory that is removed from reported paths.',
+        ),
+    ] = None,
     basedir: Annotated[
         str | None,
         typer.Option(
-            '--basedir',
-            help='Base directory that is removed from reported paths.',
+            '--basedir', hidden=True,
+            help='Deprecated alias for --base-dir.',
+        ),
+    ] = None,
+    src_dir: Annotated[
+        str | None,
+        typer.Option(
+            '--src-dir',
+            help='Source directory added to reported paths.',
+        ),
+    ] = None,
+    srcdir: Annotated[
+        str | None,
+        typer.Option(
+            '--srcdir', hidden=True,
+            help='Deprecated alias for --src-dir.',
         ),
     ] = None,
     output: Annotated[
@@ -158,13 +243,6 @@ def coveralls(
         typer.Option(
             '--output',
             help="Write report to file. Doesn't send anything.",
-        ),
-    ] = None,
-    srcdir: Annotated[
-        str | None,
-        typer.Option(
-            '--srcdir',
-            help='Source directory added to reported paths.',
         ),
     ] = None,
     submit: Annotated[
@@ -182,6 +260,24 @@ def coveralls(
         bool,
         typer.Option('--finish', help='Finish parallel jobs.'),
     ] = False,
+    parallel: Annotated[
+        bool,
+        typer.Option(
+            '--parallel',
+            help='Submit as one of several parallel jobs to be merged.',
+        ),
+    ] = False,
+    host: Annotated[
+        str | None,
+        typer.Option('--host', help='Coveralls API host base URL.'),
+    ] = None,
+    skip_ssl_verify: Annotated[
+        bool,
+        typer.Option(
+            '--skip-ssl-verify',
+            help='Skip verification of the SSL certificate of the host.',
+        ),
+    ] = False,
     verbose: Annotated[
         bool,
         typer.Option(
@@ -190,15 +286,6 @@ def coveralls(
             help='Print extra info, always enabled when debugging.',
         ),
     ] = False,
-    version: Annotated[
-        bool | None,
-        typer.Option(
-            '--version',
-            callback=_show_version,
-            help='Display the version and exit.',
-            is_eager=True,
-        ),
-    ] = None,
     timeout: Annotated[
         float | None,
         typer.Option(
@@ -220,86 +307,6 @@ def coveralls(
             help='Read timeout, in seconds (default: 60).',
         ),
     ] = None,
-) -> None:
-    # pylint: disable=too-many-arguments,too-many-positional-arguments
-    if ctx.invoked_subcommand is not None:
-        return
-
-    _ = version
-    _run(
-        is_debug=False,
-        service=service,
-        rcfile=rcfile,
-        basedir=basedir,
-        output=output,
-        srcdir=srcdir,
-        submit=submit,
-        merge=merge,
-        finish=finish,
-        verbose=verbose,
-        timeout=timeout,
-        connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
-
-
-@app.command(help=DEBUG_HELP)
-def debug(
-    service: Annotated[
-        str | None,
-        typer.Option(
-            '--service',
-            help='Provide an alternative service name to submit.',
-        ),
-    ] = None,
-    rcfile: Annotated[
-        str,
-        typer.Option('--rcfile', help='Specify configuration file.'),
-    ] = '.coveragerc',
-    basedir: Annotated[
-        str | None,
-        typer.Option(
-            '--basedir',
-            help='Base directory that is removed from reported paths.',
-        ),
-    ] = None,
-    output: Annotated[
-        str | None,
-        typer.Option(
-            '--output',
-            help="Write report to file. Doesn't send anything.",
-        ),
-    ] = None,
-    srcdir: Annotated[
-        str | None,
-        typer.Option(
-            '--srcdir',
-            help='Source directory added to reported paths.',
-        ),
-    ] = None,
-    submit: Annotated[
-        str | None,
-        typer.Option('--submit', help='Upload a previously generated file.'),
-    ] = None,
-    merge: Annotated[
-        str | None,
-        typer.Option(
-            '--merge',
-            help='Merge report from file when submitting.',
-        ),
-    ] = None,
-    finish: Annotated[
-        bool,
-        typer.Option('--finish', help='Finish parallel jobs.'),
-    ] = False,
-    verbose: Annotated[
-        bool,
-        typer.Option(
-            '-v',
-            '--verbose',
-            help='Print extra info, always enabled when debugging.',
-        ),
-    ] = False,
     version: Annotated[
         bool | None,
         typer.Option(
@@ -309,40 +316,31 @@ def debug(
             is_eager=True,
         ),
     ] = None,
-    timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--timeout',
-            help='Connect and read timeout, in seconds (default: 10/60).',
-        ),
-    ] = None,
-    connect_timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--connect-timeout',
-            help='Connect timeout, in seconds (default: 10).',
-        ),
-    ] = None,
-    read_timeout: Annotated[
-        float | None,
-        typer.Option(
-            '--read-timeout',
-            help='Read timeout, in seconds (default: 60).',
-        ),
-    ] = None,
 ) -> None:
     # pylint: disable=too-many-arguments,too-many-positional-arguments
+    # pylint: disable=too-many-locals
     _ = version
+    service_name = _resolve_deprecated(
+        service_name, service, '--service-name', '--service',
+    )
+    base_dir = _resolve_deprecated(
+        base_dir, basedir, '--base-dir', '--basedir',
+    )
+    src_dir = _resolve_deprecated(src_dir, srcdir, '--src-dir', '--srcdir')
+
     _run(
-        is_debug=True,
-        service=service,
+        is_debug=debug,
+        service_name=service_name,
         rcfile=rcfile,
-        basedir=basedir,
+        base_dir=base_dir,
+        src_dir=src_dir,
         output=output,
-        srcdir=srcdir,
         submit=submit,
         merge=merge,
         finish=finish,
+        parallel=parallel,
+        host=host,
+        skip_ssl_verify=skip_ssl_verify,
         verbose=verbose,
         timeout=timeout,
         connect_timeout=connect_timeout,
@@ -350,6 +348,6 @@ def debug(
     )
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> None:
     command = typer.main.get_command(app)
     command.main(args=argv, prog_name='coveralls', standalone_mode=False)
