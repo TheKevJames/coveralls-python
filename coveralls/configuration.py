@@ -1,8 +1,18 @@
 import dataclasses
+import logging
+import os
+import pathlib
+import re
+from collections.abc import Mapping
 from typing import Any
 
 from .exception import CoverallsException
 
+
+log = logging.getLogger('coveralls.configuration')
+
+# Trailing integer, e.g. the number at the end of a pull-request URL or path.
+NUMBER_REGEX = re.compile(r'(\d+)$')
 
 DEFAULT_HOST = 'https://coveralls.io/'
 
@@ -118,3 +128,218 @@ class Config:
             for name in PAYLOAD_FIELDS
             if (value := getattr(self, name))
         }
+
+
+_FIELD_NAMES = frozenset(f.name for f in dataclasses.fields(Config))
+
+
+def _pr_from_path(value: str | None) -> str | None:
+    """Extract a trailing PR number from a URL/path such as ``.../pull/42``."""
+    return (value or '').split('/')[-1] or None
+
+
+def _from_generic_ci_environment() -> dict[str, Any]:
+    # Inspired by the official client: coveralls-ruby in
+    # lib/coveralls/configuration.rb
+    # (set_standard_service_params_for_generic_ci).
+    # The meaning of each var is clarified in:
+    # https://github.com/lemurheavy/coveralls-public/issues/1558
+    config = {
+        'service_name': os.environ.get('CI_NAME'),
+        'service_number': os.environ.get('CI_BUILD_NUMBER'),
+        'service_build_url': os.environ.get('CI_BUILD_URL'),
+        'service_job_id': os.environ.get('CI_JOB_ID'),
+        'service_branch': os.environ.get('CI_BRANCH'),
+    }
+
+    pr_match = NUMBER_REGEX.findall(os.environ.get('CI_PULL_REQUEST', ''))
+    if pr_match:
+        config['service_pull_request'] = pr_match[-1]
+
+    return {key: value for key, value in config.items() if value}
+
+
+def _detect_ci() -> tuple[str, dict[str, Any]]:
+    # pylint: disable=too-many-return-statements
+    """
+    Detect the specific CI service and its service-identifying fields.
+
+    Returns the service name plus a partial config. ``token_required`` may be
+    present to waive the repo-token requirement (e.g. on TravisCI).
+    """
+    env = os.environ
+    if env.get('APPVEYOR'):
+        return 'appveyor', {
+            'service_job_id': env.get('APPVEYOR_BUILD_ID'),
+            'service_pull_request': env.get('APPVEYOR_PULL_REQUEST_NUMBER'),
+        }
+    if env.get('BUILDKITE'):
+        pr = env.get('BUILDKITE_PULL_REQUEST')
+        return 'buildkite', {
+            'service_job_id': env.get('BUILDKITE_JOB_ID'),
+            'service_pull_request': None if pr == 'false' else pr,
+        }
+    if env.get('CIRCLECI'):
+        return 'circleci', {
+            'service_job_id': env.get('CIRCLE_NODE_INDEX'),
+            'service_number': (
+                env.get('CIRCLE_WORKFLOW_ID') or env.get('CIRCLE_BUILD_NUM')
+            ),
+            'service_pull_request': _pr_from_path(env.get('CI_PULL_REQUEST')),
+        }
+    if env.get('GITHUB_ACTIONS'):
+        # See https://github.com/lemurheavy/coveralls-public/issues/1710
+        # GitHub tokens and standard Coveralls tokens are almost but not quite
+        # the same -- forcibly using GitHub's flow seems to be more stable.
+        pr = None
+        if env.get('GITHUB_REF', '').startswith('refs/pull/'):
+            pr = env.get('GITHUB_REF', '//').split('/')[2]
+        run_id = env.get('GITHUB_RUN_ID')
+        return 'github', {
+            'repo_token': env.get('GITHUB_TOKEN'),
+            'service_job_id': run_id,
+            'service_number': run_id,
+            'service_pull_request': pr,
+        }
+    if env.get('JENKINS_HOME'):
+        return 'jenkins', {
+            'service_job_id': env.get('BUILD_NUMBER'),
+            'service_pull_request': _pr_from_path(env.get('CI_PULL_REQUEST')),
+        }
+    if env.get('TRAVIS'):
+        return 'travis-ci', {
+            'service_job_id': env.get('TRAVIS_JOB_ID'),
+            'service_pull_request': env.get('TRAVIS_PULL_REQUEST'),
+            'token_required': False,
+        }
+    if env.get('SEMAPHORE'):
+        return 'semaphore-ci', {
+            'service_job_id': (
+                env.get('SEMAPHORE_JOB_UUID')  # Classic
+                or env.get('SEMAPHORE_JOB_ID')  # 2.0
+            ),
+            'service_number': (
+                env.get('SEMAPHORE_EXECUTABLE_UUID')  # Classic
+                or env.get('SEMAPHORE_WORKFLOW_ID')  # 2.0
+            ),
+            'service_pull_request': (
+                env.get('SEMAPHORE_BRANCH_ID')  # Classic
+                or env.get('SEMAPHORE_GIT_PR_NUMBER')  # 2.0
+            ),
+        }
+    return 'coveralls-python', {}
+
+
+def _from_ci_environment() -> dict[str, Any]:
+    # As defined at the bottom of
+    # https://docs.coveralls.io/supported-ci-services there are a few env vars
+    # that support any arbitrary CI. We load them first and allow the more
+    # specific service to overwrite job/number/pr, but the generic CI_NAME
+    # takes precedence over the service's default name.
+    config = _from_generic_ci_environment()
+
+    name, fields = _detect_ci()
+    config.setdefault('service_name', name)
+
+    token_required = fields.pop('token_required', None)
+    if token_required is not None:
+        config['token_required'] = token_required
+
+    for key, value in fields.items():
+        if value:
+            config[key] = value
+
+    return config
+
+
+def _from_environment() -> dict[str, Any]:
+    config: dict[str, Any] = {}
+
+    host = os.environ.get('COVERALLS_HOST')
+    if host:
+        config['host'] = host
+    if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
+        config['parallel'] = True
+    if os.environ.get('COVERALLS_SKIP_SSL_VERIFY'):
+        config['skip_ssl_verify'] = True
+
+    fields = {
+        'COVERALLS_CONNECT_TIMEOUT': 'connect_timeout',
+        'COVERALLS_FLAG_NAME': 'flag_name',
+        'COVERALLS_READ_TIMEOUT': 'read_timeout',
+        'COVERALLS_REPO_TOKEN': 'repo_token',
+        'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
+        'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
+        'COVERALLS_SERVICE_NAME': 'service_name',
+        'COVERALLS_SERVICE_NUMBER': 'service_number',
+        'COVERALLS_TIMEOUT': 'timeout',
+    }
+    for var, key in fields.items():
+        value = os.environ.get(var)
+        if value:
+            config[key] = value
+
+    return config
+
+
+def _filter_known(data: Mapping[str, Any], *, source: str) -> dict[str, Any]:
+    known = {}
+    for key, value in data.items():
+        if key in _FIELD_NAMES:
+            known[key] = value
+        else:
+            log.warning(
+                'Ignoring unknown config option %r from %s.', key, source,
+            )
+    return known
+
+
+def _from_file(config_filename: str) -> dict[str, Any]:
+    try:
+        import yaml  # pylint: disable=import-outside-toplevel
+    except ImportError:
+        log.warning('PyYAML is not installed, skipping %s.', config_filename)
+        return {}
+
+    try:
+        content = (pathlib.Path.cwd() / config_filename).read_text()
+    except FileNotFoundError:
+        log.debug(
+            'Missing %s file. Using only env variables.', config_filename,
+        )
+        return {}
+
+    return _filter_known(yaml.safe_load(content) or {}, source=config_filename)
+
+
+def resolve(config_filename: str, overrides: Mapping[str, Any]) -> Config:
+    """
+    Resolve configuration from all sources into a single typed Config.
+
+    Precedence (later wins): CI environment, ``COVERALLS_*`` env vars, the
+    config file, then explicit overrides (e.g. CLI flags). ``token_required``
+    is special: any source may waive the requirement but none may re-impose
+    it, so it is AND-ed across sources rather than last-wins.
+    """
+    cleaned = {
+        key: value for key,
+        value in overrides.items() if value is not None
+    }
+    partials = [
+        _from_ci_environment(),
+        _from_environment(),
+        _from_file(config_filename),
+        cleaned,
+    ]
+
+    merged: dict[str, Any] = {}
+    token_required = True
+    for part in partials:
+        part = part.copy()
+        required = part.pop('token_required', None)
+        if required is not None:
+            token_required = token_required and required
+        merged.update(part)
+    merged['token_required'] = token_required
+
+    return Config(**merged)
