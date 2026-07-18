@@ -29,9 +29,19 @@ If you have placed your ``.coveragerc`` in a non-standard location (ie. other th
 
 If you would like to override the service name (auto-discovered on most CI systems, set to ``coveralls-python`` otherwise)::
 
-    coveralls --service=travis-pro
+    coveralls --service-name=travis-pro
     # or, via env var:
     COVERALLS_SERVICE_NAME=travis-pro coveralls
+
+.. note::
+
+    Every configuration option follows a single naming convention: a setting
+    ``foo_bar`` is spelled ``--foo-bar`` as a CLI flag, ``COVERALLS_FOO_BAR``
+    as an environment variable, and ``foo_bar`` in the config file. The
+    ``--service``, ``--basedir`` and ``--srcdir`` flags were renamed to
+    ``--service-name``, ``--base-dir`` and ``--src-dir`` to match; the old
+    spellings still work but are deprecated and will be removed in a future
+    release.
 
 If you are interested in merging the coverage results between multiple languages/projects, see our :ref:`multi-language <multilang>` documentation.
 
@@ -42,18 +52,24 @@ If coveralls-python is being run on TravisCI or on GitHub Actions, it will autom
 If you are running multiple jobs in parallel and want coveralls.io to merge those results, you should set ``COVERALLS_PARALLEL`` to ``true`` in your environment::
 
     COVERALLS_PARALLEL=true coveralls
+    # or, via CLI flag:
+    coveralls --parallel
 
 Later on, you can use ``coveralls --finish`` to let the Coveralls service know you have completed all your parallel runs::
 
     coveralls --finish
 
-If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set ``COVERALLS_HOST`` to the base URL of that insance::
+If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set the host to the base URL of that instance::
 
     COVERALLS_HOST="https://coveralls.aperture.com" coveralls
+    # or, via CLI flag:
+    coveralls --host=https://coveralls.aperture.com
 
 In that case, you may also be interested in disabling SSL verification::
 
     COVERALLS_SKIP_SSL_VERIFY='1' coveralls
+    # or, via CLI flag:
+    coveralls --skip-ssl-verify
 
 Network requests to coveralls.io use a default connect timeout of 10 seconds and a read timeout of 60 seconds, so a stalled endpoint can never hang the CLI indefinitely. You can override these via env vars or CLI flags::
 
@@ -77,10 +93,18 @@ Sample ``.coveralls.yml`` file::
     service_name: travis-pro
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
     parallel: true
-    coveralls_host: https://coveralls.aperture.com
+    host: https://coveralls.aperture.com
     timeout: 30
     connect_timeout: 5
     read_timeout: 90
+
+.. note::
+
+    The config-file keys ``coveralls_host`` and ``config_file`` were renamed to
+    ``host`` and ``rcfile`` respectively, so that every setting has one
+    consistent name across the config file, environment variables, and CLI
+    flags. Update any existing ``.coveralls.yml`` accordingly; unknown keys are
+    now ignored with a warning.
 
 Github Actions support
 ----------------------
@@ -94,14 +118,14 @@ pass the default-provided secret GITHUB_TOKEN::
 
 Passing a coveralls.io token via the ``COVERALLS_REPO_TOKEN`` environment variable
 (or via the ``repo_token`` parameter in the config file) is not needed for
-Github Actions by default (eg. with the default value of ``--service=github``).
+Github Actions by default (eg. with the default value of ``--service-name=github``).
 
 Github Actions can get a bit finicky as to how coverage is submitted. If you
 find yourself getting 422 error responses, you can also try specifying the
 ``github-actions`` service name instead. If you do so, you will need to proved
 a ``COVERALLS_REPO_TOKEN`` *instead* of a ``GITHUB_TOKEN``::
 
-    run: coveralls --service=github-actions
+    run: coveralls --service-name=github-actions
     env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
