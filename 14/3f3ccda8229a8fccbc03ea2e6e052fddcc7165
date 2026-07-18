@@ -1,0 +1,37 @@
+tests/cli_test.py
+  s_eae091f7b39574::t_7ccad0260e3c83 229-258
+tests/api/wear_test.py
+  s_eae091f7b39574::t_f253b4732e40c0 10,121,131,134-166
+  s_eae091f7b39574::t_539033337f1506 167
+tests/api/configuration_test.py
+  s_eae091f7b39574::t_b98e3599e6b0d4 345-348,369-432
+  s_eae091f7b39574::t_073d6f915b3673 349-368
+docs/usage/configuration.rst
+  s_eae091f7b39574::t_8865dbeedadecf 58-68,81-83
+coveralls/cli.py
+  s_eae091f7b39574::t_a22738bc860526 64
+  s_eae091f7b39574::t_2d2b2f4fc7c42a 60-62,74-85,93
+  s_eae091f7b39574::t_539033337f1506 331-332
+  s_eae091f7b39574::t_a3d7e39c111ceb 202-222,240-242,312-330,347-349
+coveralls/api.py
+  s_eae091f7b39574::t_d1906cd382e388 85,242,244,250
+  s_eae091f7b39574::t_19b692ed173166 289-305
+  s_eae091f7b39574::t_7d7d619e33f4dc 20-24,306-315,319-329,371-380
+  s_eae091f7b39574::t_4776deff918302 25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "143f3ccda8229a8fccbc03ea2e6e052fddcc7165",
+  "prompts": {},
+  "sessions": {
+    "s_eae091f7b39574": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7552-40be-7466-bd8e-4c509bf487da",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
