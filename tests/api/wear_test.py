@@ -7,6 +7,7 @@ import unittest.mock
 
 import coverage
 import pytest
+import requests
 
 import coveralls
 from coveralls.api import log
@@ -117,7 +118,7 @@ class WearTest(unittest.TestCase):
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         mock_requests.post.assert_called_once_with(
             'https://coveralls.my-enterprise.info/api/v1/jobs',
-            files=unittest.mock.ANY, verify=False,
+            files=unittest.mock.ANY, verify=False, timeout=(10, 60),
         )
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
@@ -127,7 +128,42 @@ class WearTest(unittest.TestCase):
             'https://coveralls.io/api/v1/jobs',
             files=unittest.mock.ANY,
             verify=True,
+            timeout=(10, 60),
         )
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_submit_report_uses_default_timeout(self, mock_requests):
+        mock_requests.post.return_value.json.return_value = EXPECTED
+        coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+        _, kwargs = mock_requests.post.call_args
+        assert kwargs['timeout'] == (10, 60)
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_submit_report_raises_on_timeout(self, mock_requests):
+        mock_requests.exceptions.Timeout = requests.exceptions.Timeout
+        mock_requests.post.side_effect = requests.exceptions.Timeout('boom')
+        with pytest.raises(
+            coveralls.exception.CoverallsException,
+            match=r'Timed out submitting coverage',
+        ):
+            coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_parallel_finish_uses_default_timeout(self, mock_requests):
+        mock_requests.post.return_value.json.return_value = {'done': True}
+        coveralls.Coveralls(repo_token='xxx').parallel_finish()
+        _, kwargs = mock_requests.post.call_args
+        assert kwargs['timeout'] == (10, 60)
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_parallel_finish_raises_on_timeout(self, mock_requests):
+        mock_requests.exceptions.Timeout = requests.exceptions.Timeout
+        mock_requests.post.side_effect = requests.exceptions.Timeout('boom')
+        with pytest.raises(
+            coveralls.exception.CoverallsException,
+            match=r'Timed out finishing parallel jobs',
+        ):
+            coveralls.Coveralls(repo_token='xxx').parallel_finish()
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_submit_report_resubmission(self, mock_requests):

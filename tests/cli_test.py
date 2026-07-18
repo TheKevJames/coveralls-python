@@ -226,3 +226,33 @@ def test_src_dir_arg(mock_coveralls):
         base_dir='',
         src_dir='foo',
     )
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_no_timeout_args_not_forwarded(mock_coveralls):
+    coveralls.cli.main(argv=[])
+    _, kwargs = mock_coveralls.call_args
+    assert 'timeout' not in kwargs
+    assert 'connect_timeout' not in kwargs
+    assert 'read_timeout' not in kwargs
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_timeout_arg(mock_coveralls):
+    coveralls.cli.main(argv=['--timeout=30'])
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['timeout'] == 30.0
+    assert 'connect_timeout' not in kwargs
+    assert 'read_timeout' not in kwargs
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_connect_and_read_timeout_args(mock_coveralls):
+    coveralls.cli.main(argv=['--connect-timeout=5', '--read-timeout=90'])
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['connect_timeout'] == 5.0
+    assert kwargs['read_timeout'] == 90.0
+    assert 'timeout' not in kwargs

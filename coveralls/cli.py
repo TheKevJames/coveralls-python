@@ -57,8 +57,11 @@ def _run(
     merge: str | None,
     finish: bool,
     verbose: bool,
+    timeout: float | None,
+    connect_timeout: float | None,
+    read_timeout: float | None,
 ) -> None:
-    # pylint: disable=too-complex,too-many-locals
+    # pylint: disable=too-complex,too-many-locals,too-many-arguments
     if is_debug:
         verbose = True
 
@@ -68,6 +71,18 @@ def _run(
 
     token_required = not is_debug and not output
 
+    # Only forward timeouts that were explicitly set so CLI defaults (None)
+    # don't clobber values already resolved from env vars or the config file.
+    timeout_kwargs = {
+        key: value
+        for key, value in (
+            ('timeout', timeout),
+            ('connect_timeout', connect_timeout),
+            ('read_timeout', read_timeout),
+        )
+        if value is not None
+    }
+
     try:
         coverallz = Coveralls(
             token_required,
@@ -75,6 +90,7 @@ def _run(
             service_name=service,
             base_dir=basedir or '',
             src_dir=srcdir or '',
+            **timeout_kwargs,
         )
 
         if merge:
@@ -183,6 +199,27 @@ def coveralls(
             is_eager=True,
         ),
     ] = None,
+    timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--timeout',
+            help='Connect and read timeout, in seconds (default: 10/60).',
+        ),
+    ] = None,
+    connect_timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--connect-timeout',
+            help='Connect timeout, in seconds (default: 10).',
+        ),
+    ] = None,
+    read_timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--read-timeout',
+            help='Read timeout, in seconds (default: 60).',
+        ),
+    ] = None,
 ) -> None:
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     if ctx.invoked_subcommand is not None:
@@ -200,6 +237,9 @@ def coveralls(
         merge=merge,
         finish=finish,
         verbose=verbose,
+        timeout=timeout,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
     )
 
 
@@ -269,6 +309,27 @@ def debug(
             is_eager=True,
         ),
     ] = None,
+    timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--timeout',
+            help='Connect and read timeout, in seconds (default: 10/60).',
+        ),
+    ] = None,
+    connect_timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--connect-timeout',
+            help='Connect timeout, in seconds (default: 10).',
+        ),
+    ] = None,
+    read_timeout: Annotated[
+        float | None,
+        typer.Option(
+            '--read-timeout',
+            help='Read timeout, in seconds (default: 60).',
+        ),
+    ] = None,
 ) -> None:
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     _ = version
@@ -283,6 +344,9 @@ def debug(
         merge=merge,
         finish=finish,
         verbose=verbose,
+        timeout=timeout,
+        connect_timeout=connect_timeout,
+        read_timeout=read_timeout,
     )
 
 

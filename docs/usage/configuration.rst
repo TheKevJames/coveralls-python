@@ -55,6 +55,17 @@ In that case, you may also be interested in disabling SSL verification::
 
     COVERALLS_SKIP_SSL_VERIFY='1' coveralls
 
+Network requests to coveralls.io use a default connect timeout of 10 seconds and a read timeout of 60 seconds, so a stalled endpoint can never hang the CLI indefinitely. You can override these via env vars or CLI flags::
+
+    COVERALLS_TIMEOUT=30 coveralls          # applies to both connect and read
+    COVERALLS_CONNECT_TIMEOUT=5 coveralls
+    COVERALLS_READ_TIMEOUT=90 coveralls
+
+    coveralls --timeout=30
+    coveralls --connect-timeout=5 --read-timeout=90
+
+A connect- or read-specific value takes precedence over the overall ``--timeout``/``COVERALLS_TIMEOUT`` for its phase. Note that, like the underlying ``requests`` library, these are per-phase timeouts rather than a single wall-clock budget for the whole request.
+
 If you are using named jobs, you can set::
 
     COVERALLS_FLAG_NAME="insert-name-here"
@@ -67,6 +78,9 @@ Sample ``.coveralls.yml`` file::
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
     parallel: true
     coveralls_host: https://coveralls.aperture.com
+    timeout: 30
+    connect_timeout: 5
+    read_timeout: 90
 
 Github Actions support
 ----------------------

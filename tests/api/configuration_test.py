@@ -342,3 +342,91 @@ class CLIConfiguration(unittest.TestCase):
         assert cover.config['repo_token'] == 'yyy'
         assert cover.config['service_name'] == 'coveralls-aaa'
         assert cover._coveralls_host == 'https://coveralls.aaa.com'
+
+
+@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+class TimeoutConfiguration(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_cwd = pathlib.Path.cwd()
+
+    @classmethod
+    def tearDownClass(cls):
+        os.chdir(cls.old_cwd)
+
+    @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_timeout_from_file(self):
+        # pylint: disable=protected-access
+        os.chdir(tempfile.mkdtemp())
+        with open('.coveralls.mock', 'w+') as fp:
+            fp.write('repo_token: xxx\n')
+            fp.write('timeout: 45\n')
+        cover = Coveralls()
+        assert cover.config['timeout'] == 45.0
+        assert cover._request_timeout() == (45.0, 45.0)
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_default_timeout(self):
+        # pylint: disable=protected-access
+        cover = Coveralls(repo_token='xxx')
+        assert cover._request_timeout() == (10, 60)
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'COVERALLS_REPO_TOKEN': 'xxx', 'COVERALLS_TIMEOUT': '30'},
+        clear=True,
+    )
+    def test_overall_timeout_from_env(self):
+        # pylint: disable=protected-access
+        cover = Coveralls()
+        assert cover.config['timeout'] == 30.0
+        assert cover._request_timeout() == (30.0, 30.0)
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {
+            'COVERALLS_REPO_TOKEN': 'xxx',
+            'COVERALLS_CONNECT_TIMEOUT': '5',
+            'COVERALLS_READ_TIMEOUT': '90',
+        },
+        clear=True,
+    )
+    def test_phase_timeouts_from_env(self):
+        # pylint: disable=protected-access
+        cover = Coveralls()
+        assert cover._request_timeout() == (5.0, 90.0)
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {
+            'COVERALLS_REPO_TOKEN': 'xxx',
+            'COVERALLS_TIMEOUT': '30',
+            'COVERALLS_CONNECT_TIMEOUT': '5',
+        },
+        clear=True,
+    )
+    def test_phase_timeout_overrides_overall(self):
+        # pylint: disable=protected-access
+        cover = Coveralls()
+        assert cover._request_timeout() == (5.0, 30.0)
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'COVERALLS_REPO_TOKEN': 'xxx', 'COVERALLS_TIMEOUT': 'abc'},
+        clear=True,
+    )
+    def test_invalid_timeout_raises(self):
+        with pytest.raises(Exception) as excinfo:
+            Coveralls()
+        assert 'Invalid timeout' in str(excinfo.value)
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {'COVERALLS_REPO_TOKEN': 'xxx', 'COVERALLS_READ_TIMEOUT': '0'},
+        clear=True,
+    )
+    def test_non_positive_timeout_raises(self):
+        with pytest.raises(Exception) as excinfo:
+            Coveralls()
+        assert 'greater than 0' in str(excinfo.value)

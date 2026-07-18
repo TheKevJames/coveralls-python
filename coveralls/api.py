@@ -17,6 +17,12 @@ log = logging.getLogger('coveralls.api')
 
 NUMBER_REGEX = re.compile(r'(\d+)$', re.IGNORECASE)
 
+# requests has no wall-clock "total" timeout: a scalar applies separately to
+# the connect and read phases. We always send an explicit (connect, read)
+# tuple so a stalled endpoint can never hang the CLI indefinitely.
+DEFAULT_CONNECT_TIMEOUT = 10
+DEFAULT_READ_TIMEOUT = 60
+
 
 class Coveralls:
     # pylint: disable=too-many-public-methods
@@ -76,6 +82,7 @@ class Coveralls:
         self.load_config_from_environment()
         self.load_config_from_file()
         self.config.update(kwargs)
+        self._normalize_timeouts()
         if self.config.get('coveralls_host'):
             # N.B. users can set --coveralls-host via CLI, but we don't keep
             # that in the config
@@ -232,12 +239,15 @@ class Coveralls:
             self.config['parallel'] = parallel
 
         fields = {
+            'COVERALLS_CONNECT_TIMEOUT': 'connect_timeout',
             'COVERALLS_FLAG_NAME': 'flag_name',
+            'COVERALLS_READ_TIMEOUT': 'read_timeout',
             'COVERALLS_REPO_TOKEN': 'repo_token',
             'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
             'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
             'COVERALLS_SERVICE_NAME': 'service_name',
             'COVERALLS_SERVICE_NUMBER': 'service_number',
+            'COVERALLS_TIMEOUT': 'timeout',
         }
         for var, key in fields.items():
             value = os.environ.get(var)
@@ -276,12 +286,47 @@ class Coveralls:
             return {}
         return self.submit_report(json_string)
 
+    def _normalize_timeouts(self):
+        for key in ('timeout', 'connect_timeout', 'read_timeout'):
+            if key not in self.config:
+                continue
+            raw = self.config[key]
+            try:
+                value = float(raw)
+            except (TypeError, ValueError) as e:
+                raise CoverallsException(
+                    f'Invalid {key} value {raw!r}: must be a number.',
+                ) from e
+            if value <= 0:
+                raise CoverallsException(
+                    f'Invalid {key} value {raw!r}: must be greater than 0.',
+                )
+            self.config[key] = value
+
+    def _request_timeout(self):
+        overall = self.config.get('timeout')
+        connect = self.config.get('connect_timeout', overall)
+        read = self.config.get('read_timeout', overall)
+        if connect is None:
+            connect = DEFAULT_CONNECT_TIMEOUT
+        if read is None:
+            read = DEFAULT_READ_TIMEOUT
+        return (connect, read)
+
     def submit_report(self, json_string):
         endpoint = f'{self._coveralls_host.rstrip("/")}/api/v1/jobs'
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(
-            endpoint, files={'json_file': json_string}, verify=verify,
-        )
+        timeout = self._request_timeout()
+        try:
+            response = requests.post(
+                endpoint, files={'json_file': json_string}, verify=verify,
+                timeout=timeout,
+            )
+        except requests.exceptions.Timeout as e:
+            raise CoverallsException(
+                f'Timed out submitting coverage to {endpoint} '
+                f'(connect={timeout[0]}s, read={timeout[1]}s)',
+            ) from e
 
         if response.status_code == 422:
             if self.config['service_name'].startswith('github'):
@@ -323,7 +368,16 @@ class Coveralls:
 
         endpoint = f'{self._coveralls_host.rstrip("/")}/webhook'
         verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
-        response = requests.post(endpoint, json=payload, verify=verify)
+        timeout = self._request_timeout()
+        try:
+            response = requests.post(
+                endpoint, json=payload, verify=verify, timeout=timeout,
+            )
+        except requests.exceptions.Timeout as e:
+            raise CoverallsException(
+                f'Timed out finishing parallel jobs at {endpoint} '
+                f'(connect={timeout[0]}s, read={timeout[1]}s)',
+            ) from e
         try:
             response.raise_for_status()
             response = response.json()
