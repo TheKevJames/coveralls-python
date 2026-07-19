@@ -62,7 +62,7 @@ def _resolve_deprecated(
 
 def _build_overrides(
     *,
-    rcfile: str,
+    rcfile: str | None,
     service_name: str | None,
     base_dir: str | None,
     src_dir: str | None,
@@ -105,7 +105,7 @@ def _run(
     *,
     is_debug: bool,
     service_name: str | None,
-    rcfile: str,
+    rcfile: str | None,
     base_dir: str | None,
     src_dir: str | None,
     output: str | None,
@@ -201,8 +201,11 @@ _Service = Annotated[
     ),
 ]
 _Rcfile = Annotated[
-    str,
-    typer.Option('--rcfile', help='Specify coverage.py configuration.'),
+    str | None,
+    typer.Option(
+        '--rcfile',
+        help='Specify the coverage.py config file (default: auto-discovered).',
+    ),
 ]
 _BaseDir = Annotated[
     str | None,
@@ -306,7 +309,7 @@ def _dispatch(
     is_debug: bool,
     service_name: str | None,
     service: str | None,
-    rcfile: str,
+    rcfile: str | None,
     base_dir: str | None,
     basedir: str | None,
     src_dir: str | None,
@@ -357,7 +360,7 @@ def coveralls(
     ctx: typer.Context,
     service_name: _ServiceName = None,
     service: _Service = None,
-    rcfile: _Rcfile = '.coveragerc',
+    rcfile: _Rcfile = None,
     base_dir: _BaseDir = None,
     basedir: _Basedir = None,
     src_dir: _SrcDir = None,
@@ -407,7 +410,7 @@ def coveralls(
 def debug(
     service_name: _ServiceName = None,
     service: _Service = None,
-    rcfile: _Rcfile = '.coveragerc',
+    rcfile: _Rcfile = None,
     base_dir: _BaseDir = None,
     basedir: _Basedir = None,
     src_dir: _SrcDir = None,

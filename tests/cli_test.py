@@ -179,7 +179,7 @@ def test_rcfile(mock_coveralls):
 def test_service_name(mock_coveralls):
     coveralls.cli.main(argv=['--service-name=travis-pro'])
     mock_coveralls.assert_called_with(
-        True, rcfile='.coveragerc',
+        True, rcfile=None,
         service_name='travis-pro',
         base_dir=None,
         src_dir=None,
@@ -198,7 +198,7 @@ def test_host_and_skip_ssl_verify_and_parallel(mock_coveralls):
         ],
     )
     mock_coveralls.assert_called_with(
-        True, rcfile='.coveragerc',
+        True, rcfile=None,
         service_name=None,
         base_dir=None,
         src_dir=None,
@@ -260,7 +260,7 @@ def test_submit(mock_submit):
 def test_base_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--base-dir=foo'])
     mock_coveralls.assert_called_with(
-        True, rcfile='.coveragerc',
+        True, rcfile=None,
         service_name=None,
         base_dir='foo',
         src_dir=None,
@@ -272,7 +272,7 @@ def test_base_dir_arg(mock_coveralls):
 def test_src_dir_arg(mock_coveralls):
     coveralls.cli.main(argv=['--src-dir=foo'])
     mock_coveralls.assert_called_with(
-        True, rcfile='.coveragerc',
+        True, rcfile=None,
         service_name=None,
         base_dir=None,
         src_dir='foo',

@@ -326,6 +326,19 @@ def test_deprecated_key_does_not_override_explicit_canonical():
 
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_none_rcfile_override_keeps_file_value(tmp_path, monkeypatch):
+    # The CLI forwards rcfile=None when --rcfile is not passed; that must not
+    # override an rcfile/config_file set in the config file.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / '.coveralls.mock').write_text(
+        'repo_token: xxx\nconfig_file: from_yaml.rc\n',
+    )
+    config = resolve('.coveralls.mock', {'rcfile': None})
+    assert config.rcfile == 'from_yaml.rc'
+
+
+@pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_deprecated_file_keys_still_work(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / '.coveralls.mock').write_text(
