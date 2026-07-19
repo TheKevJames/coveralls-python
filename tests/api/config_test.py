@@ -13,6 +13,7 @@ from coveralls.exception import CoverallsException
 def test_defaults():
     config = Config()
     assert config.repo_token is None
+    assert config.service_name == 'coveralls-python'
     assert config.parallel is False
     assert config.host == DEFAULT_HOST
     assert config.skip_ssl_verify is False
@@ -36,7 +37,8 @@ def test_to_payload_includes_only_set_payload_fields():
 
 def test_to_payload_omits_unset_and_false_payload_fields():
     payload = Config(repo_token='xxx').to_payload()
-    assert payload == {'repo_token': 'xxx'}
+    # service_name always defaults to a real value; everything else is unset
+    assert payload == {'repo_token': 'xxx', 'service_name': 'coveralls-python'}
     # parallel defaults False and must not be advertised as a job attribute
     assert 'parallel' not in payload
 

@@ -16,6 +16,9 @@ NUMBER_REGEX = re.compile(r'(\d+)$')
 
 DEFAULT_HOST = 'https://coveralls.io/'
 
+# Used when no CI service is detected and none is configured explicitly.
+DEFAULT_SERVICE_NAME = 'coveralls-python'
+
 # requests has no wall-clock "total" timeout: a scalar applies separately to
 # the connect and read phases. We always resolve an explicit (connect, read)
 # tuple so a stalled endpoint can never hang the CLI indefinitely.
@@ -52,7 +55,7 @@ class Config:
 
     # payload fields
     repo_token: str | None = None
-    service_name: str | None = None
+    service_name: str = DEFAULT_SERVICE_NAME
     service_number: str | None = None
     service_job_id: str | None = None
     service_job_number: str | None = None
@@ -167,12 +170,13 @@ def _from_generic_ci_environment() -> dict[str, Any]:
     return {key: value for key, value in config.items() if value}
 
 
-def _detect_ci() -> tuple[str, dict[str, Any]]:
+def _detect_ci() -> tuple[str | None, dict[str, Any]]:
     # pylint: disable=too-many-return-statements
     """
     Detect the specific CI service and its service-identifying fields.
 
-    Returns the service name plus a partial config. ``token_required`` may be
+    Returns the service name (or None when no CI is detected, letting the
+    Config default apply) plus a partial config. ``token_required`` may be
     present to waive the repo-token requirement (e.g. on TravisCI).
     """
     env = os.environ
@@ -235,7 +239,7 @@ def _detect_ci() -> tuple[str, dict[str, Any]]:
                 or env.get('SEMAPHORE_GIT_PR_NUMBER')  # 2.0
             ),
         }
-    return 'coveralls-python', {}
+    return None, {}
 
 
 def _from_ci_environment() -> dict[str, Any]:
@@ -247,7 +251,8 @@ def _from_ci_environment() -> dict[str, Any]:
     config = _from_generic_ci_environment()
 
     name, fields = _detect_ci()
-    config.setdefault('service_name', name)
+    if name:
+        config.setdefault('service_name', name)
 
     token_required = fields.pop('token_required', None)
     if token_required is not None:
