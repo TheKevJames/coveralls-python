@@ -1,0 +1,23 @@
+tests/cli_test.py
+  s_32a874004aeecb::t_fc35a936117d33 69-72,407,428-429,431,435,437
+coveralls/cli.py
+  s_32a874004aeecb::t_2ac9a37ad0350a 81-82,84-86,89,170-172,339-342
+  s_32a874004aeecb::t_253ca53bb9d510 92-94,489-491
+  s_32a874004aeecb::t_0246f050fe8439 80,83,87-88,90-91,95-102,104-113,274,276,327,344-348,354-361,364-365,368-369,372-373,375-376,380-387,389-393,395,399-413,415,419-446,448,452-470,472,474-479,481
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "bed0d2473e188efcb6bc385c885b6592c3be97b7",
+  "prompts": {},
+  "sessions": {
+    "s_32a874004aeecb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f80c8-ee39-73a6-830d-b28228c87663",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
