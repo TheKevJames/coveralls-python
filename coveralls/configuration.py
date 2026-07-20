@@ -81,13 +81,13 @@ class Config:
     run_at: str | None = None
 
     # client settings
-    coveralls_host: str = DEFAULT_HOST
+    host: str = DEFAULT_HOST
     skip_ssl_verify: bool = False
     token_required: bool = True
     base_dir: str = ''
     src_dir: str = ''
     # True lets coverage.py auto-discover its config file; a str names one.
-    config_file: str | bool = True
+    rcfile: str | bool = True
     timeout: float | None = None
     connect_timeout: float | None = None
     read_timeout: float | None = None
@@ -152,6 +152,24 @@ class Config:
 
 
 _FIELD_NAMES = frozenset(f.name for f in dataclasses.fields(Config))
+
+# Config keys (in the config file or as Coveralls() kwargs) that were renamed
+# for naming consistency. The old spelling still works but warns, mirroring the
+# deprecated CLI flag aliases.
+# Permanent alternate spellings accepted in the config file and as Coveralls()
+# keyword arguments. Both the canonical name and the alias are long-term
+# supported and neither warns: ``coveralls_host`` reads more clearly in a
+# .coveralls.yml, while ``host`` matches the ``COVERALLS_HOST`` env var and
+# ``--host`` flag.
+ALIASES = {
+    'coveralls_host': 'host',
+}
+
+# Renamed keys still accepted for backwards-compatibility but deprecated: they
+# warn and will be removed in a future release.
+DEPRECATED_KEYS = {
+    'config_file': 'rcfile',
+}
 
 
 def _parse_pr_number(value: str | None) -> str | None:
@@ -289,21 +307,24 @@ def _from_environment() -> dict[str, Any]:
 
     host = os.environ.get('COVERALLS_HOST')
     if host:
-        config['coveralls_host'] = host
+        config['host'] = host
     if os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true':
         config['parallel'] = True
     if os.environ.get('COVERALLS_SKIP_SSL_VERIFY'):
         config['skip_ssl_verify'] = True
 
     fields = {
+        'COVERALLS_BASE_DIR': 'base_dir',
         'COVERALLS_CONNECT_TIMEOUT': 'connect_timeout',
         'COVERALLS_FLAG_NAME': 'flag_name',
+        'COVERALLS_RCFILE': 'rcfile',
         'COVERALLS_READ_TIMEOUT': 'read_timeout',
         'COVERALLS_REPO_TOKEN': 'repo_token',
         'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
         'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
         'COVERALLS_SERVICE_NAME': 'service_name',
         'COVERALLS_SERVICE_NUMBER': 'service_number',
+        'COVERALLS_SRC_DIR': 'src_dir',
         'COVERALLS_TIMEOUT': 'timeout',
     }
     for var, key in fields.items():
@@ -312,6 +333,31 @@ def _from_environment() -> dict[str, Any]:
             config[key] = value
 
     return config
+
+
+def _canonicalize_keys(
+    data: Mapping[str, Any], *, source: str,
+) -> dict[str, Any]:
+    """
+    Map alias/deprecated keys to their canonical names.
+
+    Permanent aliases are mapped silently; deprecated keys additionally warn.
+    An explicit canonical key in the same source always takes precedence.
+    """
+    result: dict[str, Any] = {}
+    for key, value in data.items():
+        canonical = ALIASES.get(key) or DEPRECATED_KEYS.get(key)
+        if canonical is None:
+            result[key] = value
+            continue
+        if key in DEPRECATED_KEYS:
+            log.warning(
+                '%r is deprecated and will be removed in a future release; '
+                'use %r instead (in %s).', key, canonical, source,
+            )
+        if canonical not in data:
+            result[canonical] = value
+    return result
 
 
 def _filter_known(data: Mapping[str, Any], *, source: str) -> dict[str, Any]:
@@ -341,8 +387,9 @@ def _from_file(config_filename: str) -> dict[str, Any]:
         )
         return {}
 
-    # yaml.safe_load() returns None for an empty or comment-only file.
-    data = yaml.safe_load(content) or {}
+    data = _canonicalize_keys(
+        yaml.safe_load(content) or {}, source=config_filename,
+    )
     return _filter_known(data, source=config_filename)
 
 
@@ -365,6 +412,7 @@ def resolve(
     that authenticates uploads itself. A ``token_required`` key in the config
     file or environment is therefore ignored.
     """
+    overrides = _canonicalize_keys(overrides, source='arguments')
     cleaned = _filter_known(
         {
             key: value for key, value in overrides.items()

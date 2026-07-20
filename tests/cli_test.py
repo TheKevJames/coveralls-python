@@ -20,6 +20,32 @@ def req_json(request):
     return json.loads(request.body.decode('utf-8'))
 
 
+def coveralls_kwargs(**overrides):
+    """Expected Coveralls() override kwargs: everything unset (None) initially.
+
+    The CLI forwards every value as-is and lets resolve() drop the unset ones,
+    so the constructor is always called with the full override set.
+
+    Keep this in sync with the CLI option set: a new forwarded option must be
+    added here, otherwise every test that uses the default set will silently
+    under-assert on it.
+    """
+    kwargs = {
+        'rcfile': None,
+        'service_name': None,
+        'base_dir': None,
+        'src_dir': None,
+        'host': None,
+        'parallel': None,
+        'skip_ssl_verify': None,
+        'timeout': None,
+        'connect_timeout': None,
+        'read_timeout': None,
+    }
+    kwargs.update(overrides)
+    return kwargs
+
+
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
@@ -36,6 +62,16 @@ def test_debug_no_token(mock_wear, mock_log):
     coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
     mock_log.assert_has_calls([mock.call('Testing coveralls-python...')])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_debug_accepts_options(mock_coveralls):
+    # the debug subcommand shares the full option set with the default command
+    coveralls.cli.main(argv=['debug', '--rcfile=coveragerc', '--host=h'])
+    mock_coveralls.assert_called_with(
+        False, **coveralls_kwargs(rcfile='coveragerc', host='h'),
+    )
 
 
 @mock.patch.dict(
@@ -152,23 +188,61 @@ def test_real(mock_wear, mock_log):
 def test_rcfile(mock_coveralls):
     coveralls.cli.main(argv=['--rcfile=coveragerc'])
     mock_coveralls.assert_called_with(
-        True, config_file='coveragerc',
-        service_name=None,
-        base_dir='',
-        src_dir='',
+        True, **coveralls_kwargs(rcfile='coveragerc'),
     )
 
 
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
 def test_service_name(mock_coveralls):
-    coveralls.cli.main(argv=['--service=travis-pro'])
+    coveralls.cli.main(argv=['--service-name=travis-pro'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
-        service_name='travis-pro',
-        base_dir='',
-        src_dir='',
+        True, **coveralls_kwargs(service_name='travis-pro'),
     )
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_host_and_skip_ssl_verify_and_parallel(mock_coveralls):
+    coveralls.cli.main(
+        argv=[
+            '--host=https://enterprise.example.com',
+            '--skip-ssl-verify',
+            '--parallel',
+        ],
+    )
+    mock_coveralls.assert_called_with(
+        True, **coveralls_kwargs(
+            host='https://enterprise.example.com',
+            parallel=True,
+            skip_ssl_verify=True,
+        ),
+    )
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_no_parallel_and_no_skip_ssl_verify_forward_false(mock_coveralls):
+    # --no-parallel / --no-skip-ssl-verify let the CLI express an explicit
+    # False override (matching library callers), which resolve() applies over
+    # an env/file value rather than being swallowed as an unset default.
+    coveralls.cli.main(argv=['--no-parallel', '--no-skip-ssl-verify'])
+    mock_coveralls.assert_called_with(
+        True, **coveralls_kwargs(parallel=False, skip_ssl_verify=False),
+    )
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_service_alias_warns(mock_coveralls, mock_warning):
+    coveralls.cli.main(argv=['--service=travis-pro'])
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--service', '--service-name',
+    )
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['service_name'] == 'travis-pro'
 
 
 @mock.patch.object(coveralls.cli.log, 'exception')
@@ -208,51 +282,39 @@ def test_submit(mock_submit):
 
 @mock.patch('coveralls.cli.Coveralls')
 def test_base_dir_arg(mock_coveralls):
-    coveralls.cli.main(argv=['--basedir=foo'])
+    coveralls.cli.main(argv=['--base-dir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
-        service_name=None,
-        base_dir='foo',
-        src_dir='',
+        True, **coveralls_kwargs(base_dir='foo'),
     )
 
 
 @mock.patch('coveralls.cli.Coveralls')
 def test_src_dir_arg(mock_coveralls):
-    coveralls.cli.main(argv=['--srcdir=foo'])
+    coveralls.cli.main(argv=['--src-dir=foo'])
     mock_coveralls.assert_called_with(
-        True, config_file='.coveragerc',
-        service_name=None,
-        base_dir='',
-        src_dir='foo',
+        True, **coveralls_kwargs(src_dir='foo'),
     )
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
-def test_no_timeout_args_not_forwarded(mock_coveralls):
+def test_unset_timeout_args_are_none(mock_coveralls):
+    # Unset options forward as None; resolve() drops them so nothing clobbers.
     coveralls.cli.main(argv=[])
-    _, kwargs = mock_coveralls.call_args
-    assert 'timeout' not in kwargs
-    assert 'connect_timeout' not in kwargs
-    assert 'read_timeout' not in kwargs
+    mock_coveralls.assert_called_with(True, **coveralls_kwargs())
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
 def test_timeout_arg(mock_coveralls):
     coveralls.cli.main(argv=['--timeout=30'])
-    _, kwargs = mock_coveralls.call_args
-    assert kwargs['timeout'] == 30.0
-    assert 'connect_timeout' not in kwargs
-    assert 'read_timeout' not in kwargs
+    mock_coveralls.assert_called_with(True, **coveralls_kwargs(timeout=30.0))
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
 def test_connect_and_read_timeout_args(mock_coveralls):
     coveralls.cli.main(argv=['--connect-timeout=5', '--read-timeout=90'])
-    _, kwargs = mock_coveralls.call_args
-    assert kwargs['connect_timeout'] == 5.0
-    assert kwargs['read_timeout'] == 90.0
-    assert 'timeout' not in kwargs
+    mock_coveralls.assert_called_with(
+        True, **coveralls_kwargs(connect_timeout=5.0, read_timeout=90.0),
+    )
