@@ -8,9 +8,7 @@ import re
 import coverage
 import requests
 
-from .configuration import DEFAULT_CONNECT_TIMEOUT
-from .configuration import DEFAULT_READ_TIMEOUT
-from .configuration import PAYLOAD_FIELDS
+from .configuration import Config
 from .configuration import resolve
 from .exception import CoverallsException
 from .git import git_info
@@ -47,14 +45,14 @@ class Coveralls:
         """
         self._data = None
 
-        self.config = resolve(
+        self.config: Config = resolve(
             self.config_filename, kwargs, token_required=token_required,
         )
 
         self.ensure_token()
 
     def ensure_token(self):
-        if self.config.get('repo_token') or not self.config['token_required']:
+        if self.config.repo_token or not self.config.token_required:
             return
 
         if os.environ.get('GITHUB_ACTIONS'):
@@ -81,21 +79,11 @@ class Coveralls:
             return {}
         return self.submit_report(json_string)
 
-    def _request_timeout(self):
-        overall = self.config.get('timeout')
-        connect = self.config.get('connect_timeout') or overall
-        read = self.config.get('read_timeout') or overall
-        if connect is None:
-            connect = DEFAULT_CONNECT_TIMEOUT
-        if read is None:
-            read = DEFAULT_READ_TIMEOUT
-        return (connect, read)
-
     def submit_report(self, json_string):
-        host = self.config['coveralls_host'].rstrip('/')
+        host = self.config.coveralls_host.rstrip('/')
         endpoint = f'{host}/api/v1/jobs'
-        verify = not self.config['skip_ssl_verify']
-        timeout = self._request_timeout()
+        verify = not self.config.skip_ssl_verify
+        timeout = self.config.request_timeout
         try:
             response = requests.post(
                 endpoint, files={'json_file': json_string}, verify=verify,
@@ -108,7 +96,7 @@ class Coveralls:
             ) from e
 
         if response.status_code == 422:
-            if self.config['service_name'].startswith('github'):
+            if self.config.service_name.startswith('github'):
                 print(
                     'Received 422 submitting job via Github Actions. By '
                     'default, coveralls-python uses the "github" service '
@@ -135,20 +123,20 @@ class Coveralls:
         payload = {'payload': {'status': 'done'}}
 
         # required args
-        if self.config.get('repo_token'):
-            payload['repo_token'] = self.config['repo_token']
-        if self.config.get('service_number'):
-            payload['payload']['build_num'] = self.config['service_number']
+        if self.config.repo_token:
+            payload['repo_token'] = self.config.repo_token
+        if self.config.service_number:
+            payload['payload']['build_num'] = self.config.service_number
 
         # service-specific parameters
         if os.environ.get('GITHUB_REPOSITORY'):
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
-        host = self.config['coveralls_host'].rstrip('/')
+        host = self.config.coveralls_host.rstrip('/')
         endpoint = f'{host}/webhook'
-        verify = not self.config['skip_ssl_verify']
-        timeout = self._request_timeout()
+        verify = not self.config.skip_ssl_verify
+        timeout = self.config.request_timeout
         try:
             response = requests.post(
                 endpoint, json=payload, verify=verify, timeout=timeout,
@@ -236,9 +224,7 @@ class Coveralls:
             return self._data
 
         self._data = {'source_files': self.get_coverage()} | git_info()
-        self._data.update({
-            k: self.config[k] for k in PAYLOAD_FIELDS if k in self.config
-        })
+        self._data.update(self.config.to_payload())
         if extra:
             if 'source_files' in extra:
                 self._data['source_files'].extend(extra['source_files'])
@@ -251,14 +237,13 @@ class Coveralls:
         return self._data
 
     def get_coverage(self):
-        config_file = self.config.get('config_file', True)
-        work = coverage.coverage(config_file=config_file)
+        work = coverage.coverage(config_file=self.config.config_file)
         work.load()
         work.get_data()
 
-        base_dir = self.config.get('base_dir') or ''
-        src_dir = self.config.get('src_dir') or ''
-        return CoverallReporter(work, base_dir, src_dir).coverage
+        return CoverallReporter(
+            work, self.config.base_dir, self.config.src_dir,
+        ).coverage
 
     @staticmethod
     def debug_bad_encoding(data):

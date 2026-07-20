@@ -1,7 +1,9 @@
+import dataclasses
 import logging
 import os
 import pathlib
 import re
+from collections.abc import Mapping
 from typing import Any
 
 from .exception import CoverallsException
@@ -27,14 +29,9 @@ TOKENLESS_CI_SERVICES = frozenset({'travis-ci'})
 DEFAULT_CONNECT_TIMEOUT = 10
 DEFAULT_READ_TIMEOUT = 60
 
-TIMEOUT_FIELDS = ('timeout', 'connect_timeout', 'read_timeout')
-
-# The config keys that belong in the JSON submitted to coveralls.io -- every
-# job parameter the API accepts and lets the caller set. Everything else in the
-# config (base_dir, src_dir, config_file, the timeout family, ...) controls
-# local client behaviour and must never be sent: the uploaded payload already
-# includes every source file, so leaking client-only settings is both noise and
-# a needless disclosure.
+# Fields sent to the coveralls.io API -- every job parameter the /jobs endpoint
+# accepts and lets the caller set. Everything else on Config controls local
+# client behaviour and must never enter the submitted payload.
 # See https://docs.coveralls.io/api-jobs-endpoint (service_build_url and
 # service_branch are not in that table but are populated from CI and accepted;
 # git and source_files are computed elsewhere, not sourced from config).
@@ -51,6 +48,110 @@ PAYLOAD_FIELDS = (
     'parallel',
     'run_at',
 )
+
+
+@dataclasses.dataclass
+class Config:
+    # pylint: disable=too-many-instance-attributes
+    """
+    Fully resolved coveralls-python configuration.
+
+    Fields fall into two groups. The :data:`PAYLOAD_FIELDS` are sent to the
+    coveralls.io API via :meth:`to_payload`; every other field controls local
+    client behaviour (where to send, how to talk to coverage.py, etc.) and is
+    deliberately never included in the submitted payload.
+    """
+
+    # payload fields
+    repo_token: str | None = None
+    service_name: str = DEFAULT_SERVICE_NAME
+    service_number: str | None = None
+    service_job_id: str | None = None
+    service_job_number: str | None = None
+    service_pull_request: str | None = None
+    service_branch: str | None = None
+    service_build_url: str | None = None
+    flag_name: str | None = None
+    # None means "unset"; an explicit True/False is forwarded to the API so a
+    # caller can positively mark a job as non-parallel.
+    parallel: bool | None = None
+    # No CI/env loader populates run_at; it is a caller-only field, set via the
+    # config file or a Coveralls() kwarg, and forwarded because the API accepts
+    # it (a job timestamp, per the /jobs endpoint).
+    run_at: str | None = None
+
+    # client settings
+    coveralls_host: str = DEFAULT_HOST
+    skip_ssl_verify: bool = False
+    token_required: bool = True
+    base_dir: str = ''
+    src_dir: str = ''
+    # True lets coverage.py auto-discover its config file; a str names one.
+    config_file: str | bool = True
+    timeout: float | None = None
+    connect_timeout: float | None = None
+    read_timeout: float | None = None
+
+    def __post_init__(self) -> None:
+        self.timeout = self._validate_timeout('timeout', self.timeout)
+        self.connect_timeout = self._validate_timeout(
+            'connect_timeout', self.connect_timeout,
+        )
+        self.read_timeout = self._validate_timeout(
+            'read_timeout', self.read_timeout,
+        )
+
+    @staticmethod
+    def _validate_timeout(name: str, raw: Any) -> float | None:
+        if raw is None:
+            return None
+        try:
+            value = float(raw)
+        except (TypeError, ValueError) as e:
+            raise CoverallsException(
+                f'Invalid {name} value {raw!r}: must be a number.',
+            ) from e
+        if value <= 0:
+            raise CoverallsException(
+                f'Invalid {name} value {raw!r}: must be greater than 0.',
+            )
+        return value
+
+    @property
+    def request_timeout(self) -> tuple[float, float]:
+        """
+        Resolve the (connect, read) tuple passed to ``requests``.
+
+        A phase-specific value wins for its phase; otherwise the overall
+        ``timeout`` applies; otherwise the phase default is used.
+        """
+        connect = self.connect_timeout
+        if connect is None:
+            connect = self.timeout
+        if connect is None:
+            connect = DEFAULT_CONNECT_TIMEOUT
+
+        read = self.read_timeout
+        if read is None:
+            read = self.timeout
+        if read is None:
+            read = DEFAULT_READ_TIMEOUT
+
+        return (connect, read)
+
+    def to_payload(self) -> dict[str, Any]:
+        """Build the subset of config that is submitted to the API."""
+        # Include a field when it is set to anything other than None: an
+        # explicitly-falsey value (parallel=False, a numeric 0 job id) is a
+        # real choice and must be forwarded; only unset fields are dropped.
+        return {
+            name: value
+            for name in PAYLOAD_FIELDS
+            if (value := getattr(self, name)) is not None
+        }
+
+
+_FIELD_NAMES = frozenset(f.name for f in dataclasses.fields(Config))
 
 
 def _parse_pr_number(value: str | None) -> str | None:
@@ -213,6 +314,18 @@ def _from_environment() -> dict[str, Any]:
     return config
 
 
+def _filter_known(data: Mapping[str, Any], *, source: str) -> dict[str, Any]:
+    known = {}
+    for key, value in data.items():
+        if key in _FIELD_NAMES:
+            known[key] = value
+        else:
+            log.warning(
+                'Ignoring unknown config option %r from %s.', key, source,
+            )
+    return known
+
+
 def _from_file(config_filename: str) -> dict[str, Any]:
     try:
         import yaml  # pylint: disable=import-outside-toplevel
@@ -229,33 +342,18 @@ def _from_file(config_filename: str) -> dict[str, Any]:
         return {}
 
     # yaml.safe_load() returns None for an empty or comment-only file.
-    return yaml.safe_load(content) or {}
-
-
-def _validate_timeout(name: str, raw: Any) -> float | None:
-    if raw is None:
-        return None
-    try:
-        value = float(raw)
-    except (TypeError, ValueError) as e:
-        raise CoverallsException(
-            f'Invalid {name} value {raw!r}: must be a number.',
-        ) from e
-    if value <= 0:
-        raise CoverallsException(
-            f'Invalid {name} value {raw!r}: must be greater than 0.',
-        )
-    return value
+    data = yaml.safe_load(content) or {}
+    return _filter_known(data, source=config_filename)
 
 
 def resolve(
     config_filename: str,
-    overrides: dict[str, Any],
+    overrides: Mapping[str, Any],
     *,
     token_required: bool = True,
-) -> dict[str, Any]:
+) -> Config:
     """
-    Resolve configuration from every source into a single merged config.
+    Resolve configuration from all sources into a single typed Config.
 
     Precedence (later wins): CI environment, ``COVERALLS_*`` env vars, the
     config file, then explicit overrides (e.g. CLI flags).
@@ -267,9 +365,13 @@ def resolve(
     that authenticates uploads itself. A ``token_required`` key in the config
     file or environment is therefore ignored.
     """
-    cleaned = {
-        key: value for key, value in overrides.items() if value is not None
-    }
+    cleaned = _filter_known(
+        {
+            key: value for key, value in overrides.items()
+            if value is not None
+        },
+        source='arguments',
+    )
     name, fields = _detect_ci()
 
     partials = [
@@ -282,19 +384,14 @@ def resolve(
     merged: dict[str, Any] = {}
     for part in partials:
         merged.update(part)
-
     merged['token_required'] = (
         token_required and name not in TOKENLESS_CI_SERVICES
     )
-    merged.setdefault('service_name', DEFAULT_SERVICE_NAME)
-    merged.setdefault('coveralls_host', DEFAULT_HOST)
-    # parallel is a payload field: normalize it only when a source set it, so
-    # an unset value is omitted while an explicit parallel: false is forwarded.
-    if 'parallel' in merged:
-        merged['parallel'] = bool(merged['parallel'])
-    merged['skip_ssl_verify'] = bool(merged.get('skip_ssl_verify'))
-    for name in TIMEOUT_FIELDS:
-        if name in merged:
-            merged[name] = _validate_timeout(name, merged[name])
+    # Coerce the boolean flags: a config file may carry a non-bool (e.g. a
+    # quoted ``parallel: "yes"``), which must not reach the API or a client
+    # toggle as a stray string.
+    for flag in ('parallel', 'skip_ssl_verify'):
+        if flag in merged:
+            merged[flag] = bool(merged[flag])
 
-    return merged
+    return Config(**merged)
