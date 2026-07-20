@@ -279,6 +279,18 @@ def test_override_waives_token():
     assert config.token_required is False
 
 
+def test_bool_override_precedence_is_owned_by_resolve():
+    # A None override means "unset" and must not clobber env/file; an explicit
+    # False override wins. This is the single rule resolve() enforces for both
+    # CLI (--no-parallel) and library callers.
+    env = {'COVERALLS_PARALLEL': 'true', 'COVERALLS_SKIP_SSL_VERIFY': '1'}
+    with unittest.mock.patch.dict(os.environ, env, clear=True):
+        assert resolve_config(parallel=None).parallel is True
+        assert resolve_config(parallel=False).parallel is False
+        assert resolve_config(skip_ssl_verify=None).skip_ssl_verify is True
+        assert resolve_config(skip_ssl_verify=False).skip_ssl_verify is False
+
+
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_file_source_and_unknown_key_warning(tmp_path, monkeypatch):

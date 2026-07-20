@@ -60,47 +60,6 @@ def _resolve_deprecated(
     return new if new is not None else old
 
 
-def _build_overrides(
-    *,
-    rcfile: str | None,
-    service_name: str | None,
-    base_dir: str | None,
-    src_dir: str | None,
-    host: str | None,
-    parallel: bool,
-    skip_ssl_verify: bool,
-    timeout: float | None,
-    connect_timeout: float | None,
-    read_timeout: float | None,
-) -> dict[str, Any]:
-    """
-    Collect explicit CLI values into Config overrides.
-
-    None-valued options are safe to forward (resolve() drops them), but boolean
-    flags must only be forwarded when set so their False default cannot clobber
-    a value already resolved from env vars or the config file.
-    """
-    overrides: dict[str, Any] = {
-        'rcfile': rcfile,
-        'service_name': service_name,
-        'base_dir': base_dir,
-        'src_dir': src_dir,
-        'host': host,
-    }
-    for key, value in (
-        ('timeout', timeout),
-        ('connect_timeout', connect_timeout),
-        ('read_timeout', read_timeout),
-    ):
-        if value is not None:
-            overrides[key] = value
-    if parallel:
-        overrides['parallel'] = True
-    if skip_ssl_verify:
-        overrides['skip_ssl_verify'] = True
-    return overrides
-
-
 def _run(
     *,
     is_debug: bool,
@@ -112,9 +71,9 @@ def _run(
     submit: str | None,
     merge: str | None,
     finish: bool,
-    parallel: bool,
+    parallel: bool | None,
     host: str | None,
-    skip_ssl_verify: bool,
+    skip_ssl_verify: bool | None,
     verbose: bool,
     timeout: float | None,
     connect_timeout: float | None,
@@ -130,18 +89,23 @@ def _run(
 
     token_required = not is_debug and not output
 
-    overrides = _build_overrides(
-        rcfile=rcfile,
-        service_name=service_name,
-        base_dir=base_dir,
-        src_dir=src_dir,
-        host=host,
-        parallel=parallel,
-        skip_ssl_verify=skip_ssl_verify,
-        timeout=timeout,
-        connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
+    # Forward every CLI value as-is and let resolve() own precedence: it drops
+    # the ones left unset (None) so a flag that was not passed cannot clobber a
+    # value from the environment or config file. Passing an explicit value
+    # (including a False from --no-parallel/--no-skip-ssl-verify) overrides,
+    # keeping the CLI and library entrypoints on identical precedence rules.
+    overrides: dict[str, Any] = {
+        'rcfile': rcfile,
+        'service_name': service_name,
+        'base_dir': base_dir,
+        'src_dir': src_dir,
+        'host': host,
+        'parallel': parallel,
+        'skip_ssl_verify': skip_ssl_verify,
+        'timeout': timeout,
+        'connect_timeout': connect_timeout,
+        'read_timeout': read_timeout,
+    }
 
     try:
         coverallz = Coveralls(token_required, **overrides)
@@ -252,9 +216,9 @@ _Finish = Annotated[
     typer.Option('--finish', help='Finish parallel jobs.'),
 ]
 _Parallel = Annotated[
-    bool,
+    bool | None,
     typer.Option(
-        '--parallel',
+        '--parallel/--no-parallel',
         help='Submit as one of several parallel jobs to be merged.',
     ),
 ]
@@ -263,9 +227,9 @@ _Host = Annotated[
     typer.Option('--host', help='Coveralls API host base URL.'),
 ]
 _SkipSslVerify = Annotated[
-    bool,
+    bool | None,
     typer.Option(
-        '--skip-ssl-verify',
+        '--skip-ssl-verify/--no-skip-ssl-verify',
         help='Skip verification of the SSL certificate of the host.',
     ),
 ]
@@ -318,9 +282,9 @@ def _dispatch(
     submit: str | None,
     merge: str | None,
     finish: bool,
-    parallel: bool,
+    parallel: bool | None,
     host: str | None,
-    skip_ssl_verify: bool,
+    skip_ssl_verify: bool | None,
     verbose: bool,
     timeout: float | None,
     connect_timeout: float | None,
@@ -369,9 +333,9 @@ def coveralls(
     submit: _Submit = None,
     merge: _Merge = None,
     finish: _Finish = False,
-    parallel: _Parallel = False,
+    parallel: _Parallel = None,
     host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = False,
+    skip_ssl_verify: _SkipSslVerify = None,
     verbose: _Verbose = False,
     timeout: _Timeout = None,
     connect_timeout: _ConnectTimeout = None,
@@ -419,9 +383,9 @@ def debug(
     submit: _Submit = None,
     merge: _Merge = None,
     finish: _Finish = False,
-    parallel: _Parallel = False,
+    parallel: _Parallel = None,
     host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = False,
+    skip_ssl_verify: _SkipSslVerify = None,
     verbose: _Verbose = False,
     timeout: _Timeout = None,
     connect_timeout: _ConnectTimeout = None,
