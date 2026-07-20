@@ -1,0 +1,22 @@
+tests/api/config_test.py
+  s_aea5193df500cb::t_feffd3156a4936 16,40-41
+coveralls/configuration.py
+  s_aea5193df500cb::t_59e6e98e94c866 19-21,58,173,242,254-255
+  s_aea5193df500cb::t_3cc4cc382adf0a 178-179
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6d74ff8f3d033b86d45fdacaa8579a1ba569df79",
+  "prompts": {},
+  "sessions": {
+    "s_aea5193df500cb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7558-b415-7ba1-8080-878d32b878c0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}

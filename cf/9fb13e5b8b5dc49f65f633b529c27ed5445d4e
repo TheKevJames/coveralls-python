@@ -1,0 +1,34 @@
+example/example.json
+  s_aea5193df500cb::t_1f2e8320a32898 1
+docs/troubleshooting.rst
+  s_aea5193df500cb::t_74dea6b462b24c 6
+docs/usage/configuration.rst
+  s_aea5193df500cb::t_8d56591a1e2791 62,65-66,71-72,96,101-107
+  s_aea5193df500cb::t_ad5a7d8b5ca56f 121,128
+  s_aea5193df500cb::t_d93ae42d71ce0e 32,36-45,55-56
+  s_394126a10f7b80::t_7dff01bd47c796 108
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "cf9fb13e5b8b5dc49f65f633b529c27ed5445d4e",
+  "prompts": {},
+  "sessions": {
+    "s_394126a10f7b80": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7598-e663-7365-a71b-02104430d73f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    },
+    "s_aea5193df500cb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7558-b415-7ba1-8080-878d32b878c0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
