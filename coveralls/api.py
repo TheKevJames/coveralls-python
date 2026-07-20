@@ -8,6 +8,7 @@ import re
 import coverage
 import requests
 
+from .configuration import PAYLOAD_FIELDS
 from .exception import CoverallsException
 from .git import git_info
 from .reporter import CoverallReporter
@@ -455,9 +456,10 @@ class Coveralls:
         if self._data:
             return self._data
 
-        self._data = {'source_files': self.get_coverage()}
-        self._data.update(git_info())
-        self._data.update(self.config)
+        self._data = {'source_files': self.get_coverage()} | git_info()
+        self._data.update({
+            k: self.config[k] for k in PAYLOAD_FIELDS if k in self.config
+        })
         if extra:
             if 'source_files' in extra:
                 self._data['source_files'].extend(extra['source_files'])

@@ -31,6 +31,52 @@ class WearTest(unittest.TestCase):
         result = coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
         assert result == EXPECTED
 
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_client_settings_do_not_leak_into_payload(self, _mock_requests):
+        # Regression guard: base_dir/src_dir/config_file and the timeout family
+        # are client-only settings and must never enter the submitted JSON.
+        api = coveralls.Coveralls(
+            repo_token='xxx',
+            service_name='travis-ci',
+            base_dir='foo',
+            src_dir='bar',
+            config_file='.coveragerc',
+            timeout=30,
+            connect_timeout=5,
+            read_timeout=25,
+        )
+        with unittest.mock.patch.object(api, 'get_coverage', return_value=[]):
+            data = api.create_data()
+
+        for leaked in (
+            'base_dir', 'src_dir', 'config_file',
+            'timeout', 'connect_timeout', 'read_timeout',
+        ):
+            assert leaked not in data
+        assert data['repo_token'] == 'xxx'
+        assert data['service_name'] == 'travis-ci'
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_set_payload_fields_are_forwarded_including_falsey(
+        self, _mock_requests,
+    ):
+        # Every job field the API accepts is forwarded when set -- including
+        # run_at, and including explicitly-falsey values (parallel=False, a
+        # numeric 0 job id). Only genuinely-absent fields are dropped.
+        api = coveralls.Coveralls(
+            repo_token='xxx',
+            service_name='travis-ci',
+            run_at='2013-02-18 00:52:48 -0800',
+            parallel=False,
+            service_job_id=0,
+        )
+        with unittest.mock.patch.object(api, 'get_coverage', return_value=[]):
+            data = api.create_data()
+
+        assert data['run_at'] == '2013-02-18 00:52:48 -0800'
+        assert data['parallel'] is False
+        assert data['service_job_id'] == 0
+
     def test_merge(self, _mock_requests):
         with tempfile.NamedTemporaryFile() as coverage_file:
             coverage_file.write(
