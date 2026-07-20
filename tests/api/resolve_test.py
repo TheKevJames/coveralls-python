@@ -325,6 +325,21 @@ def test_deprecated_key_does_not_override_explicit_canonical():
 
 
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+@pytest.mark.parametrize('content', ['', '\n\n', '# only a comment\n'])
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_empty_config_file_is_ignored(content, tmp_path, monkeypatch):
+    # yaml.safe_load() returns None for empty/comment-only files; resolve must
+    # treat that as no config rather than crashing on a None update.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / '.coveralls.mock').write_text(content)
+
+    config = resolve('.coveralls.mock', {})
+
+    assert config.service_name == 'coveralls-python'
+    assert config.repo_token is None
+
+
+@pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_none_rcfile_override_keeps_file_value(tmp_path, monkeypatch):
     # The CLI forwards rcfile=None when --rcfile is not passed; that must not
