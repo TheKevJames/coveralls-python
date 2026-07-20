@@ -1,0 +1,29 @@
+coveralls/api.py
+  s_61195346338880::t_2ed40fcc643d45 460-462
+  s_61195346338880::t_ad4b787d8056a3 459
+  s_61195346338880::t_ff9eefe36f28ae 11
+tests/api/wear_test.py
+  s_61195346338880::t_20825c1307d182 34-58
+  s_61195346338880::t_9e65212cde21e9 59-79
+example/example.json
+  s_61195346338880::t_09cf816c7fa02b 1
+coveralls/configuration.py
+  s_61195346338880::t_69cfce6b154977 1-9,21
+  s_61195346338880::t_b19ccbdd6227dd 10-20,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "66bfb6b849f0f15791a0dd0dc97dd9d08fc6fc24",
+  "prompts": {},
+  "sessions": {
+    "s_61195346338880": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f87-b1e0-7ecf-8cf3-46f82e76057c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
