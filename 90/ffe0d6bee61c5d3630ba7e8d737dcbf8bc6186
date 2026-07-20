@@ -1,0 +1,29 @@
+CHANGELOG.legacy.md
+  s_635b48e1430736::t_1a62becbc8fa7e 1-475
+CHANGELOG.md
+  s_635b48e1430736::t_65a15aacaddf40 1-12
+cliff.toml
+  s_635b48e1430736::t_444630294a4aed 34
+  s_635b48e1430736::t_140a8200fac0c2 14-15,17
+  s_635b48e1430736::t_c6c251ce24ca92 16,32-33
+.pre-commit-config.yaml
+  s_635b48e1430736::t_652016a3e2b074 4-7,210-216
+scripts/update-changelog.sh
+  s_635b48e1430736::t_502b9eca11cf33 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "90ffe0d6bee61c5d3630ba7e8d737dcbf8bc6186",
+  "prompts": {},
+  "sessions": {
+    "s_635b48e1430736": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f91-a971-7cbb-9860-db2b6c002f9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
