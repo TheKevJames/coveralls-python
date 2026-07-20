@@ -1,0 +1,27 @@
+coveralls/api.py
+  s_61195346338880::t_ff9eefe36f28ae 11
+  s_61195346338880::t_ad4b787d8056a3 459
+  s_61195346338880::t_941268ded143db 460-461
+tests/api/wear_test.py
+  s_61195346338880::t_20825c1307d182 34-58
+example/example.json
+  s_61195346338880::t_09cf816c7fa02b 1
+coveralls/configuration.py
+  s_61195346338880::t_b19ccbdd6227dd 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b9dfbc791efabe68512c5c90e2fe22b1c9afbbd0",
+  "prompts": {},
+  "sessions": {
+    "s_61195346338880": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f87-b1e0-7ecf-8cf3-46f82e76057c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
