@@ -1,0 +1,19 @@
+tests/cli_test.py
+  s_32a874004aeecb::t_dc8205ee9f0b9a 248-282
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c98376a8010f042309e109ceee4f3c8691e77fc0",
+  "prompts": {},
+  "sessions": {
+    "s_32a874004aeecb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f80c8-ee39-73a6-830d-b28228c87663",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
