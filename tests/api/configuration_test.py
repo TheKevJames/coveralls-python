@@ -236,6 +236,20 @@ class NoConfiguration(unittest.TestCase):
     @unittest.mock.patch.dict(
         os.environ,
         {
+            'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777',
+            'TRAVIS_PULL_REQUEST': 'false',
+        },
+        clear=True,
+    )
+    def test_travis_no_pr_false_sentinel(self):
+        # Travis sets TRAVIS_PULL_REQUEST='false' on non-PR builds; the 'false'
+        # sentinel must not leak into the payload as a PR number.
+        cover = Coveralls(repo_token='xxx')
+        assert 'service_pull_request' not in cover.config
+
+    @unittest.mock.patch.dict(
+        os.environ,
+        {
             'SEMAPHORE': 'True',
             'SEMAPHORE_EXECUTABLE_UUID': '36980c73',
             'SEMAPHORE_JOB_UUID': 'a26d42cf',
@@ -320,9 +334,8 @@ class NoConfiguration(unittest.TestCase):
         clear=True,
     )
     def test_service_name_from_env(self):
-        # pylint: disable=protected-access
         cover = Coveralls()
-        assert cover._coveralls_host == 'aaa'
+        assert cover.config['coveralls_host'] == 'aaa'
         assert cover.config['parallel'] is True
         assert cover.config['repo_token'] == 'a1b2c3d4'
         assert cover.config['service_name'] == 'bbb'
@@ -333,7 +346,6 @@ class NoConfiguration(unittest.TestCase):
 @unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class CLIConfiguration(unittest.TestCase):
     def test_load_config(self):
-        # pylint: disable=protected-access
         cover = Coveralls(
             repo_token='yyy',
             service_name='coveralls-aaa',
@@ -341,7 +353,7 @@ class CLIConfiguration(unittest.TestCase):
         )
         assert cover.config['repo_token'] == 'yyy'
         assert cover.config['service_name'] == 'coveralls-aaa'
-        assert cover._coveralls_host == 'https://coveralls.aaa.com'
+        assert cover.config['coveralls_host'] == 'https://coveralls.aaa.com'
 
 
 @unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
@@ -430,3 +442,56 @@ class TimeoutConfiguration(unittest.TestCase):
         with pytest.raises(Exception) as excinfo:
             Coveralls()
         assert 'greater than 0' in str(excinfo.value)
+
+
+@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
+class TokenRequired(unittest.TestCase):
+    """token_required guards against accidental tokenless uploads.
+
+    Only CI detection and the explicit constructor argument may waive it; the
+    config file and env vars must not, so a committed .coveralls.yml cannot
+    silently disable the check.
+    """
+
+    def setUp(self):
+        self._old_cwd = pathlib.Path.cwd()
+
+    def tearDown(self):
+        # Restore cwd per-test: test_config_file_cannot_waive chdir's into a
+        # temp dir, and leaking that would break cwd-sensitive tests (e.g.
+        # git_test) that run afterwards.
+        os.chdir(self._old_cwd)
+
+    @unittest.mock.patch.dict(
+        os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'}, clear=True,
+    )
+    def test_ci_waives(self):
+        cover = Coveralls()
+        assert cover.config['token_required'] is False
+
+    @unittest.mock.patch.dict(
+        os.environ, {'APPVEYOR': 'True', 'APPVEYOR_BUILD_ID': '1'}, clear=True,
+    )
+    def test_non_tokenless_ci_still_requires_token(self):
+        # Only services that authenticate uploads themselves waive the token;
+        # a normal CI service must still provide one.
+        with pytest.raises(Exception) as excinfo:
+            Coveralls()
+        assert 'provide either repo_token' in str(excinfo.value)
+
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_constructor_argument_waives(self):
+        cover = Coveralls(token_required=False)
+        assert cover.config['token_required'] is False
+
+    @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+    @unittest.mock.patch.dict(os.environ, {}, clear=True)
+    def test_config_file_cannot_waive(self):
+        # A token_required: false in the config file is ignored: it is not a
+        # user-facing setting and must not disable the guard.
+        os.chdir(tempfile.mkdtemp())
+        pathlib.Path('.coveralls.mock').write_text('token_required: false\n')
+
+        with pytest.raises(Exception) as excinfo:
+            Coveralls()
+        assert 'provide either repo_token' in str(excinfo.value)
