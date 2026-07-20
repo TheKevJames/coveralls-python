@@ -22,9 +22,12 @@ class Coveralls:
     # pylint: disable=too-many-public-methods
     config_filename = '.coveralls.yml'
 
-    def __init__(self, token_required=True, service_name=None, **kwargs):
+    def __init__(self, token_required=True, **kwargs):
         """
         Initialize the main Coveralls collection entrypoint.
+
+        Keyword arguments are treated as explicit config overrides (highest
+        precedence) and must be valid :class:`Config` fields, e.g.:
 
         * repo_token
           The secret token for your repository, found at the bottom of your
@@ -35,19 +38,14 @@ class Coveralls:
           This can be anything, but certain services have special features
           (travis-ci, travis-pro, or coveralls-ruby).
 
-        * [service_job_id]
+        * service_job_id
           A unique identifier of the job on the service specified by
           service_name.
-
-        Remaining keyword arguments are treated as explicit config overrides
-        (highest precedence) and must be valid :class:`Config` fields.
         """
         self._data = None
 
         overrides = kwargs.copy()
         overrides['token_required'] = token_required
-        if service_name:
-            overrides['service_name'] = service_name
         self.config: Config = resolve(self.config_filename, overrides)
 
         self.ensure_token()
