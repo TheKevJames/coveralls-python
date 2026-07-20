@@ -11,8 +11,14 @@ body = """
         - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
             {% if commit.breaking %}[**breaking**] {% endif %}\
             {{ commit.message | upper_first }}\
+            {% for footer in commit.footers %}\
+              {% if footer.token == "changelog" %}\
+                {{ footer.value | trim | indent(prefix="  ", first=true) }}\
+              {% endif %}\
+            {% endfor %}\
     {% endfor %}
 {% endfor %}
+
 """
 trim = true
 render_always = true
@@ -26,9 +32,7 @@ conventional_commits = true
 filter_unconventional = false
 require_conventional = false
 split_commits = false
-commit_preprocessors = [
-    { pattern = "(?s)\n.*$", replace = "" },
-]
+commit_preprocessors = []
 protect_breaking_commits = false
 commit_parsers = [
     { message = "^feat", group = "<!-- 0 -->Features" },
