@@ -8,7 +8,10 @@ import re
 import coverage
 import requests
 
+from .configuration import DEFAULT_CONNECT_TIMEOUT
+from .configuration import DEFAULT_READ_TIMEOUT
 from .configuration import PAYLOAD_FIELDS
+from .configuration import resolve
 from .exception import CoverallsException
 from .git import git_info
 from .reporter import CoverallReporter
@@ -16,22 +19,18 @@ from .reporter import CoverallReporter
 
 log = logging.getLogger('coveralls.api')
 
-NUMBER_REGEX = re.compile(r'(\d+)$', re.IGNORECASE)
-
-# requests has no wall-clock "total" timeout: a scalar applies separately to
-# the connect and read phases. We always send an explicit (connect, read)
-# tuple so a stalled endpoint can never hang the CLI indefinitely.
-DEFAULT_CONNECT_TIMEOUT = 10
-DEFAULT_READ_TIMEOUT = 60
-
 
 class Coveralls:
     # pylint: disable=too-many-public-methods
     config_filename = '.coveralls.yml'
 
-    def __init__(self, token_required=True, service_name=None, **kwargs):
+    def __init__(self, token_required=True, **kwargs):
         """
         Initialize the main Coveralls collection entrypoint.
+
+        Keyword arguments are treated as explicit config overrides (highest
+        precedence) and merged with the CI environment, ``COVERALLS_*`` env
+        vars, and the config file by :func:`resolve`, e.g.:
 
         * repo_token
           The secret token for your repository, found at the bottom of your
@@ -42,20 +41,20 @@ class Coveralls:
           This can be anything, but certain services have special features
           (travis-ci, travis-pro, or coveralls-ruby).
 
-        * [service_job_id]
+        * service_job_id
           A unique identifier of the job on the service specified by
           service_name.
         """
         self._data = None
-        self._coveralls_host = 'https://coveralls.io/'
-        self._token_required = token_required
-        self.config = {}
 
-        self.load_config(kwargs, service_name)
+        self.config = resolve(
+            self.config_filename, kwargs, token_required=token_required,
+        )
+
         self.ensure_token()
 
     def ensure_token(self):
-        if self.config.get('repo_token') or not self._token_required:
+        if self.config.get('repo_token') or not self.config['token_required']:
             return
 
         if os.environ.get('GITHUB_ACTIONS'):
@@ -70,211 +69,6 @@ class Coveralls:
             f'{self.config_filename} or set the COVERALLS_REPO_TOKEN env var.',
         )
 
-    def load_config(self, kwargs, service_name):
-        """
-        Loads all coveralls configuration in the following precedence order.
-
-            1. automatic CI configuration
-            2. COVERALLS_* env vars
-            3. .coveralls.yml config file
-            4. CLI flags
-        """
-        self.load_config_from_ci_environment()
-        self.load_config_from_environment()
-        self.load_config_from_file()
-        self.config.update(kwargs)
-        self._normalize_timeouts()
-        if self.config.get('coveralls_host'):
-            # N.B. users can set --coveralls-host via CLI, but we don't keep
-            # that in the config
-            self._coveralls_host = self.config.pop('coveralls_host')
-        if service_name:
-            self.config['service_name'] = service_name
-
-    @staticmethod
-    def load_config_from_appveyor():
-        pr = os.environ.get('APPVEYOR_PULL_REQUEST_NUMBER')
-        return 'appveyor', os.environ.get('APPVEYOR_BUILD_ID'), None, pr
-
-    @staticmethod
-    def load_config_from_buildkite():
-        pr = os.environ.get('BUILDKITE_PULL_REQUEST')
-        if pr == 'false':
-            pr = None
-        return 'buildkite', os.environ.get('BUILDKITE_JOB_ID'), None, pr
-
-    @staticmethod
-    def load_config_from_circle():
-        number = (
-            os.environ.get('CIRCLE_WORKFLOW_ID')
-            or os.environ.get('CIRCLE_BUILD_NUM')
-        )
-        pr = (os.environ.get('CI_PULL_REQUEST') or '').split('/')[-1] or None
-        job = os.environ.get('CIRCLE_NODE_INDEX')
-        return 'circleci', job, number, pr
-
-    def load_config_from_github(self):
-        # See https://github.com/lemurheavy/coveralls-public/issues/1710
-
-        # Github tokens and standard Coveralls tokens are almost but not quite
-        # the same -- forceibly using Github's flow seems to be more stable
-        self.config['repo_token'] = os.environ.get('GITHUB_TOKEN')
-
-        pr = None
-        if os.environ.get('GITHUB_REF', '').startswith('refs/pull/'):
-            pr = os.environ.get('GITHUB_REF', '//').split('/')[2]
-
-        # TODO: coveralls suggests using the RUN_ID for both these values:
-        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1539203555
-        # However, they also suggest following this successful config approach:
-        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1913696022
-        # which instead sets:
-        # COVERALLS_SERVICE_JOB_ID: $GITHUB_RUN_ID
-        # COVERALLS_SERVICE_NUMBER: $GITHUB_WORKFLOW-$GITHUB_RUN_NUMBER
-        # should we do the same?
-        job = os.environ.get('GITHUB_RUN_ID')
-        number = os.environ.get('GITHUB_RUN_ID')
-
-        # N.B. per Coveralls:
-        # > When you want to identify the repo at Coveralls by its
-        # > GITHUB_TOKEN, you should choose github, and when you want to
-        # > identify it by its Coveralls Repo Token, you should choose
-        # > github-action.
-        # https://github.com/lemurheavy/coveralls-public/issues/1710#issuecomment-1539203555
-        return 'github', job, number, pr
-
-    @staticmethod
-    def load_config_from_jenkins():
-        pr = os.environ.get('CI_PULL_REQUEST', '').split('/')[-1] or None
-        return 'jenkins', os.environ.get('BUILD_NUMBER'), None, pr
-
-    @staticmethod
-    def load_config_from_travis():
-        pr = os.environ.get('TRAVIS_PULL_REQUEST')
-        return 'travis-ci', os.environ.get('TRAVIS_JOB_ID'), None, pr
-
-    @staticmethod
-    def load_config_from_semaphore():
-        job = (
-            os.environ.get('SEMAPHORE_JOB_UUID')  # Classic
-            or os.environ.get('SEMAPHORE_JOB_ID')  # 2.0
-        )
-        number = (
-            os.environ.get('SEMAPHORE_EXECUTABLE_UUID')  # Classic
-            or os.environ.get('SEMAPHORE_WORKFLOW_ID')  # 2.0
-        )
-        pr = (
-            os.environ.get('SEMAPHORE_BRANCH_ID')  # Classic
-            or os.environ.get('SEMAPHORE_GIT_PR_NUMBER')  # 2.0
-        )
-        return 'semaphore-ci', job, number, pr
-
-    @staticmethod
-    def load_config_from_unknown():
-        return 'coveralls-python', None, None, None
-
-    def load_config_from_generic_ci_environment(self):
-        # Inspired by the official client:
-        # coveralls-ruby in lib/coveralls/configuration.rb
-        # (set_standard_service_params_for_generic_ci)
-
-        # The meaning of each env var is clarified in:
-        # https://github.com/lemurheavy/coveralls-public/issues/1558
-
-        config = {
-            'service_name': os.environ.get('CI_NAME'),
-            'service_number': os.environ.get('CI_BUILD_NUMBER'),
-            'service_build_url': os.environ.get('CI_BUILD_URL'),
-            'service_job_id': os.environ.get('CI_JOB_ID'),
-            'service_branch': os.environ.get('CI_BRANCH'),
-        }
-
-        pr_match = NUMBER_REGEX.findall(os.environ.get('CI_PULL_REQUEST', ''))
-        if pr_match:
-            config['service_pull_request'] = pr_match[-1]
-
-        non_empty = {key: value for key, value in config.items() if value}
-        self.config.update(non_empty)
-
-    def load_config_from_ci_environment(self):
-        # pylint: disable=too-complex
-        # As defined at the bottom of
-        # https://docs.coveralls.io/supported-ci-services
-        # there are a few env vars that should support any arbitrary CI.
-        # We load them first and allow more specific vars to overwrite
-        self.load_config_from_generic_ci_environment()
-
-        if os.environ.get('APPVEYOR'):
-            name, job, number, pr = self.load_config_from_appveyor()
-        elif os.environ.get('BUILDKITE'):
-            name, job, number, pr = self.load_config_from_buildkite()
-        elif os.environ.get('CIRCLECI'):
-            name, job, number, pr = self.load_config_from_circle()
-        elif os.environ.get('GITHUB_ACTIONS'):
-            name, job, number, pr = self.load_config_from_github()
-        elif os.environ.get('JENKINS_HOME'):
-            name, job, number, pr = self.load_config_from_jenkins()
-        elif os.environ.get('TRAVIS'):
-            self._token_required = False
-            name, job, number, pr = self.load_config_from_travis()
-        elif os.environ.get('SEMAPHORE'):
-            name, job, number, pr = self.load_config_from_semaphore()
-        else:
-            name, job, number, pr = self.load_config_from_unknown()
-
-        self.config.setdefault('service_name', name)
-        if job:
-            self.config['service_job_id'] = job
-        if number:
-            self.config['service_number'] = number
-        if pr:
-            self.config['service_pull_request'] = pr
-
-    def load_config_from_environment(self):
-        coveralls_host = os.environ.get('COVERALLS_HOST')
-        if coveralls_host:
-            self._coveralls_host = coveralls_host
-
-        parallel = os.environ.get('COVERALLS_PARALLEL', '').lower() == 'true'
-        if parallel:
-            self.config['parallel'] = parallel
-
-        fields = {
-            'COVERALLS_CONNECT_TIMEOUT': 'connect_timeout',
-            'COVERALLS_FLAG_NAME': 'flag_name',
-            'COVERALLS_READ_TIMEOUT': 'read_timeout',
-            'COVERALLS_REPO_TOKEN': 'repo_token',
-            'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
-            'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
-            'COVERALLS_SERVICE_NAME': 'service_name',
-            'COVERALLS_SERVICE_NUMBER': 'service_number',
-            'COVERALLS_TIMEOUT': 'timeout',
-        }
-        for var, key in fields.items():
-            value = os.environ.get(var)
-            if value:
-                self.config[key] = value
-
-    def load_config_from_file(self):
-        try:
-            import yaml  # pylint: disable=import-outside-toplevel
-        except ImportError:
-            log.warning(
-                'PyYAML is not installed, skipping %s.',
-                self.config_filename,
-            )
-            return
-
-        try:
-            config = (pathlib.Path.cwd() / self.config_filename).read_text()
-        except FileNotFoundError:
-            log.debug(
-                'Missing %s file. Using only env variables.',
-                self.config_filename,
-            )
-        else:
-            self.config.update(yaml.safe_load(config))
-
     def merge(self, path):
         reader = codecs.getreader('utf-8')
         with open(path, 'rb') as fh:
@@ -287,27 +81,10 @@ class Coveralls:
             return {}
         return self.submit_report(json_string)
 
-    def _normalize_timeouts(self):
-        for key in ('timeout', 'connect_timeout', 'read_timeout'):
-            if key not in self.config:
-                continue
-            raw = self.config[key]
-            try:
-                value = float(raw)
-            except (TypeError, ValueError) as e:
-                raise CoverallsException(
-                    f'Invalid {key} value {raw!r}: must be a number.',
-                ) from e
-            if value <= 0:
-                raise CoverallsException(
-                    f'Invalid {key} value {raw!r}: must be greater than 0.',
-                )
-            self.config[key] = value
-
     def _request_timeout(self):
         overall = self.config.get('timeout')
-        connect = self.config.get('connect_timeout', overall)
-        read = self.config.get('read_timeout', overall)
+        connect = self.config.get('connect_timeout') or overall
+        read = self.config.get('read_timeout') or overall
         if connect is None:
             connect = DEFAULT_CONNECT_TIMEOUT
         if read is None:
@@ -315,8 +92,9 @@ class Coveralls:
         return (connect, read)
 
     def submit_report(self, json_string):
-        endpoint = f'{self._coveralls_host.rstrip("/")}/api/v1/jobs'
-        verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        host = self.config['coveralls_host'].rstrip('/')
+        endpoint = f'{host}/api/v1/jobs'
+        verify = not self.config['skip_ssl_verify']
         timeout = self._request_timeout()
         try:
             response = requests.post(
@@ -367,8 +145,9 @@ class Coveralls:
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
-        endpoint = f'{self._coveralls_host.rstrip("/")}/webhook'
-        verify = not bool(os.environ.get('COVERALLS_SKIP_SSL_VERIFY'))
+        host = self.config['coveralls_host'].rstrip('/')
+        endpoint = f'{host}/webhook'
+        verify = not self.config['skip_ssl_verify']
         timeout = self._request_timeout()
         try:
             response = requests.post(
