@@ -43,7 +43,7 @@ class TestConfigIntegration:
     def test_reads_environment(self):
         cover = Coveralls()
 
-        assert cover.config.coveralls_host == 'https://enterprise.example.com'
+        assert cover.config.host == 'https://enterprise.example.com'
         assert cover.config.parallel is True
         assert cover.config.repo_token == 'a1b2c3d4'
         assert cover.config.service_name == 'bbb'
@@ -53,12 +53,12 @@ class TestConfigIntegration:
         cover = Coveralls(
             repo_token='yyy',
             service_name='coveralls-aaa',
-            coveralls_host='https://coveralls.aaa.com',
+            host='https://coveralls.aaa.com',
         )
 
         assert cover.config.repo_token == 'yyy'
         assert cover.config.service_name == 'coveralls-aaa'
-        assert cover.config.coveralls_host == 'https://coveralls.aaa.com'
+        assert cover.config.host == 'https://coveralls.aaa.com'
 
     @unittest.mock.patch.dict(
         os.environ,

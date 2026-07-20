@@ -16,12 +16,12 @@ def test_defaults():
     assert config.service_name == 'coveralls-python'
     assert config.parallel is None
     assert config.run_at is None
-    assert config.coveralls_host == DEFAULT_HOST
+    assert config.host == DEFAULT_HOST
     assert config.skip_ssl_verify is False
     assert config.token_required is True
     assert config.base_dir == ''
     assert config.src_dir == ''
-    assert config.config_file is True
+    assert config.rcfile is True
     assert config.timeout is None
     assert config.connect_timeout is None
     assert config.read_timeout is None
@@ -56,12 +56,12 @@ def test_to_payload_forwards_explicitly_set_falsey_fields():
 # listed here. test_payload_and_client_fields_..._cover_the_dataclass enforces
 # this, so add new fields to one list or the other.
 CLIENT_ONLY_FIELDS = (
-    'coveralls_host',
+    'host',
     'skip_ssl_verify',
     'token_required',
     'base_dir',
     'src_dir',
-    'config_file',
+    'rcfile',
     'timeout',
     'connect_timeout',
     'read_timeout',
@@ -69,15 +69,15 @@ CLIENT_ONLY_FIELDS = (
 
 
 def test_client_settings_never_leak_into_payload():
-    # Regression guard: base_dir/src_dir/config_file and the timeout family
-    # have all historically leaked into the submitted JSON via a config bag.
+    # Regression guard: base_dir/src_dir/rcfile and the timeout family have all
+    # historically leaked into the submitted JSON via an untyped config bag.
     payload = Config(
         repo_token='xxx',
-        coveralls_host='https://enterprise.example.com',
+        host='https://enterprise.example.com',
         skip_ssl_verify=True,
         base_dir='b',
         src_dir='s',
-        config_file='.coveragerc',
+        rcfile='.coveragerc',
         timeout=30,
         connect_timeout=5,
         read_timeout=25,

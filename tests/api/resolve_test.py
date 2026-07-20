@@ -265,12 +265,15 @@ def test_generic_ci_name_wins_over_specific_service():
         'COVERALLS_SERVICE_JOB_NUMBER': '1234',
         'COVERALLS_SKIP_SSL_VERIFY': '1',
         'COVERALLS_TIMEOUT': '30',
+        'COVERALLS_RCFILE': 'custom.rc',
+        'COVERALLS_BASE_DIR': 'base',
+        'COVERALLS_SRC_DIR': 'src',
     },
     clear=True,
 )
 def test_environment_variables():
     config = resolve_config()
-    assert config.coveralls_host == 'https://enterprise.example.com'
+    assert config.host == 'https://enterprise.example.com'
     assert config.parallel is True
     assert config.repo_token == 'a1b2c3d4'
     assert config.service_name == 'bbb'
@@ -278,15 +281,17 @@ def test_environment_variables():
     assert config.service_job_number == '1234'
     assert config.skip_ssl_verify is True
     assert config.timeout == 30.0
+    # base_dir/src_dir/rcfile complete the convention on the env interface
+    assert config.rcfile == 'custom.rc'
+    assert config.base_dir == 'base'
+    assert config.src_dir == 'src'
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_overrides_win_over_environment():
     with unittest.mock.patch.dict(os.environ, {'COVERALLS_HOST': 'env'}):
-        config = resolve_config(
-            coveralls_host='cli', service_name='cli-service',
-        )
-    assert config.coveralls_host == 'cli'
+        config = resolve_config(host='cli', service_name='cli-service')
+    assert config.host == 'cli'
     assert config.service_name == 'cli-service'
 
 
@@ -399,6 +404,39 @@ def test_resolve_returns_config_instance():
     assert isinstance(resolve_config(), Config)
 
 
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_coveralls_host_alias_is_permanent_and_silent():
+    # coveralls_host and host are both long-term spellings; the alias maps to
+    # host and must NOT emit a deprecation warning.
+    with unittest.mock.patch.object(log, 'warning') as warning:
+        config = resolve_config(
+            repo_token='x', coveralls_host='https://old.example.com',
+        )
+    assert config.host == 'https://old.example.com'
+    warning.assert_not_called()
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_deprecated_config_file_key_warns():
+    with unittest.mock.patch.object(log, 'warning') as warning:
+        config = resolve_config(repo_token='x', config_file='custom.rc')
+    assert config.rcfile == 'custom.rc'
+    warning.assert_called_once_with(
+        '%r is deprecated and will be removed in a future release; use %r '
+        'instead (in %s).', 'config_file', 'rcfile', 'arguments',
+    )
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_alias_does_not_override_explicit_canonical():
+    config = resolve_config(
+        repo_token='x',
+        host='https://new.example.com',
+        coveralls_host='https://old.example.com',
+    )
+    assert config.host == 'https://new.example.com'
+
+
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @pytest.mark.parametrize('content', ['', '\n\n', '# only a comment\n'])
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
@@ -416,12 +454,33 @@ def test_empty_config_file_is_ignored(content, tmp_path, monkeypatch):
 
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
-def test_none_config_file_override_keeps_file_value(tmp_path, monkeypatch):
-    # The CLI forwards config_file=None when unset; that must not override a
-    # config_file set in the config file.
+def test_none_rcfile_override_keeps_file_value(tmp_path, monkeypatch):
+    # The CLI forwards rcfile=None when --rcfile is not passed; that must not
+    # override an rcfile/config_file set in the config file.
     monkeypatch.chdir(tmp_path)
     (tmp_path / '.coveralls.mock').write_text(
         'repo_token: xxx\nconfig_file: from_yaml.rc\n',
     )
-    config = resolve('.coveralls.mock', {'config_file': None})
-    assert config.config_file == 'from_yaml.rc'
+    config = resolve('.coveralls.mock', {'rcfile': None})
+    assert config.rcfile == 'from_yaml.rc'
+
+
+@pytest.mark.skipif(yaml is None, reason='requires PyYAML')
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+def test_alias_and_deprecated_file_keys_still_work(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / '.coveralls.mock').write_text(
+        'repo_token: xxx\n'
+        'coveralls_host: https://old.example.com\n'
+        'config_file: custom.rc\n',
+    )
+    with unittest.mock.patch.object(log, 'warning') as warning:
+        config = resolve('.coveralls.mock', {})
+
+    assert config.host == 'https://old.example.com'
+    assert config.rcfile == 'custom.rc'
+    # config_file is deprecated (warns); coveralls_host is a permanent alias.
+    warning.assert_called_once_with(
+        '%r is deprecated and will be removed in a future release; use %r '
+        'instead (in %s).', 'config_file', 'rcfile', '.coveralls.mock',
+    )

@@ -33,14 +33,15 @@ class WearTest(unittest.TestCase):
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_client_settings_do_not_leak_into_payload(self, _mock_requests):
-        # Regression guard: base_dir/src_dir/config_file and the timeout family
-        # are client-only settings and must never enter the submitted JSON.
+        # Regression guard at the create_data() boundary: base_dir/src_dir/
+        # rcfile and the timeout family are client-only and must never enter
+        # the submitted JSON.
         api = coveralls.Coveralls(
             repo_token='xxx',
             service_name='travis-ci',
             base_dir='foo',
             src_dir='bar',
-            config_file='.coveragerc',
+            rcfile='.coveragerc',
             timeout=30,
             connect_timeout=5,
             read_timeout=25,
@@ -49,7 +50,7 @@ class WearTest(unittest.TestCase):
             data = api.create_data()
 
         for leaked in (
-            'base_dir', 'src_dir', 'config_file',
+            'base_dir', 'src_dir', 'rcfile', 'config_file',
             'timeout', 'connect_timeout', 'read_timeout',
         ):
             assert leaked not in data
@@ -173,7 +174,7 @@ class WearTest(unittest.TestCase):
         # any channel -- here as explicit overrides, not just env vars.
         coveralls.Coveralls(
             repo_token='xxx',
-            coveralls_host='https://coveralls.my-enterprise.info',
+            host='https://coveralls.my-enterprise.info',
             skip_ssl_verify=True,
         ).wear(dry_run=False)
         mock_requests.post.assert_called_once_with(

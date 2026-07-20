@@ -27,8 +27,7 @@ class Coveralls:
         Initialize the main Coveralls collection entrypoint.
 
         Keyword arguments are treated as explicit config overrides (highest
-        precedence) and merged with the CI environment, ``COVERALLS_*`` env
-        vars, and the config file by :func:`resolve`, e.g.:
+        precedence) and must be valid :class:`Config` fields, e.g.:
 
         * repo_token
           The secret token for your repository, found at the bottom of your
@@ -80,8 +79,7 @@ class Coveralls:
         return self.submit_report(json_string)
 
     def submit_report(self, json_string):
-        host = self.config.coveralls_host.rstrip('/')
-        endpoint = f'{host}/api/v1/jobs'
+        endpoint = f'{self.config.host.rstrip("/")}/api/v1/jobs'
         verify = not self.config.skip_ssl_verify
         timeout = self.config.request_timeout
         try:
@@ -133,8 +131,7 @@ class Coveralls:
             # Github Actions only
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
-        host = self.config.coveralls_host.rstrip('/')
-        endpoint = f'{host}/webhook'
+        endpoint = f'{self.config.host.rstrip("/")}/webhook'
         verify = not self.config.skip_ssl_verify
         timeout = self.config.request_timeout
         try:
@@ -237,7 +234,7 @@ class Coveralls:
         return self._data
 
     def get_coverage(self):
-        work = coverage.coverage(config_file=self.config.config_file)
+        work = coverage.coverage(config_file=self.config.rcfile)
         work.load()
         work.get_data()
 
