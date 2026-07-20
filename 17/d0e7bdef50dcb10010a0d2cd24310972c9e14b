@@ -1,0 +1,39 @@
+coveralls/api.py
+  s_61195346338880::t_d6f558dfd8dfaf 30,82,134,237
+tests/api/wear_test.py
+  s_61195346338880::t_f240947d95db71 36-38,44,53
+  s_61195346338880::t_d6f558dfd8dfaf 177
+tests/api/config_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 19,24,59,64,72-73,76,80
+tests/api/resolve_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 273,286-287,400-429,447-449,454-475
+tests/api/configuration_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 46,56,61
+tests/cli_test.py
+  s_61195346338880::t_9255e254b26f54 28-31
+  s_61195346338880::t_d6f558dfd8dfaf 23-27,32-48,67-76,191,198,200-219,223-247,285,287,293,295,301-302,304,311,318-320
+docs/usage/configuration.rst
+  s_61195346338880::t_886bca7eac63fd 38-46
+  s_61195346338880::t_d6f558dfd8dfaf 32,36-37,47,57-58,64,67-68,73-74,98,103-112,125,132
+coveralls/cli.py
+  s_61195346338880::t_d6f558dfd8dfaf 5,31-32,35,58-71,75-78,83-85,93-108,112,153-294,300-326,330-348,351,355,357,360,362,364,368-370,380-398,401,403,405,408,410,412,416-418,426
+  s_61195346338880::t_943095b07c7934 49-57,295-299
+coveralls/configuration.py
+  s_61195346338880::t_d6f558dfd8dfaf 84,90,156-163,300,325-343,371-373,396
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "17d0e7bdef50dcb10010a0d2cd24310972c9e14b",
+  "prompts": {},
+  "sessions": {
+    "s_61195346338880": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f87-b1e0-7ecf-8cf3-46f82e76057c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
