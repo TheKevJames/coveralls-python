@@ -1,0 +1,36 @@
+coveralls/api.py
+  s_61195346338880::t_2ed40fcc643d45 239-241
+  s_61195346338880::t_ad4b787d8056a3 238
+  s_61195346338880::t_ff9eefe36f28ae 13
+  s_61195346338880::t_8d9bfa080bfa43 11-12,14,27,31-34,44,51-53,57,86-87,95-97,148-150
+  s_61195346338880::t_d78771a5664549 50
+tests/api/wear_test.py
+  s_61195346338880::t_20825c1307d182 34-58
+  s_61195346338880::t_9e65212cde21e9 59-79
+example/example.json
+  s_61195346338880::t_09cf816c7fa02b 1
+coveralls/configuration.py
+  s_61195346338880::t_69cfce6b154977 28-36,48
+  s_61195346338880::t_b19ccbdd6227dd 37-47,49
+  s_61195346338880::t_713d13e2cf6615 273
+  s_61195346338880::t_3a0d641aacebd8 282-285
+  s_61195346338880::t_29e2540d3a3aaa 1-27,50-272,274-281,286-291
+tests/api/configuration_test.py
+  s_61195346338880::t_141aa8648fd4c6 325,344
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fb519502110c2ea72629a6cf07706dc413c37829",
+  "prompts": {},
+  "sessions": {
+    "s_61195346338880": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f87-b1e0-7ecf-8cf3-46f82e76057c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
