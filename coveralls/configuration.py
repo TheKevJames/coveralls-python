@@ -144,9 +144,16 @@ DEPRECATED_KEYS = {
 }
 
 
-def _pr_from_path(value: str | None) -> str | None:
-    """Extract a trailing PR number from a URL/path such as ``.../pull/42``."""
-    return (value or '').split('/')[-1] or None
+def _parse_pr_number(value: str | None) -> str | None:
+    """
+    Extract the pull-request number from a CI-provided value.
+
+    The value may be a bare integer, a path, or a full URL; per the Coveralls
+    docs the PR number is the trailing integer (e.g. ``.../pull/42`` -> 42).
+    All CI loaders that read a PR value share this single semantic.
+    """
+    matches = NUMBER_REGEX.findall(value or '')
+    return matches[-1] if matches else None
 
 
 def _from_generic_ci_environment() -> dict[str, Any]:
@@ -163,9 +170,9 @@ def _from_generic_ci_environment() -> dict[str, Any]:
         'service_branch': os.environ.get('CI_BRANCH'),
     }
 
-    pr_match = NUMBER_REGEX.findall(os.environ.get('CI_PULL_REQUEST', ''))
-    if pr_match:
-        config['service_pull_request'] = pr_match[-1]
+    config['service_pull_request'] = _parse_pr_number(
+        os.environ.get('CI_PULL_REQUEST'),
+    )
 
     return {key: value for key, value in config.items() if value}
 
@@ -197,7 +204,9 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
             'service_number': (
                 env.get('CIRCLE_WORKFLOW_ID') or env.get('CIRCLE_BUILD_NUM')
             ),
-            'service_pull_request': _pr_from_path(env.get('CI_PULL_REQUEST')),
+            'service_pull_request': _parse_pr_number(
+                env.get('CI_PULL_REQUEST'),
+            ),
         }
     if env.get('GITHUB_ACTIONS'):
         # See https://github.com/lemurheavy/coveralls-public/issues/1710
@@ -216,7 +225,9 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
     if env.get('JENKINS_HOME'):
         return 'jenkins', {
             'service_job_id': env.get('BUILD_NUMBER'),
-            'service_pull_request': _pr_from_path(env.get('CI_PULL_REQUEST')),
+            'service_pull_request': _parse_pr_number(
+                env.get('CI_PULL_REQUEST'),
+            ),
         }
     if env.get('TRAVIS'):
         return 'travis-ci', {

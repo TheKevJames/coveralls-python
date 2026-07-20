@@ -10,10 +10,27 @@ except ImportError:
 from coveralls.configuration import Config
 from coveralls.configuration import log
 from coveralls.configuration import resolve
+from coveralls.configuration import _parse_pr_number
 
 
 def resolve_config(**overrides):
     return resolve('.coveralls.mock', overrides)
+
+
+@pytest.mark.parametrize(
+    ('value', 'expected'),
+    [
+        ('42', '42'),
+        ('pull/42', '42'),
+        ('https://github.com/org/repo/pull/42', '42'),
+        ('', None),
+        (None, None),
+        ('pull/42/', None),
+    ],
+)
+def test_parse_pr_number(value, expected):
+    # All CI loaders share this one trailing-integer semantic.
+    assert _parse_pr_number(value) == expected
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
