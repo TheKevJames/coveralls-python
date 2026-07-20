@@ -1,0 +1,22 @@
+docs/release.rst
+  s_635b48e1430736::t_8736548fb3ee1a 1-18,24-25,30-31,56
+cliff.toml
+  s_635b48e1430736::t_e57a8fa0523913 35
+  s_635b48e1430736::t_8dd18b048d5342 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "14109e412a4694a04b7e88a9addc441e856be0dc",
+  "prompts": {},
+  "sessions": {
+    "s_635b48e1430736": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f91-a971-7cbb-9860-db2b6c002f9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
