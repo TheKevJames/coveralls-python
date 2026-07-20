@@ -1,0 +1,19 @@
+docs/release.rst
+  s_635b48e1430736::t_41250172cf9189 1-26,32-35,43,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "7f5d16b0b80937a54ae617d384e19be089f239e7",
+  "prompts": {},
+  "sessions": {
+    "s_635b48e1430736": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f91-a971-7cbb-9860-db2b6c002f9e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
