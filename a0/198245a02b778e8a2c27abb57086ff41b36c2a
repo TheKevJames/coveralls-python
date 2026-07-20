@@ -1,0 +1,36 @@
+tests/api/configuration_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 46,56,61
+tests/api/resolve_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 240,253-254,326-355,373-375,380-401
+tests/api/config_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 18,23,47,52,60-61,64,68
+docs/usage/configuration.rst
+  s_61195346338880::t_d6f558dfd8dfaf 32,36-45,55-56,62,65-66,71-72,96,101-110,123,130
+tests/api/wear_test.py
+  s_61195346338880::t_f240947d95db71 36-38,44,53
+  s_61195346338880::t_d6f558dfd8dfaf 156
+coveralls/api.py
+  s_61195346338880::t_d6f558dfd8dfaf 30,82,134,237
+tests/cli_test.py
+  s_61195346338880::t_d6f558dfd8dfaf 23-44,63-72,187,194,196-215,219-243,281,283,289,291,297-298,300,307,314-316
+coveralls/cli.py
+  s_61195346338880::t_d6f558dfd8dfaf 5,31-32,35,49-62,66-69,74-76,92-107,111,152-321,325-343,346,350,352,355,357,359,363-365,375-393,396,398,400,403,405,407,411-413,421
+coveralls/configuration.py
+  s_61195346338880::t_d6f558dfd8dfaf 69,75,138-145,284,309-327,355-357,370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a0198245a02b778e8a2c27abb57086ff41b36c2a",
+  "prompts": {},
+  "sessions": {
+    "s_61195346338880": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f7f87-b1e0-7ecf-8cf3-46f82e76057c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
