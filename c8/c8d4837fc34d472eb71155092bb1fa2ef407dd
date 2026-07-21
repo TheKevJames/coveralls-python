@@ -1,0 +1,21 @@
+.pre-commit-config.yaml
+  s_ff9d5305af8e7e::t_09db560cc10e27 200
+pyproject.toml
+  s_ff9d5305af8e7e::t_be2c17b3eab7d0 98-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c8c8d4837fc34d472eb71155092bb1fa2ef407dd",
+  "prompts": {},
+  "sessions": {
+    "s_ff9d5305af8e7e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f850c-f178-7590-8c71-2f25c62de796",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
