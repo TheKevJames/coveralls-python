@@ -115,7 +115,7 @@ jobs:
     steps:
       - run: apk add --no-cache git
       - checkout
-      - run: pip install --upgrade tox
+      - run: pip install --upgrade tox tox-uv
       - run: tox run -f "${CIRCLE_JOB//test-}"
       - run: tox run -e upload
 
@@ -128,7 +128,7 @@ jobs:
       - run: apt-get update -qy
       - run: apt-get install -qy --no-install-recommends git
       - checkout
-      - run: pip install --upgrade tox
+      - run: pip install --upgrade tox tox-uv
       - run: tox run -f pypy3
       - run: tox run -e upload
 
