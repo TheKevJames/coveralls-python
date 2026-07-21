@@ -1,0 +1,86 @@
+poetry.lock
+  s_6bb908cc05754e::t_298b68d34edf15 1014
+tests/api/resolve_test.py
+  s_6bb908cc05754e::t_b9b051fb3ff0ae 255,272
+docs/usage/configuration.rst
+  s_6bb908cc05754e::t_31ab0a99ea56ec 94-101,117
+uv.lock
+  s_6bb908cc05754e::t_17efcce39a8caa 252,273,275
+coveralls/configuration.py
+  s_6bb908cc05754e::t_6f88f88953f345 124
+  s_6bb908cc05754e::t_7936fdf26bf8f6 345
+  s_6bb908cc05754e::t_657f70bf2abc8c 125-129,131
+  s_6bb908cc05754e::t_4c717d07cf9937 94,123
+  s_6bb908cc05754e::t_d955d06590be7a 30-31,104,122,130,132-141
+coveralls/cli.py
+  s_6bb908cc05754e::t_be20830ad48a84 88
+  s_6bb908cc05754e::t_1197cb05373ad6 86,111,258-265,325
+tests/api/config_test.py
+  s_6bb908cc05754e::t_7d94b6e9bf5a9b 149-154,156-157,159-166
+  s_6bb908cc05754e::t_643b5ae7633bf1 167-168
+  s_6bb908cc05754e::t_87f7ff9826b03f 158
+  s_6bb908cc05754e::t_6a75d9f464fdd7 70,87
+  s_6bb908cc05754e::t_e9cd2567714412 147-148,155
+  s_6bb908cc05754e::t_279b058187cb1f 29
+tests/cli_test.py
+  s_6bb908cc05754e::t_305e7e8a30aa77 61
+pyproject.toml
+  s_6bb908cc05754e::t_387335210e603d 24-26
+coveralls/api.py
+  s_6bb908cc05754e::t_49eee212ba8a84 44-49,51
+  s_6bb908cc05754e::t_8a81007f51811d 58-63
+  s_6bb908cc05754e::t_ad94a43e396bb6 74-75
+  s_6bb908cc05754e::t_282de58b2cd77f 164
+  s_6bb908cc05754e::t_059122f18ac6d3 146,169
+  s_6bb908cc05754e::t_c58e2090acd79b 147-149,153,170-173,214
+  s_6bb908cc05754e::t_6f84f1ae32f147 11-12,22-43,50,52-57,64-70
+  s_6bb908cc05754e::t_d8274ab168ba50 156-158,160-163
+  s_6bb908cc05754e::t_f7a618d3bef774 150-151
+  s_d4403f36360117::t_c2adbb04a3005a 219
+  s_6bb908cc05754e::t_1c903a326874f5 71
+  s_6bb908cc05754e::t_5f914a1db5c231 10,73,76-86,152,165-168
+  s_6bb908cc05754e::t_3572c470795a12 72
+tests/api/reporter_test.py
+  s_6bb908cc05754e::t_e0bad4b71db452 273-278,282-283
+  s_6bb908cc05754e::t_1d6f5d5d046e74 10
+tests/api/wear_test.py
+  s_6bb908cc05754e::t_237cd88336fbd8 5,256-257,263-265,279-281,286-297,313-314
+  s_6bb908cc05754e::t_a89bf581322335 252,332
+  s_6bb908cc05754e::t_eb4f554ceacbda 323
+  s_6bb908cc05754e::t_097299b74218fb 19,21,404-411,415-416
+  s_6bb908cc05754e::t_a5bbc26634da41 16,412-414
+  s_6bb908cc05754e::t_96d3ea59055a4c 32
+  s_6bb908cc05754e::t_204abc4394e132 259-261
+  s_6bb908cc05754e::t_c3b3dce7c57f0d 316
+  s_6bb908cc05754e::t_4e82fae7509dc3 258
+  s_6bb908cc05754e::t_5016afa42d4267 7
+  s_6bb908cc05754e::t_197cc3614471c8 262
+  s_6bb908cc05754e::t_0c762703b3797c 266-278,282-285,299-300,302-311
+  s_6bb908cc05754e::t_8d2283ddbad55a 9-10,33-37,45,203-204,222,233-234,242,322
+  s_6bb908cc05754e::t_1132e253e8c69c 15,28-31,38-44,46-100,102-104,107-112,114-116,118-119,122-132,135-140,145-150,154-173,175-202,205-221,223-232,235-241,243-251,317-321,324-331,334-344,346-403,417-427
+  s_6bb908cc05754e::t_5bb59f7994b1d5 255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e726ab4bad2039c8d2d9349562139b46b812b345",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    },
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
