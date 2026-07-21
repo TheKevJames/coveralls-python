@@ -1,0 +1,19 @@
+coveralls/api.py
+  s_b5ca46a08fb604::t_9bb21e3c8e95d8 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "62c30e17e1107d5249f4809eedef3988ce8255ae",
+  "prompts": {},
+  "sessions": {
+    "s_b5ca46a08fb604": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8504-1686-7606-9c08-9c6d17f19967",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
