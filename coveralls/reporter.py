@@ -4,8 +4,15 @@ from typing import Any
 
 import coverage
 from coverage.plugin import FileReporter
-from coverage.report_core import get_analysis_to_report
 from coverage.results import Analysis
+
+try:
+    # coverage v7.5+ moved get_analysis_to_report into report_core
+    from coverage.report_core import get_analysis_to_report
+except ImportError:
+    from coverage.report import (  # type: ignore[attr-defined]
+        get_analysis_to_report,
+    )
 
 
 log = logging.getLogger('coveralls.reporter')
