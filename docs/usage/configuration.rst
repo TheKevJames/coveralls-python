@@ -45,6 +45,13 @@ If you would like to override the service name (auto-discovered on most CI syste
     ``--src-dir`` to match; the old spellings still work but are deprecated
     and will be removed in a future release.
 
+.. note::
+
+    The action flags ``--finish``, ``--output FILE`` and ``--submit FILE`` are
+    now the subcommands ``coveralls finish``, ``coveralls save FILE`` and
+    ``coveralls upload FILE`` respectively. The old flags still work but are
+    deprecated and will be removed in a future release.
+
 If you are interested in merging the coverage results between multiple languages/projects, see our :ref:`multi-language <multilang>` documentation.
 
 If coveralls-python is being run on TravisCI or on GitHub Actions, it will automatically set the token for communication with coveralls.io. Otherwise, you should set the environment variable ``COVERALLS_REPO_TOKEN``, which can be found on the dashboard for your project in coveralls.io::
@@ -57,9 +64,9 @@ If you are running multiple jobs in parallel and want coveralls.io to merge thos
     # or, via CLI flag:
     coveralls --parallel
 
-Later on, you can use ``coveralls --finish`` to let the Coveralls service know you have completed all your parallel runs::
+Later on, you can use ``coveralls finish`` to let the Coveralls service know you have completed all your parallel runs::
 
-    coveralls --finish
+    coveralls finish
 
 If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set the host to the base URL of that instance::
 
@@ -170,7 +177,7 @@ parallel build is finished::
         - name: Install coveralls
           run: pip3 install --upgrade coveralls
         - name: Finished
-          run: coveralls --finish
+          run: coveralls finish
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

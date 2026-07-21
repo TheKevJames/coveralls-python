@@ -66,25 +66,26 @@ def test_debug_no_token(mock_wear, mock_log):
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 @mock.patch('coveralls.cli.Coveralls')
-def test_debug_accepts_options(mock_coveralls):
-    # the debug subcommand shares the full option set with the default command
+def test_debug_accepts_options_after_subcommand(mock_coveralls):
+    # Each command owns its options, so they are given after the command name
+    # (a long-standing, load-bearing invocation for debug).
     coveralls.cli.main(argv=['debug', '--rcfile=coveragerc', '--host=h'])
     mock_coveralls.assert_called_with(
         False, **coveralls_kwargs(rcfile='coveragerc', host='h'),
     )
 
 
-@mock.patch.dict(
-    os.environ,
-    {
+def _github_finish_env():
+    return {
         'GITHUB_ACTIONS': 'true',
         'GITHUB_REPOSITORY': 'test/repo',
         'GITHUB_TOKEN': 'xxx',
         'GITHUB_RUN_ID': '123456789',
         'GITHUB_RUN_NUMBER': '123',
-    },
-    clear=True,
-)
+    }
+
+
+@mock.patch.dict(os.environ, _github_finish_env(), clear=True)
 @mock.patch.object(coveralls.cli.log, 'info')
 @responses.activate
 def test_finish(mock_log):
@@ -101,7 +102,7 @@ def test_finish(mock_log):
         },
     }
 
-    coveralls.cli.main(argv=['--finish'])
+    coveralls.cli.main(argv=['finish'])
 
     mock_log.assert_has_calls(
         [
@@ -111,6 +112,24 @@ def test_finish(mock_log):
     )
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
+
+
+@mock.patch.dict(os.environ, _github_finish_env(), clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@responses.activate
+def test_finish_deprecated_flag_warns(mock_warning):
+    responses.add(
+        responses.POST, 'https://coveralls.io/webhook',
+        json={'done': True}, status=200,
+    )
+
+    coveralls.cli.main(argv=['--finish'])
+
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--finish', 'coveralls finish',
+    )
+    assert len(responses.calls) == 1
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
@@ -129,7 +148,7 @@ def test_finish_exception(mock_log):
     msg = 'Parallel finish failed: Mocked'
 
     with pytest.raises(SystemExit):
-        coveralls.cli.main(argv=['--finish'])
+        coveralls.cli.main(argv=['finish'])
 
     mock_log.assert_has_calls([
         mock.call(
@@ -157,7 +176,7 @@ def test_finish_exception_without_error(mock_log):
     msg = 'Parallel finish failed'
 
     with pytest.raises(SystemExit):
-        coveralls.cli.main(argv=['--finish'])
+        coveralls.cli.main(argv=['finish'])
 
     mock_log.assert_has_calls([
         mock.call(
@@ -232,6 +251,15 @@ def test_no_parallel_and_no_skip_ssl_verify_forward_false(mock_coveralls):
     )
 
 
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_merge_before_submit(mock_coveralls):
+    # --merge folds an extra report into the data before the default submit.
+    coveralls.cli.main(argv=['--merge=extra.json'])
+    mock_coveralls.return_value.merge.assert_called_once_with('extra.json')
+    mock_coveralls.return_value.wear.assert_called_once_with()
+
+
 @mock.patch.dict(os.environ, {}, clear=True)
 @mock.patch.object(coveralls.cli.log, 'warning')
 @mock.patch('coveralls.cli.Coveralls')
@@ -243,6 +271,32 @@ def test_deprecated_service_alias_warns(mock_coveralls, mock_warning):
     )
     _, kwargs = mock_coveralls.call_args
     assert kwargs['service_name'] == 'travis-pro'
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_basedir_alias_warns(mock_coveralls, mock_warning):
+    coveralls.cli.main(argv=['--basedir=foo'])
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--basedir', '--base-dir',
+    )
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['base_dir'] == 'foo'
+
+
+@mock.patch.dict(os.environ, {}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_srcdir_alias_warns(mock_coveralls, mock_warning):
+    coveralls.cli.main(argv=['--srcdir=foo'])
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--srcdir', '--src-dir',
+    )
+    _, kwargs = mock_coveralls.call_args
+    assert kwargs['src_dir'] == 'foo'
 
 
 @mock.patch.object(coveralls.cli.log, 'exception')
@@ -259,7 +313,7 @@ def test_exception(_mock_coveralls, mock_log):
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_save_report_to_file(mock_coveralls):
     """Check save_report api usage."""
-    coveralls.cli.main(argv=['--output=test.log'])
+    coveralls.cli.main(argv=['save', 'test.log'])
     mock_coveralls.assert_called_with('test.log')
 
 
@@ -267,17 +321,62 @@ def test_save_report_to_file(mock_coveralls):
 @mock.patch.object(coveralls.Coveralls, 'save_report')
 def test_save_report_to_file_no_token(mock_coveralls):
     """Check save_report api usage when token is not set."""
-    coveralls.cli.main(argv=['--output=test.log'])
+    coveralls.cli.main(argv=['save', 'test.log'])
     mock_coveralls.assert_called_with('test.log')
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch.object(coveralls.Coveralls, 'save_report')
+def test_save_report_deprecated_output_warns(mock_save, mock_warning):
+    coveralls.cli.main(argv=['--output=test.log'])
+    mock_save.assert_called_with('test.log')
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--output', 'coveralls save FILE',
+    )
 
 
 @mock.patch.object(coveralls.Coveralls, 'submit_report')
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-def test_submit(mock_submit):
+def test_upload(mock_submit):
+    json_file = os.path.join(EXAMPLE_DIR, 'example.json')
+    coveralls.cli.main(argv=['upload', json_file])
+    with open(json_file) as f:
+        mock_submit.assert_called_with(f.read())
+
+
+@mock.patch.object(coveralls.cli.log, 'warning')
+@mock.patch.object(coveralls.Coveralls, 'submit_report')
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_upload_deprecated_submit_warns(mock_submit, mock_warning):
     json_file = os.path.join(EXAMPLE_DIR, 'example.json')
     coveralls.cli.main(argv=['--submit=' + json_file])
     with open(json_file) as f:
         mock_submit.assert_called_with(f.read())
+    mock_warning.assert_called_once_with(
+        '%s is deprecated and will be removed in a future release; use %s '
+        'instead.', '--submit', 'coveralls upload FILE',
+    )
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_submit_applies_merge(mock_coveralls):
+    # The old flat CLI ran merge() before every action; the deprecated --submit
+    # path must dispatch identically, so --merge is still applied.
+    json_file = os.path.join(EXAMPLE_DIR, 'example.json')
+    coveralls.cli.main(argv=['--submit=' + json_file, '--merge=extra.json'])
+    mock_coveralls.return_value.merge.assert_called_once_with('extra.json')
+    mock_coveralls.return_value.submit_report.assert_called_once()
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_deprecated_finish_applies_merge(mock_coveralls):
+    coveralls.cli.main(argv=['--finish', '--merge=extra.json'])
+    mock_coveralls.return_value.merge.assert_called_once_with('extra.json')
+    mock_coveralls.return_value.parallel_finish.assert_called_once_with()
 
 
 @mock.patch('coveralls.cli.Coveralls')
@@ -318,3 +417,47 @@ def test_connect_and_read_timeout_args(mock_coveralls):
     mock_coveralls.assert_called_with(
         True, **coveralls_kwargs(connect_timeout=5.0, read_timeout=90.0),
     )
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+@mock.patch('coveralls.cli.Coveralls')
+def test_submit_family_accepts_merge_and_parallel(mock_coveralls):
+    # save/debug build a report, so they honour the submit-only modifiers.
+    coveralls.cli.main(argv=['save', 'o', '--parallel', '--merge=extra.json'])
+    mock_coveralls.assert_called_with(
+        False, **coveralls_kwargs(parallel=True),
+    )
+    mock_coveralls.return_value.merge.assert_called_once_with('extra.json')
+    mock_coveralls.return_value.save_report.assert_called_once_with('o')
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_deprecated_verb_flag_with_subcommand_errors():
+    with pytest.raises(SystemExit):
+        coveralls.cli.main(argv=['--finish', 'save', 'o'])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_multiple_deprecated_verb_flags_error():
+    with pytest.raises(SystemExit):
+        coveralls.cli.main(argv=['--output=a', '--submit=b'])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_debug_does_not_advertise_verbose():
+    # debug always forces verbose, so it does not offer a redundant --verbose.
+    with pytest.raises(SystemExit):
+        coveralls.cli.main(argv=['debug', '--verbose'])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_finish_does_not_advertise_parallel():
+    # finish ignores report-building modifiers, so it does not accept them.
+    with pytest.raises(SystemExit):
+        coveralls.cli.main(argv=['finish', '--parallel'])
+
+
+@mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
+def test_upload_does_not_advertise_merge():
+    with pytest.raises(SystemExit):
+        coveralls.cli.main(argv=['upload', 'f', '--merge=extra.json'])
