@@ -7,6 +7,9 @@ from typing import Any
 
 import coverage
 import requests
+import urllib3.exceptions
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from .configuration import Config
 from .configuration import resolve
@@ -15,6 +18,71 @@ from .reporter import CoverallReporter
 
 
 log = logging.getLogger('coveralls.api')
+
+# Transient failures worth retrying: server-side 5xx and rate limiting (429).
+RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
+# urllib3's default allowed_methods excludes POST (non-idempotent); every call
+# we make is a POST, so we must opt POST in explicitly or nothing retries.
+RETRY_METHODS = frozenset({'POST'})
+# Exponential backoff with jitter. backoff_factor sets the base delay
+# (0.5, 1, 2, 4, ... seconds), backoff_jitter adds up to this many seconds of
+# randomness to spread out retries, and backoff_max caps any single wait.
+RETRY_BACKOFF_FACTOR = 0.5
+RETRY_BACKOFF_JITTER = 0.5
+RETRY_BACKOFF_MAX = 60
+
+
+def _build_session(retries: int) -> requests.Session:
+    """
+    Build a requests Session that retries transient HTTP failures.
+
+    With ``retries=0`` this is equivalent to a plain ``requests`` call: a
+    single attempt is made and connect/read timeouts surface as before.
+    ``raise_on_status=False`` keeps the final response (even a 5xx) flowing
+    back to the caller so the existing status handling stays in charge.
+    """
+    # urllib3 treats read=0 and read=False differently: read=0 raises
+    # MaxRetryError on a read timeout (which requests remaps to a bare
+    # ConnectionError), while read=False lets the ReadTimeoutError propagate as
+    # a requests Timeout. Mirror requests' own default (Retry(0, read=False))
+    # so the no-retry path still surfaces read timeouts as TimeoutError.
+    read = retries or False
+    retry = Retry(
+        total=retries, connect=retries, read=read, status=retries,
+        other=retries,
+        status_forcelist=RETRY_STATUSES,
+        allowed_methods=RETRY_METHODS,
+        backoff_factor=RETRY_BACKOFF_FACTOR,
+        backoff_jitter=RETRY_BACKOFF_JITTER,
+        backoff_max=RETRY_BACKOFF_MAX,
+        # Ignore Retry-After and always use our own bounded backoff: a server
+        # can send an arbitrarily large Retry-After (e.g. 3600s), and urllib3
+        # only started clamping it -- to 6 hours -- in 2.6.3, so on our
+        # supported range it is otherwise unbounded and could hang CI for
+        # hours. 429/503 are still retried; only the sleep length differs.
+        respect_retry_after_header=False,
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session = requests.Session()
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
+def _caused_by_timeout(exc: requests.exceptions.RequestException) -> bool:
+    """
+    Report whether a request failure was ultimately a timeout.
+
+    A single timeout raises a requests ``Timeout`` directly, but a timeout that
+    exhausts its retries surfaces as a ``ConnectionError`` wrapping a urllib3
+    ``MaxRetryError`` whose ``reason`` is a urllib3 ``TimeoutError``; unwrap
+    that so both read the same to the caller.
+    """
+    if isinstance(exc, requests.exceptions.Timeout):
+        return True
+    reason = getattr(exc.args[0] if exc.args else None, 'reason', None)
+    return isinstance(reason, urllib3.exceptions.TimeoutError)
 
 
 class Coveralls:
@@ -75,20 +143,34 @@ class Coveralls:
             return {}
         return self.submit_report(json_string)
 
-    def submit_report(self, json_string: str) -> dict[str, Any]:
-        endpoint = f'{self.config.host.rstrip("/")}/api/v1/jobs'
+    def _post(self, endpoint: str, **kwargs: Any) -> requests.Response:
+        """
+        POST to a coveralls endpoint, retrying transient failures.
+
+        A transient failure that exhausts its retries surfaces as a
+        connection/RetryError rather than a plain Timeout, so both are mapped
+        to clear exceptions here (see :func:`_caused_by_timeout`).
+        """
         verify = not self.config.skip_ssl_verify
         timeout = self.config.request_timeout
+        # Each command makes a single POST, so there is no pooling benefit from
+        # the session; it exists only to carry the retry adapter. Close it to
+        # release the connection pool and avoid a ResourceWarning.
         try:
-            response = requests.post(
-                endpoint, files={'json_file': json_string}, verify=verify,
-                timeout=timeout,
-            )
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(
-                f'Timed out submitting coverage to {endpoint} '
-                f'(connect={timeout[0]}s, read={timeout[1]}s)',
-            ) from e
+            with _build_session(self.config.retries) as session:
+                return session.post(
+                    endpoint, verify=verify, timeout=timeout, **kwargs,
+                )
+        except requests.exceptions.RequestException as e:
+            if _caused_by_timeout(e):
+                raise TimeoutError(
+                    f'Request timeout: {endpoint} (timeout={timeout})',
+                ) from e
+            raise RuntimeError(f'Could not submit coverage: {e}') from e
+
+    def submit_report(self, json_string: str) -> dict[str, Any]:
+        endpoint = f'{self.config.host.rstrip("/")}/api/v1/jobs'
+        response = self._post(endpoint, files={'json_file': json_string})
 
         if response.status_code == 422:
             if self.config.service_name.startswith('github'):
@@ -129,24 +211,12 @@ class Coveralls:
             payload['repo_name'] = os.environ.get('GITHUB_REPOSITORY')
 
         endpoint = f'{self.config.host.rstrip("/")}/webhook'
-        verify = not self.config.skip_ssl_verify
-        timeout = self.config.request_timeout
-        try:
-            response = requests.post(
-                endpoint, json=payload, verify=verify, timeout=timeout,
-            )
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError(
-                f'Timed out finishing parallel jobs at {endpoint} '
-                f'(connect={timeout[0]}s, read={timeout[1]}s)',
-            ) from e
+        response = self._post(endpoint, json=payload)
         try:
             response.raise_for_status()
             data: dict[str, Any] = response.json()
         except Exception as e:
-            raise RuntimeError(
-                f'Parallel finish failed: {e}',
-            ) from e
+            raise RuntimeError(f'Could not submit coverage: {e}') from e
 
         if 'error' in data:
             exc = data['error']

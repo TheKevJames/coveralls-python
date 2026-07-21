@@ -27,6 +27,8 @@ TOKENLESS_CI_SERVICES = frozenset({'travis-ci'})
 DEFAULT_CONNECT_TIMEOUT = 10
 DEFAULT_READ_TIMEOUT = 60
 
+DEFAULT_RETRIES = 0
+
 # Fields sent to the coveralls.io API -- every job parameter the /jobs endpoint
 # accepts and lets the caller set. Everything else on Config controls local
 # client behaviour and must never enter the submitted payload.
@@ -89,6 +91,7 @@ class Config:
     timeout: float | None = None
     connect_timeout: float | None = None
     read_timeout: float | None = None
+    retries: int = DEFAULT_RETRIES
 
     def __post_init__(self) -> None:
         self.timeout = self._validate_timeout('timeout', self.timeout)
@@ -98,6 +101,7 @@ class Config:
         self.read_timeout = self._validate_timeout(
             'read_timeout', self.read_timeout,
         )
+        self.retries = self._validate_retries(self.retries)
 
     @staticmethod
     def _validate_timeout(name: str, raw: Any) -> float | None:
@@ -112,6 +116,26 @@ class Config:
         if value <= 0:
             raise ValueError(
                 f'Invalid {name} value {raw!r}: must be greater than 0.',
+            )
+        return value
+
+    @staticmethod
+    def _validate_retries(raw: Any) -> int:
+        # Only genuine ints and integer-valued strings (e.g. "3", from env vars
+        # or YAML) are accepted. Bools are excluded despite being ints, so
+        # retries=True is not silently read as 1; everything else is routed
+        # through int(str(...)), which never truncates, so floats and
+        # fractional strings (2.0, "1.5", "2.0") all raise.
+        is_int = isinstance(raw, int) and not isinstance(raw, bool)
+        try:
+            value = int(raw) if is_int else int(str(raw))
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f'Invalid retries value {raw!r}: must be an integer.',
+            ) from e
+        if value < 0:
+            raise ValueError(
+                f'Invalid retries value {raw!r}: must not be negative.',
             )
         return value
 
@@ -318,6 +342,7 @@ def _from_environment() -> dict[str, Any]:
         'COVERALLS_RCFILE': 'rcfile',
         'COVERALLS_READ_TIMEOUT': 'read_timeout',
         'COVERALLS_REPO_TOKEN': 'repo_token',
+        'COVERALLS_RETRIES': 'retries',
         'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
         'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
         'COVERALLS_SERVICE_NAME': 'service_name',

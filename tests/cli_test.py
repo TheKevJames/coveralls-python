@@ -58,6 +58,7 @@ def coveralls_kwargs(**overrides: Any) -> dict[str, Any]:
         'timeout': None,
         'connect_timeout': None,
         'read_timeout': None,
+        'retries': None,
     }
     kwargs.update(overrides)
     return kwargs

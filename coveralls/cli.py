@@ -83,8 +83,9 @@ def _make_coveralls(
     parallel: bool | None = None,
     timeout: float | None = None,
     connect_timeout: float | None = None, read_timeout: float | None = None,
+    retries: int | None = None,
 ) -> Coveralls:
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-arguments,too-many-locals
     # Modifiers not exposed by a command default to None; resolve() drops unset
     # ones so nothing clobbers env/config. An explicit value (incl. a False
     # from --no-parallel) overrides.
@@ -107,6 +108,7 @@ def _make_coveralls(
         'timeout': timeout,
         'connect_timeout': connect_timeout,
         'read_timeout': read_timeout,
+        'retries': retries,
     }
     return Coveralls(token_required, **overrides)
 
@@ -253,6 +255,14 @@ _ReadTimeout = Annotated[
         '--read-timeout', help='Read timeout, in seconds (default: 60).',
     ),
 ]
+_Retries = Annotated[
+    int | None,
+    typer.Option(
+        '--retries',
+        help='Retry transient HTTP failures this many times (default: 0). '
+             'Uses exponential backoff with jitter.',
+    ),
+]
 _Version = Annotated[
     bool | None,
     typer.Option(
@@ -312,6 +322,7 @@ HTTP_OPTIONS: dict[str, CollectionOption] = {
     'timeout': (_Timeout, None),
     'connect_timeout': (_ConnectTimeout, None),
     'read_timeout': (_ReadTimeout, None),
+    'retries': (_Retries, None),
 }
 
 

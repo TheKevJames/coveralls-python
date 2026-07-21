@@ -91,6 +91,14 @@ Network requests to coveralls.io use a default connect timeout of 10 seconds and
 
 A connect- or read-specific value takes precedence over the overall ``--timeout``/``COVERALLS_TIMEOUT`` for its phase. Note that, like the underlying ``requests`` library, these are per-phase timeouts rather than a single wall-clock budget for the whole request.
 
+By default a failed request is not retried. If you occasionally hit transient HTTP failures (for example a ``502``/``504`` gateway error, or a connection reset), you can ask coveralls-python to retry them::
+
+    COVERALLS_RETRIES=3 coveralls
+    # or, via CLI flag:
+    coveralls --retries=3
+
+Retries use exponential backoff with jitter and apply to every command that talks to the API. Only transient failures are retried: connection errors, read timeouts, ``429`` (rate limited), and ``5xx`` responses. A ``422`` is treated as a configuration error and is never retried.
+
 If you are using named jobs, you can set::
 
     COVERALLS_FLAG_NAME="insert-name-here"
@@ -106,6 +114,7 @@ Sample ``.coveralls.yml`` file::
     timeout: 30
     connect_timeout: 5
     read_timeout: 90
+    retries: 3
 
 .. note::
 
