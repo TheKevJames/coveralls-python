@@ -1,0 +1,21 @@
+coveralls/reporter.py
+  s_a42413be82edde::t_f081598853e5df 13-15
+  s_a42413be82edde::t_f827e33ff92410 9-12
+  s_a42413be82edde::t_7484ff705c5b85 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "4a2882410c5ac9f3afb379bf9683f3332a17f57a",
+  "prompts": {},
+  "sessions": {
+    "s_a42413be82edde": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8513-8da8-79b6-bc0c-26a94a6e2e9c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
