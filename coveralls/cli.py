@@ -1,12 +1,12 @@
 import importlib.metadata
 import inspect
 import logging
-import sys
 from collections.abc import Callable
 from typing import Annotated
 from typing import Any
 
 import typer
+from typer._click.exceptions import Abort
 from typer._click.exceptions import ClickException
 from typer._click.exceptions import UsageError
 
@@ -109,18 +109,6 @@ def _make_coveralls(
         'read_timeout': read_timeout,
     }
     return Coveralls(token_required, **overrides)
-
-
-def _run_action(action: Callable[[], None]) -> None:
-    try:
-        action()
-    except KeyboardInterrupt:  # pragma: no cover
-        log.info('Aborted')
-    except Exception:
-        # log.exception already records the active exception (type, message,
-        # traceback) via exc_info, so it is not repeated in the message.
-        log.exception('Error running coveralls')
-        sys.exit(1)
 
 
 def _action_submit(coverallz: Coveralls, merge: str | None) -> None:
@@ -412,18 +400,18 @@ def coveralls(
     if finish_flag:
         _warn_deprecated_verb('--finish', 'coveralls finish')
         coverallz = _make_coveralls(token_required=True, **opts)
-        _run_action(lambda: _action_finish(coverallz, merge))
+        _action_finish(coverallz, merge)
     elif output is not None:
         _warn_deprecated_verb('--output', 'coveralls save FILE')
         coverallz = _make_coveralls(token_required=False, **opts)
-        _run_action(lambda: _action_save(coverallz, merge, output))
+        _action_save(coverallz, merge, output)
     elif submit is not None:
         _warn_deprecated_verb('--submit', 'coveralls upload FILE')
         coverallz = _make_coveralls(token_required=True, **opts)
-        _run_action(lambda: _action_upload(coverallz, submit, merge))
+        _action_upload(coverallz, submit, merge)
     else:
         coverallz = _make_coveralls(token_required=True, **opts)
-        _run_action(lambda: _action_submit(coverallz, merge))
+        _action_submit(coverallz, merge)
 
 
 @app.command()
@@ -432,7 +420,7 @@ def finish(verbose: _Verbose = False, **opts: Any) -> None:
     """Notify coveralls.io that all parallel jobs are done."""
     _configure_logging(verbose=verbose)
     coverallz = _make_coveralls(token_required=True, **opts)
-    _run_action(lambda: _action_finish(coverallz))
+    _action_finish(coverallz)
 
 
 @app.command()
@@ -441,7 +429,7 @@ def upload(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
     """Upload a previously generated coverage report FILE."""
     _configure_logging(verbose=verbose)
     coverallz = _make_coveralls(token_required=True, **opts)
-    _run_action(lambda: _action_upload(coverallz, file))
+    _action_upload(coverallz, file)
 
 
 @app.command()
@@ -453,7 +441,7 @@ def save(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
     # written JSON so a later `coveralls upload` submits the job as parallel.
     merge = opts.pop('merge')
     coverallz = _make_coveralls(token_required=False, **opts)
-    _run_action(lambda: _action_save(coverallz, merge, file))
+    _action_save(coverallz, merge, file)
 
 
 @app.command(help=DEBUG_HELP)
@@ -464,17 +452,18 @@ def debug(**opts: Any) -> None:
     _configure_logging(verbose=True)
     merge = opts.pop('merge')
     coverallz = _make_coveralls(token_required=False, **opts)
-    _run_action(lambda: _action_debug(coverallz, merge))
+    _action_debug(coverallz, merge)
 
 
 def main(argv: list[str] | None = None) -> None:
-    command = typer.main.get_command(app)
     try:
+        command = typer.main.get_command(app)
         command.main(args=argv, prog_name='coveralls', standalone_mode=False)
-    # ClickException comes from typer's vendored click (not a standalone dep);
-    # it is the concrete base typer raises for usage errors -- bad option,
-    # missing argument, our guardrail UsageErrors, etc. Render them as a clean
-    # message plus exit code instead of dumping a traceback.
     except ClickException as e:
         e.show()
         raise SystemExit(e.exit_code) from e
+    except Abort:
+        log.info('Aborted')
+    except Exception as e:
+        log.exception('Error running coveralls')
+        raise SystemExit(1) from e
