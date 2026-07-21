@@ -24,19 +24,10 @@ def assert_coverage(
     assert actual.get('branches') == expected.get('branches')
 
 
-class ReporterTest(unittest.TestCase):
-    old_cwd: pathlib.Path
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.old_cwd = pathlib.Path.cwd()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.chdir(cls.old_cwd)
-
-    def setUp(self) -> None:
-        os.chdir(EXAMPLE_DIR)
+class TestReporter:
+    @pytest.fixture(scope='function', autouse=True)
+    def _chdir_example(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(EXAMPLE_DIR)
 
         with contextlib.suppress(Exception):
             pathlib.Path('.coverage').unlink()
@@ -94,7 +85,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_no_base_dir_arg(self) -> None:
+    def test_reporter_no_base_dir_arg(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -103,7 +96,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
@@ -111,7 +104,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_base_dir_arg(self) -> None:
+    def test_reporter_with_base_dir_arg(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -120,7 +115,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
             repo_token='xxx',
             base_dir='example',
@@ -131,7 +126,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_base_dir_trailing_sep(self) -> None:
+    def test_reporter_with_base_dir_trailing_sep(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -140,7 +137,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
             repo_token='xxx',
             base_dir='example/',
@@ -151,7 +148,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_src_dir_arg(self) -> None:
+    def test_reporter_with_src_dir_arg(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -160,7 +159,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
             repo_token='xxx',
             src_dir='src',
@@ -171,7 +170,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_src_dir_trailing_sep(self) -> None:
+    def test_reporter_with_src_dir_trailing_sep(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -180,7 +181,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
             repo_token='xxx',
             src_dir='src/',
@@ -191,7 +192,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_both_base_dir_and_src_dir_args(self) -> None:
+    def test_reporter_with_both_base_dir_and_src_dir_args(
+        self, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -200,7 +203,7 @@ class ReporterTest(unittest.TestCase):
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
-        os.chdir(BASE_DIR)
+        monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
             repo_token='xxx',
             base_dir='example',

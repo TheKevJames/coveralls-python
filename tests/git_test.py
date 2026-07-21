@@ -2,7 +2,6 @@ import os
 import pathlib
 import re
 import subprocess
-import tempfile
 import unittest.mock
 
 import pytest
@@ -26,43 +25,31 @@ def in_git_dir() -> bool:
         return False
 
 
-class GitTest(unittest.TestCase):
-    old_cwd: pathlib.Path
+@pytest.fixture(scope='function')
+def git_repo(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+) -> pathlib.Path:
+    monkeypatch.chdir(tmp_path)
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.old_cwd = pathlib.Path.cwd()
+    (tmp_path / 'README').touch()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.chdir(cls.old_cwd)
+    subprocess.call(['git', 'init'], cwd=tmp_path)
+    subprocess.call(
+        ['git', 'config', 'user.name', f'"{GIT_NAME}"'], cwd=tmp_path,
+    )
+    subprocess.call(
+        ['git', 'config', 'user.email', f'"{GIT_EMAIL}"'], cwd=tmp_path,
+    )
+    subprocess.call(['git', 'add', 'README'], cwd=tmp_path)
+    subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=tmp_path)
+    subprocess.call(
+        ['git', 'remote', 'add', GIT_REMOTE, GIT_URL], cwd=tmp_path,
+    )
+    return tmp_path
 
-    def setUp(self) -> None:
-        self.dir = tempfile.mkdtemp()
-        os.chdir(self.dir)
 
-        pathlib.Path('README').touch()
-
-        subprocess.call(['git', 'init'], cwd=self.dir)
-        subprocess.call(
-            [
-                'git', 'config', 'user.name',
-                f'"{GIT_NAME}"',
-            ], cwd=self.dir,
-        )
-        subprocess.call(
-            [
-                'git', 'config', 'user.email',
-                f'"{GIT_EMAIL}"',
-            ], cwd=self.dir,
-        )
-        subprocess.call(['git', 'add', 'README'], cwd=self.dir)
-        subprocess.call(['git', 'commit', '-m', GIT_COMMIT_MSG], cwd=self.dir)
-        subprocess.call(
-            ['git', 'remote', 'add', GIT_REMOTE, GIT_URL],
-            cwd=self.dir,
-        )
-
+@pytest.mark.usefixtures('git_repo')
+class TestGit:
     @unittest.mock.patch.dict(
         os.environ,
         {'TRAVIS_BRANCH': 'master'},
@@ -91,7 +78,8 @@ class GitTest(unittest.TestCase):
         }
 
 
-class GitLogTest(GitTest):
+@pytest.mark.usefixtures('git_repo')
+class TestGitLog:
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     def test_gitlog(self) -> None:
         git_info = coveralls.git.gitlog('%H')
@@ -104,20 +92,12 @@ class GitLogTest(GitTest):
         assert coveralls.git.gitlog('%s') == GIT_COMMIT_MSG
 
 
-class GitInfoTest(unittest.TestCase):
-    old_cwd: pathlib.Path
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.old_cwd = pathlib.Path.cwd()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.chdir(cls.old_cwd)
-
-    def setUp(self) -> None:
-        self.dir = tempfile.mkdtemp()
-        os.chdir(self.dir)
+class TestGitInfo:
+    @pytest.fixture(scope='function', autouse=True)
+    def _chdir_tmp(
+        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
 
     @unittest.mock.patch.dict(
         os.environ, {
@@ -160,7 +140,7 @@ class GitInfoTest(unittest.TestCase):
         assert not git_info
 
 
-class GitInfoOverridesTest(unittest.TestCase):
+class TestGitInfoOverrides:
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
     @unittest.mock.patch.dict(
         os.environ, {

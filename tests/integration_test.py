@@ -2,8 +2,9 @@ import os
 import pathlib
 import subprocess
 import sys
-import tempfile
 import unittest.mock
+
+import pytest
 
 from coveralls import Coveralls
 
@@ -18,71 +19,69 @@ inttest.test_func({:d})
 
 COVERAGE_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'data')
 
+GITINFO = {
+    'GIT_ID': 'asdf1234',
+    'GIT_AUTHOR_NAME': 'Integration Tests',
+    'GIT_AUTHOR_EMAIL': 'integration@test.com',
+    'GIT_COMMITTER_NAME': 'Integration Tests',
+    'GIT_COMMITTER_EMAIL': 'integration@test.com',
+    'GIT_MESSAGE': 'Ran the integration tests',
+}
 
-class IntegrationTest(unittest.TestCase):
-    gitinfo = {
-        'GIT_ID': 'asdf1234',
-        'GIT_AUTHOR_NAME': 'Integration Tests',
-        'GIT_AUTHOR_EMAIL': 'integration@test.com',
-        'GIT_COMMITTER_NAME': 'Integration Tests',
-        'GIT_COMMITTER_EMAIL': 'integration@test.com',
-        'GIT_MESSAGE': 'Ran the integration tests',
-    }
 
-    old_cwd: pathlib.Path
+class TestIntegration:
+    @staticmethod
+    def _test_harness(
+        tmp_path: pathlib.Path,
+        monkeypatch: pytest.MonkeyPatch,
+        num: int,
+        hits: int,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.old_cwd = pathlib.Path.cwd()
+        test_file = tmp_path / 'test.py'
+        test_file.write_text(
+            COVERAGE_CODE_STANZA.format(COVERAGE_TEMPLATE_PATH, num),
+            encoding='utf-8',
+        )
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.chdir(cls.old_cwd)
+        subprocess.check_call([
+            sys.executable, '-m', 'coverage', 'run',
+            str(test_file),
+        ])
 
-    def _test_harness(self, num: int, hits: int) -> None:
-        with tempfile.TemporaryDirectory() as tempdir:
-            os.chdir(tempdir)
+        coverallz = Coveralls(repo_token='xxx')
+        report = coverallz.create_data()
+        coverallz.create_report()  # This is purely for coverage
 
-            test_file = os.path.join(tempdir, 'test.py')
-            pathlib.Path(test_file).write_text(
-                COVERAGE_CODE_STANZA.format(
-                    COVERAGE_TEMPLATE_PATH,
-                    num,
-                ),
-                encoding='utf-8',
-            )
+        source_files = {f['name'] for f in report['source_files']}
+        print(source_files)
+        inttest = os.path.join(COVERAGE_TEMPLATE_PATH, 'inttest.py')
+        assert inttest in source_files
 
-            subprocess.check_call([
-                sys.executable, '-m', 'coverage', 'run',
-                test_file,
-            ])
+        lines: list[int | None] | None = next(
+            (
+                f['coverage'] for f in report['source_files']
+                if f['name'] == inttest
+            ), None,
+        )
+        assert lines is not None
+        assert sum(int(bool(x)) for x in lines) == hits
 
-            coverallz = Coveralls(repo_token='xxx')
-            report = coverallz.create_data()
-            coverallz.create_report()  # This is purely for coverage
+    @unittest.mock.patch.dict(os.environ, GITINFO, clear=True)
+    def test_5(
+        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self._test_harness(tmp_path, monkeypatch, 5, 8)
 
-            source_files = {f['name'] for f in report['source_files']}
-            print(source_files)
-            inttest = os.path.join(COVERAGE_TEMPLATE_PATH, 'inttest.py')
-            self.assertIn(inttest, source_files)
+    @unittest.mock.patch.dict(os.environ, GITINFO, clear=True)
+    def test_7(
+        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self._test_harness(tmp_path, monkeypatch, 7, 9)
 
-            lines: list[int | None] | None = next(
-                (
-                    f['coverage'] for f in report['source_files']
-                    if f['name'] == inttest
-                ), None,
-            )
-            assert lines is not None
-            assert sum(int(bool(x)) for x in lines) == hits
-
-    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_5(self) -> None:
-        self._test_harness(5, 8)
-
-    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_7(self) -> None:
-        self._test_harness(7, 9)
-
-    @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_11(self) -> None:
-        self._test_harness(11, 9)
+    @unittest.mock.patch.dict(os.environ, GITINFO, clear=True)
+    def test_11(
+        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        self._test_harness(tmp_path, monkeypatch, 11, 9)
