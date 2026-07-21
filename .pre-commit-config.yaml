@@ -197,7 +197,7 @@ repos:
       - id: pyproject-use-version-ranges
         name: avoid using carets for version ranges
         description: 'Avoid using carets for version ranges'
-        entry: '\^'
+        entry: '\^\d'
         language: pygrep
         types: [toml]
         files: 'pyproject.toml$'
