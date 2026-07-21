@@ -1,0 +1,19 @@
+docs/usage/configuration.rst
+  s_32a874004aeecb::t_93911c4410bbdb 53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "5fb90191bbbf911007070629c9fc9a27b2cc49aa",
+  "prompts": {},
+  "sessions": {
+    "s_32a874004aeecb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f80c8-ee39-73a6-830d-b28228c87663",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
