@@ -1,0 +1,77 @@
+pyproject.toml
+  s_6bb908cc05754e::t_387335210e603d 24-26
+tests/cli_test.py
+  s_6bb908cc05754e::t_305e7e8a30aa77 61
+uv.lock
+  s_6bb908cc05754e::t_17efcce39a8caa 252,273,275
+tests/api/reporter_test.py
+  s_6bb908cc05754e::t_e0bad4b71db452 273-278,282-283
+  s_6bb908cc05754e::t_1d6f5d5d046e74 10
+coveralls/api.py
+  s_6bb908cc05754e::t_d8274ab168ba50 140-142,144-147
+  s_d4403f36360117::t_c2adbb04a3005a 203
+  s_6bb908cc05754e::t_282de58b2cd77f 152
+  s_6bb908cc05754e::t_059122f18ac6d3 130,150,153
+  s_6bb908cc05754e::t_8a81007f51811d 57-62
+  s_6bb908cc05754e::t_c58e2090acd79b 131-133,137,154-157,198
+  s_6bb908cc05754e::t_6f84f1ae32f147 10-11,21-42,49,51-56,63-69
+  s_6bb908cc05754e::t_49eee212ba8a84 43-48,50
+  s_6bb908cc05754e::t_1c903a326874f5 70
+  s_6bb908cc05754e::t_f7a618d3bef774 134-136
+coveralls/configuration.py
+  s_6bb908cc05754e::t_657f70bf2abc8c 125-129,131
+  s_6bb908cc05754e::t_7936fdf26bf8f6 345
+  s_6bb908cc05754e::t_d955d06590be7a 30-31,104,122,130,132-141
+  s_6bb908cc05754e::t_4c717d07cf9937 94,123
+  s_6bb908cc05754e::t_6f88f88953f345 124
+tests/api/wear_test.py
+  s_6bb908cc05754e::t_1132e253e8c69c 14,27-30,37-43,45-99,101-103,106-111,113-115,117-118,121-131,134-139,144-149,153-172,174-201,204-220,222-231,234-240,242-250,286-290,293-300,303-340,342-372,386-396
+  s_6bb908cc05754e::t_097299b74218fb 18,20,373-380,384-385
+  s_6bb908cc05754e::t_a5bbc26634da41 15,381-383
+  s_6bb908cc05754e::t_8d2283ddbad55a 8-9,32-36,44,202-203,221,232-233,241,291
+  s_6bb908cc05754e::t_96d3ea59055a4c 31
+  s_6bb908cc05754e::t_237cd88336fbd8 5,255-280,282-283
+  s_6bb908cc05754e::t_c3b3dce7c57f0d 285
+  s_6bb908cc05754e::t_a89bf581322335 251,301
+  s_6bb908cc05754e::t_eb4f554ceacbda 292
+tests/api/resolve_test.py
+  s_6bb908cc05754e::t_b9b051fb3ff0ae 255,272
+coveralls/cli.py
+  s_6bb908cc05754e::t_be20830ad48a84 88
+  s_6bb908cc05754e::t_1197cb05373ad6 86,111,258-265,325
+docs/usage/configuration.rst
+  s_6bb908cc05754e::t_31ab0a99ea56ec 94-101,117
+poetry.lock
+  s_6bb908cc05754e::t_298b68d34edf15 1014
+tests/api/config_test.py
+  s_6bb908cc05754e::t_e9cd2567714412 147-148,155
+  s_6bb908cc05754e::t_279b058187cb1f 29
+  s_6bb908cc05754e::t_6a75d9f464fdd7 70,87
+  s_6bb908cc05754e::t_7d94b6e9bf5a9b 149-154,156-157,159-166
+  s_6bb908cc05754e::t_87f7ff9826b03f 158
+  s_6bb908cc05754e::t_643b5ae7633bf1 167-168
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "bd9d4f13d9ea1148254b2e93ec5d29e2c669ef4a",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    },
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
