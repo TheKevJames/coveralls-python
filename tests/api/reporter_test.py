@@ -8,7 +8,6 @@ import unittest.mock
 import pytest
 
 from coveralls import Coveralls
-from coveralls.exception import CoverallsException
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -46,7 +45,7 @@ class ReporterTest(unittest.TestCase):
             {
                 'source': (
                     pathlib.Path(EXAMPLE_DIR) / 'project.py'
-                ).read_text(),
+                ).read_text(encoding='utf-8'),
                 'name': f'{name_prefix}project.py',
                 'coverage': [
                     1, 1, None, None, 1, None, None,
@@ -225,7 +224,9 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[1], expected_results[1])
 
     def test_missing_file(self):
-        pathlib.Path('extra.py').write_text('print("Python rocks!")\n')
+        pathlib.Path('extra.py').write_text(
+            'print("Python rocks!")\n', encoding='utf-8',
+        )
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -235,21 +236,25 @@ class ReporterTest(unittest.TestCase):
         with contextlib.suppress(Exception):
             pathlib.Path('extra.py').unlink()
 
-        with pytest.raises(CoverallsException, match='No source for code'):
+        with pytest.raises(RuntimeError, match='No source for code'):
             Coveralls(repo_token='xxx').get_coverage()
 
     def test_not_python(self):
-        pathlib.Path('extra.py').write_text('print("Python rocks!")\n')
+        pathlib.Path('extra.py').write_text(
+            'print("Python rocks!")\n', encoding='utf-8',
+        )
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
                 'extra.py',
             ], cwd=EXAMPLE_DIR,
         )
-        pathlib.Path('extra.py').write_text("<h1>This isn't python!</h1>\n")
+        pathlib.Path('extra.py').write_text(
+            "<h1>This isn't python!</h1>\n", encoding='utf-8',
+        )
 
         with pytest.raises(
-                CoverallsException,
+                RuntimeError,
                 match=r"Couldn't parse .* as Python",
         ):
             Coveralls(repo_token='xxx').get_coverage()

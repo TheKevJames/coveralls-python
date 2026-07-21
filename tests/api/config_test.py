@@ -7,7 +7,6 @@ from coveralls.configuration import DEFAULT_CONNECT_TIMEOUT
 from coveralls.configuration import DEFAULT_HOST
 from coveralls.configuration import DEFAULT_READ_TIMEOUT
 from coveralls.configuration import PAYLOAD_FIELDS
-from coveralls.exception import CoverallsException
 
 
 def test_defaults():
@@ -103,14 +102,14 @@ def test_timeout_accepts_numeric_strings(name):
 
 @pytest.mark.parametrize('name', TIMEOUT_FIELDS)
 def test_timeout_rejects_non_numeric(name):
-    with pytest.raises(CoverallsException, match='must be a number'):
+    with pytest.raises(ValueError, match='must be a number'):
         Config(**{name: 'abc'})
 
 
 @pytest.mark.parametrize('name', TIMEOUT_FIELDS)
 @pytest.mark.parametrize('value', [0, -1])
 def test_timeout_rejects_non_positive(name, value):
-    with pytest.raises(CoverallsException, match='greater than 0'):
+    with pytest.raises(ValueError, match='greater than 0'):
         Config(**{name: value})
 
 

@@ -8,7 +8,6 @@ except ImportError:
     yaml = None  # type: ignore[assignment]
 
 from coveralls import Coveralls
-from coveralls.exception import CoverallsException
 
 
 # The per-source resolution rules (CI detection, env vars, file loading,
@@ -22,6 +21,7 @@ class TestConfigIntegration:
         monkeypatch.chdir(tmp_path)
         (tmp_path / '.coveralls.mock').write_text(
             'repo_token: xxx\nservice_name: jenkins\n',
+            encoding='utf-8',
         )
 
         cover = Coveralls()
@@ -66,7 +66,7 @@ class TestConfigIntegration:
         clear=True,
     )
     def test_invalid_timeout_raises_on_construction(self):
-        with pytest.raises(CoverallsException, match='must be a number'):
+        with pytest.raises(ValueError, match='must be a number'):
             Coveralls()
 
 
@@ -95,7 +95,7 @@ class TestEnsureToken:
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_misconfigured(self):
-        with pytest.raises(CoverallsException) as excinfo:
+        with pytest.raises(RuntimeError) as excinfo:
             Coveralls()
 
         assert str(excinfo.value) == (
@@ -109,7 +109,7 @@ class TestEnsureToken:
         clear=True,
     )
     def test_misconfigured_github(self):
-        with pytest.raises(CoverallsException) as excinfo:
+        with pytest.raises(RuntimeError) as excinfo:
             Coveralls()
 
         assert str(excinfo.value).startswith(

@@ -47,6 +47,7 @@ class IntegrationTest(unittest.TestCase):
                     COVERAGE_TEMPLATE_PATH,
                     num,
                 ),
+                encoding='utf-8',
             )
 
             subprocess.check_call([

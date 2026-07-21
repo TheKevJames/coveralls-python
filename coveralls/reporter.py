@@ -8,8 +8,6 @@ from coverage.plugin import FileReporter
 from coverage.report import get_analysis_to_report
 from coverage.results import Analysis
 
-from .exception import CoverallsException
-
 
 log = logging.getLogger('coveralls.reporter')
 
@@ -46,7 +44,7 @@ class CoverallReporter:
             if str(e) == 'No data to report.':
                 return
 
-            raise CoverallsException(f'Got coverage library error: {e}') from e
+            raise RuntimeError(f'Got coverage library error: {e}') from e
 
     @staticmethod
     def get_hits(line_num: int, analysis: Analysis) -> int | None:

@@ -8,7 +8,6 @@ import unittest.mock
 import pytest
 
 import coveralls.git
-from coveralls.exception import CoverallsException
 from coveralls.git import run_command
 
 
@@ -40,8 +39,7 @@ class GitTest(unittest.TestCase):
         self.dir = tempfile.mkdtemp()
         os.chdir(self.dir)
 
-        # TODO: switch to pathlib
-        open('README', 'a').close()  # pylint: disable=consider-using-with
+        pathlib.Path('README').touch()
 
         subprocess.call(['git', 'init'], cwd=self.dir)
         subprocess.call(
@@ -155,7 +153,6 @@ class GitInfoTest(unittest.TestCase):
     def test_gitinfo_not_a_git_repo(self):
         git_info = coveralls.git.git_info()
 
-        self.assertRaises(CoverallsException)
         assert not git_info
 
 

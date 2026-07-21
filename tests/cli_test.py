@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from unittest import mock
 
@@ -6,10 +7,9 @@ import pytest
 import responses
 
 import coveralls.cli
-from coveralls.exception import CoverallsException
 
 
-EXC = CoverallsException('bad stuff happened')
+EXC = RuntimeError('bad stuff happened')
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -18,6 +18,20 @@ EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
 
 def req_json(request):
     return json.loads(request.body.decode('utf-8'))
+
+
+def assert_logged_error(caplog, msg):
+    """Assert _run_action logged exactly one error carrying exception `msg`.
+
+    _run_action logs via log.exception, so the failing exception is recorded
+    in the record's exc_info rather than the message; we inspect that.
+    """
+    errors = [r for r in caplog.records if r.levelno == logging.ERROR]
+    assert len(errors) == 1
+    record = errors[0]
+    assert record.message == 'Error running coveralls'
+    assert record.exc_info is not None
+    assert str(record.exc_info[1]) == msg
 
 
 def coveralls_kwargs(**overrides):
@@ -133,9 +147,8 @@ def test_finish_deprecated_flag_warns(mock_warning):
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-@mock.patch.object(coveralls.cli.log, 'exception')
 @responses.activate
-def test_finish_exception(mock_log):
+def test_finish_exception(caplog):
     responses.add(
         responses.POST, 'https://coveralls.io/webhook',
         json={'error': 'Mocked'}, status=200,
@@ -147,23 +160,17 @@ def test_finish_exception(mock_log):
     }
     msg = 'Parallel finish failed: Mocked'
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
         coveralls.cli.main(argv=['finish'])
 
-    mock_log.assert_has_calls([
-        mock.call(
-            'Error running coveralls: %s',
-            CoverallsException(msg),
-        ),
-    ])
+    assert_logged_error(caplog, msg)
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-@mock.patch.object(coveralls.cli.log, 'exception')
 @responses.activate
-def test_finish_exception_without_error(mock_log):
+def test_finish_exception_without_error(caplog):
     responses.add(
         responses.POST, 'https://coveralls.io/webhook',
         json={}, status=200,
@@ -175,15 +182,10 @@ def test_finish_exception_without_error(mock_log):
     }
     msg = 'Parallel finish failed'
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
         coveralls.cli.main(argv=['finish'])
 
-    mock_log.assert_has_calls([
-        mock.call(
-            'Error running coveralls: %s',
-            CoverallsException(msg),
-        ),
-    ])
+    assert_logged_error(caplog, msg)
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
 
@@ -299,14 +301,16 @@ def test_deprecated_srcdir_alias_warns(mock_coveralls, mock_warning):
     assert kwargs['src_dir'] == 'foo'
 
 
-@mock.patch.object(coveralls.cli.log, 'exception')
 @mock.patch.object(coveralls.Coveralls, 'wear', side_effect=EXC)
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-def test_exception(_mock_coveralls, mock_log):
-    with pytest.raises(SystemExit):
+def test_exception(_mock_coveralls, caplog):
+    with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
         coveralls.cli.main(argv=[])
 
-    mock_log.assert_has_calls([mock.call('Error running coveralls: %s', EXC)])
+    errors = [r for r in caplog.records if r.levelno == logging.ERROR]
+    assert len(errors) == 1
+    assert errors[0].message == 'Error running coveralls'
+    assert errors[0].exc_info[1] is EXC
 
 
 @mock.patch.object(coveralls.Coveralls, 'save_report')
@@ -342,7 +346,7 @@ def test_save_report_deprecated_output_warns(mock_save, mock_warning):
 def test_upload(mock_submit):
     json_file = os.path.join(EXAMPLE_DIR, 'example.json')
     coveralls.cli.main(argv=['upload', json_file])
-    with open(json_file) as f:
+    with open(json_file, encoding='utf-8') as f:
         mock_submit.assert_called_with(f.read())
 
 
@@ -352,7 +356,7 @@ def test_upload(mock_submit):
 def test_upload_deprecated_submit_warns(mock_submit, mock_warning):
     json_file = os.path.join(EXAMPLE_DIR, 'example.json')
     coveralls.cli.main(argv=['--submit=' + json_file])
-    with open(json_file) as f:
+    with open(json_file, encoding='utf-8') as f:
         mock_submit.assert_called_with(f.read())
     mock_warning.assert_called_once_with(
         '%s is deprecated and will be removed in a future release; use %s '

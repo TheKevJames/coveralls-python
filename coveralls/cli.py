@@ -115,8 +115,10 @@ def _run_action(action: Callable[[], None]) -> None:
         action()
     except KeyboardInterrupt:  # pragma: no cover
         log.info('Aborted')
-    except Exception as e:
-        log.exception('Error running coveralls: %s', e)
+    except Exception:
+        # log.exception already records the active exception (type, message,
+        # traceback) via exc_info, so it is not repeated in the message.
+        log.exception('Error running coveralls')
         sys.exit(1)
 
 
@@ -147,7 +149,7 @@ def _action_upload(
 ) -> None:
     if merge:
         coverallz.merge(merge)
-    with open(path) as report_file:
+    with open(path, encoding='utf-8') as report_file:
         coverallz.submit_report(report_file.read())
 
 

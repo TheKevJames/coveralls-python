@@ -6,8 +6,6 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
-from .exception import CoverallsException
-
 
 log = logging.getLogger('coveralls.configuration')
 
@@ -108,11 +106,11 @@ class Config:
         try:
             value = float(raw)
         except (TypeError, ValueError) as e:
-            raise CoverallsException(
+            raise ValueError(
                 f'Invalid {name} value {raw!r}: must be a number.',
             ) from e
         if value <= 0:
-            raise CoverallsException(
+            raise ValueError(
                 f'Invalid {name} value {raw!r}: must be greater than 0.',
             )
         return value
@@ -380,7 +378,9 @@ def _from_file(config_filename: str) -> dict[str, Any]:
         return {}
 
     try:
-        content = (pathlib.Path.cwd() / config_filename).read_text()
+        content = (pathlib.Path.cwd() / config_filename).read_text(
+            encoding='utf-8',
+        )
     except FileNotFoundError:
         log.debug(
             'Missing %s file. Using only env variables.', config_filename,

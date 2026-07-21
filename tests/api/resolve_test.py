@@ -326,7 +326,9 @@ def test_config_file_cannot_waive_token_required(tmp_path, monkeypatch):
     # token_required: false in the config file must be ignored so a committed
     # .coveralls.yml cannot silently disable the check.
     monkeypatch.chdir(tmp_path)
-    (tmp_path / '.coveralls.mock').write_text('token_required: false\n')
+    (tmp_path / '.coveralls.mock').write_text(
+        'token_required: false\n', encoding='utf-8',
+    )
     config = resolve('.coveralls.mock', {})
     assert config.token_required is True
 
@@ -349,6 +351,7 @@ def test_file_source_and_unknown_key_warning(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / '.coveralls.mock').write_text(
         'repo_token: xxx\nservice_name: jenkins\nbogus_key: nope\n',
+        encoding='utf-8',
     )
     with unittest.mock.patch.object(log, 'warning') as warning:
         config = resolve('.coveralls.mock', {})
@@ -369,6 +372,7 @@ def test_bool_flags_are_coerced_from_config_file(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / '.coveralls.mock').write_text(
         'repo_token: xxx\nparallel: "yes"\nskip_ssl_verify: "1"\n',
+        encoding='utf-8',
     )
     config = resolve('.coveralls.mock', {})
     assert config.parallel is True
@@ -444,7 +448,7 @@ def test_empty_config_file_is_ignored(content, tmp_path, monkeypatch):
     # yaml.safe_load() returns None for empty/comment-only files; resolve must
     # treat that as no config rather than crashing on a None update.
     monkeypatch.chdir(tmp_path)
-    (tmp_path / '.coveralls.mock').write_text(content)
+    (tmp_path / '.coveralls.mock').write_text(content, encoding='utf-8')
 
     config = resolve('.coveralls.mock', {})
 
@@ -460,6 +464,7 @@ def test_none_rcfile_override_keeps_file_value(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     (tmp_path / '.coveralls.mock').write_text(
         'repo_token: xxx\nconfig_file: from_yaml.rc\n',
+        encoding='utf-8',
     )
     config = resolve('.coveralls.mock', {'rcfile': None})
     assert config.rcfile == 'from_yaml.rc'
@@ -473,6 +478,7 @@ def test_alias_and_deprecated_file_keys_still_work(tmp_path, monkeypatch):
         'repo_token: xxx\n'
         'coveralls_host: https://old.example.com\n'
         'config_file: custom.rc\n',
+        encoding='utf-8',
     )
     with unittest.mock.patch.object(log, 'warning') as warning:
         config = resolve('.coveralls.mock', {})

@@ -3,8 +3,6 @@ import os
 import subprocess
 from typing import Any
 
-from .exception import CoverallsException
-
 
 log = logging.getLogger('coveralls.git')
 
@@ -17,7 +15,7 @@ def run_command(*args: str) -> str:
             capture_output=True,
         )
     except subprocess.CalledProcessError as e:
-        raise CoverallsException(
+        raise RuntimeError(
             f'{e}\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}',
         ) from e
 
@@ -101,7 +99,7 @@ def git_info() -> dict[str, dict[str, Any]]:
             for line in run_command('git', 'remote', '-v').splitlines()
             if '(fetch)' in line
         ]
-    except (CoverallsException, OSError) as ex:
+    except (RuntimeError, OSError) as ex:
         # When git is not available, try env vars as per Coveralls docs:
         # https://docs.coveralls.io/mercurial-support
         # Additionally, these variables have been extended by GIT_URL and

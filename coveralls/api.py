@@ -10,7 +10,6 @@ import requests
 
 from .configuration import Config
 from .configuration import resolve
-from .exception import CoverallsException
 from .git import git_info
 from .reporter import CoverallReporter
 
@@ -19,7 +18,6 @@ log = logging.getLogger('coveralls.api')
 
 
 class Coveralls:
-    # pylint: disable=too-many-public-methods
     config_filename = '.coveralls.yml'
 
     def __init__(self, token_required=True, **kwargs):
@@ -55,13 +53,13 @@ class Coveralls:
             return
 
         if os.environ.get('GITHUB_ACTIONS'):
-            raise CoverallsException(
+            raise RuntimeError(
                 'Running on Github Actions but GITHUB_TOKEN is not set. Add '
                 '"env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to your '
                 'step config.',
             )
 
-        raise CoverallsException(
+        raise RuntimeError(
             'Not on TravisCI. You have to provide either repo_token in '
             f'{self.config_filename} or set the COVERALLS_REPO_TOKEN env var.',
         )
@@ -88,7 +86,7 @@ class Coveralls:
                 timeout=timeout,
             )
         except requests.exceptions.Timeout as e:
-            raise CoverallsException(
+            raise TimeoutError(
                 f'Timed out submitting coverage to {endpoint} '
                 f'(connect={timeout[0]}s, read={timeout[1]}s)',
             ) from e
@@ -110,7 +108,7 @@ class Coveralls:
             response.raise_for_status()
             data = response.json()
         except Exception as e:
-            raise CoverallsException(
+            raise RuntimeError(
                 f'Could not submit coverage: {e}',
             ) from e
 
@@ -139,7 +137,7 @@ class Coveralls:
                 endpoint, json=payload, verify=verify, timeout=timeout,
             )
         except requests.exceptions.Timeout as e:
-            raise CoverallsException(
+            raise TimeoutError(
                 f'Timed out finishing parallel jobs at {endpoint} '
                 f'(connect={timeout[0]}s, read={timeout[1]}s)',
             ) from e
@@ -147,16 +145,16 @@ class Coveralls:
             response.raise_for_status()
             response = response.json()
         except Exception as e:
-            raise CoverallsException(
+            raise RuntimeError(
                 f'Parallel finish failed: {e}',
             ) from e
 
         if 'error' in response:
             exc = response['error']
-            raise CoverallsException(f'Parallel finish failed: {exc}')
+            raise RuntimeError(f'Parallel finish failed: {exc}')
 
         if 'done' not in response or not response['done']:
-            raise CoverallsException('Parallel finish failed')
+            raise RuntimeError('Parallel finish failed')
 
         return response
 
@@ -192,7 +190,7 @@ class Coveralls:
         except coverage.CoverageException:
             log.exception('Failure to gather coverage:')
         else:
-            pathlib.Path(file_path).write_text(report)
+            pathlib.Path(file_path).write_text(report, encoding='utf-8')
 
     def create_data(self, extra=None):
         r"""

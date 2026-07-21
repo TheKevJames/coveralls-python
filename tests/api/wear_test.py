@@ -141,7 +141,7 @@ class WearTest(unittest.TestCase):
         mock_requests.post.return_value.status_code = 500
         mock_requests.post.return_value.text = '<html>Http 1./1 500</html>'
 
-        with pytest.raises(coveralls.exception.CoverallsException):
+        with pytest.raises(RuntimeError):
             coveralls.Coveralls(repo_token='xxx').wear()
 
     @unittest.mock.patch('coveralls.reporter.CoverallReporter.report')
@@ -204,7 +204,7 @@ class WearTest(unittest.TestCase):
         mock_requests.exceptions.Timeout = requests.exceptions.Timeout
         mock_requests.post.side_effect = requests.exceptions.Timeout('boom')
         with pytest.raises(
-            coveralls.exception.CoverallsException,
+            TimeoutError,
             match=r'Timed out submitting coverage',
         ):
             coveralls.Coveralls(repo_token='xxx').wear(dry_run=False)
@@ -221,7 +221,7 @@ class WearTest(unittest.TestCase):
         mock_requests.exceptions.Timeout = requests.exceptions.Timeout
         mock_requests.post.side_effect = requests.exceptions.Timeout('boom')
         with pytest.raises(
-            coveralls.exception.CoverallsException,
+            TimeoutError,
             match=r'Timed out finishing parallel jobs',
         ):
             coveralls.Coveralls(repo_token='xxx').parallel_finish()
