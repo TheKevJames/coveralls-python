@@ -1,0 +1,22 @@
+tests/cli_test.py
+  s_6bb908cc05754e::t_305e7e8a30aa77 61
+coveralls/cli.py
+  s_6bb908cc05754e::t_1197cb05373ad6 86,111,258-265,325
+  s_6bb908cc05754e::t_be20830ad48a84 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "42e54939c66d9e2be4f5d23800dd24635f797496",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
