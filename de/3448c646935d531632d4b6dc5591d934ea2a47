@@ -1,0 +1,20 @@
+LINT_CLEANUP_PLAN.md
+  s_d4403f36360117::t_540911c4f18a06 17,19-20
+  s_d4403f36360117::t_70fdf1e3ac40ba 1-16,18,21-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "de3448c646935d531632d4b6dc5591d934ea2a47",
+  "prompts": {},
+  "sessions": {
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
