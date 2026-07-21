@@ -1,0 +1,25 @@
+coveralls/api.py
+  s_d4403f36360117::t_1a8f237b4366d4 193
+LINT_CLEANUP_PLAN.md
+  s_d4403f36360117::t_8afc1f1fc93cb8 136-139,159-160
+coveralls/cli.py
+  s_d4403f36360117::t_d4f16866190d65 150
+coveralls/configuration.py
+  s_d4403f36360117::t_db3b359fd2c7b8 381-383
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "7694a705e5d523e224e5fcb06ed99cd3fa99beb8",
+  "prompts": {},
+  "sessions": {
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
