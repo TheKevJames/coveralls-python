@@ -94,7 +94,7 @@ class Coveralls:
 
         if response.status_code == 422:
             if self.config.service_name.startswith('github'):
-                print(
+                log.warning(
                     'Received 422 submitting job via Github Actions. By '
                     'default, coveralls-python uses the "github" service '
                     'name, which requires you to set the $GITHUB_TOKEN '
