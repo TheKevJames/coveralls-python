@@ -1,0 +1,57 @@
+coveralls/reporter.py
+  s_d4403f36360117::t_d0929e104beebb 47
+tests/api/wear_test.py
+  s_d4403f36360117::t_573eb26aa3fe9f 144,207,224
+tests/integration_test.py
+  s_d4403f36360117::t_ec7fd6296d6201 50
+tests/api/resolve_test.py
+  s_d4403f36360117::t_798d3f53fde443 329-331,354,375,451,467,481
+coveralls/configuration.py
+  s_d4403f36360117::t_e1b789420e55b9 109,113
+  s_d4403f36360117::t_db3b359fd2c7b8 381-383
+tests/api/config_test.py
+  s_d4403f36360117::t_8011f03bf3b569 105,112
+.pre-commit-config.yaml
+  s_d4403f36360117::t_4da6c3c1efe2fa 53,55
+  s_d4403f36360117::t_6373988596535a 54
+  s_d4403f36360117::t_38f46296cb9e62 137-147
+tests/git_test.py
+  s_d4403f36360117::t_e1e07942885ef7 42
+tests/api/reporter_test.py
+  s_d4403f36360117::t_2a94d140d3e811 239,257
+  s_d4403f36360117::t_131e9b88d3054c 48,227-229,243-245,252-254
+coveralls/cli.py
+  s_d4403f36360117::t_d4f16866190d65 152
+  s_d4403f36360117::t_9e489b77f06fe0 118-121
+tests/api/configuration_test.py
+  s_d4403f36360117::t_0b6cbebd73d8e8 24
+  s_d4403f36360117::t_0fb8e19ad1c045 69,98,112
+coveralls/git.py
+  s_d4403f36360117::t_55b6b32ac9afec 18,102
+tests/cli_test.py
+  s_d4403f36360117::t_c6a197906c4f92 349,359
+  s_d4403f36360117::t_131ed898d8e3e2 306-307,310-313
+  s_d4403f36360117::t_336e58c62bbe5b 23-24,26-27,29-34
+  s_d4403f36360117::t_c94fe2b5082743 12,25,28,35-36
+  s_d4403f36360117::t_065c3528b566b4 2
+  s_d4403f36360117::t_59bfb642dfe91e 151,163,166,173,185,188
+coveralls/api.py
+  s_d4403f36360117::t_1a8f237b4366d4 193
+  s_d4403f36360117::t_c2adbb04a3005a 56,62,89,111,140,148,154,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6b3dc83a1160449544bc7f924d6a2961a8a2e224",
+  "prompts": {},
+  "sessions": {
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
