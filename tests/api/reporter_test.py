@@ -267,7 +267,7 @@ class ReporterTest(unittest.TestCase):
 
         cov = Coveralls(repo_token='test_token', service_name='github')
 
-        with unittest.mock.patch('builtins.print') as mock_print:
+        with unittest.mock.patch('coveralls.api.log.warning') as mock_warn:
             cov.submit_report('{}')
-            mock_print.assert_called()
-            assert '422' in mock_print.call_args_list[0][0][0]
+            mock_warn.assert_called()
+            assert '422' in mock_warn.call_args_list[0][0][0]
