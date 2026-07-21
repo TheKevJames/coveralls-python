@@ -1,0 +1,21 @@
+.circleci/config.yml
+  s_6fab0d8d63a6eb::t_d2d70918ed489e 118,131
+.github/workflows/test.yml
+  s_6fab0d8d63a6eb::t_4bc540ddf15044 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ffa5c4e42963b1dab8725b7f4a869501bde9fe1b",
+  "prompts": {},
+  "sessions": {
+    "s_6fab0d8d63a6eb": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f84d9-044b-7238-b1f9-4b793f82f624",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
