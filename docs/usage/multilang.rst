@@ -20,7 +20,7 @@ For example, to submit coverage for a project using both ``mocha`` and ``py.test
 
 If you want to use this library to create a JSON blob for usage elsewhere, you can run::
 
-    coveralls --output=coverage.json
+    coveralls save coverage.json
 
 Technical Details
 -----------------
