@@ -1,0 +1,36 @@
+pyproject.toml
+  s_6bb908cc05754e::t_387335210e603d 24-26
+tests/api/reporter_test.py
+  s_6bb908cc05754e::t_1d6f5d5d046e74 10
+  s_6bb908cc05754e::t_e0bad4b71db452 273-278,282-283
+tests/api/wear_test.py
+  s_6bb908cc05754e::t_1132e253e8c69c 13,23-26,33-39,41-95,97-99,101-105,107,109-111,113-114,117-135,140-145,149-197,200-216,218-227,230-236,238-245,247,251-255,258-268,270-280,282-307,309-350
+  s_6bb908cc05754e::t_9057007df95394 308
+  s_6bb908cc05754e::t_8d2283ddbad55a 7-8,28-32,40,198-199,217,228-229,237,256
+  s_6bb908cc05754e::t_96d3ea59055a4c 27
+coveralls/api.py
+  s_6bb908cc05754e::t_282de58b2cd77f 132,142
+  s_6bb908cc05754e::t_6f84f1ae32f147 10-11,21-60
+  s_6bb908cc05754e::t_c58e2090acd79b 121-129,134-135,139,143-150,191-193
+  s_6bb908cc05754e::t_1c903a326874f5 61
+poetry.lock
+  s_6bb908cc05754e::t_298b68d34edf15 1014
+uv.lock
+  s_6bb908cc05754e::t_17efcce39a8caa 252,273,275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "7da565d9465f8324f1248e5161cecbc059e7796c",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
