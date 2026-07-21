@@ -1,0 +1,27 @@
+tests/api/config_test.py
+  s_6bb908cc05754e::t_7d94b6e9bf5a9b 29,147-168
+  s_6bb908cc05754e::t_6a75d9f464fdd7 70,87
+  s_6bb908cc05754e::t_643b5ae7633bf1 169-170
+tests/api/resolve_test.py
+  s_6bb908cc05754e::t_b9b051fb3ff0ae 255,272
+coveralls/configuration.py
+  s_6bb908cc05754e::t_d955d06590be7a 30-33,96-97,107,125-142,165-170
+  s_6bb908cc05754e::t_7936fdf26bf8f6 353
+  s_6bb908cc05754e::t_22aa4ce60a98fd 171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "90c813435c0fe05de05e9d57718d6ecf64032d63",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
