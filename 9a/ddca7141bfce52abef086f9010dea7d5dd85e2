@@ -1,0 +1,24 @@
+tests/git_test.py
+  s_d4403f36360117::t_e1e07942885ef7 43
+LINT_CLEANUP_PLAN.md
+  s_d4403f36360117::t_abcc2ead00b468 53,55-61,63-65,93-97
+  s_d4403f36360117::t_ed525e3c48a7a0 83-87
+  s_d4403f36360117::t_f40aacaa19942c 22,24-26,28,30-32,34,38-47,49-51,62,66-81
+  s_d4403f36360117::t_0aa35b8d803e8e 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "9addca7141bfce52abef086f9010dea7d5dd85e2",
+  "prompts": {},
+  "sessions": {
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
