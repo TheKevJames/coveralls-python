@@ -57,6 +57,39 @@ filterwarnings = [
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
 
+[tool.tox]
+env_list = [
+    { product = [["py310", "py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
+]
+
+[tool.tox.env_run_base]
+pass_env = ["*"]
+use_develop = true
+deps = [
+    "responses==0.25.8",
+    "pytest==9.0.2",
+    { replace = "if", condition = "factor.pyyaml", then = ["PyYAML>=3.10,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov6", then = ["coverage[toml]>=6.0,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov7", then = ["coverage[toml]>=7.0,<8.0"], extend = true },
+]
+commands = [
+    ["coverage", "run", "--branch", "--source=coveralls", "-m", "pytest", "tests/"],
+    ["coverage", "report", "-m"],
+]
+
+[tool.tox.env.upload]
+deps = ["coverage[toml]>=7.0,<8.0"]
+commands = [["coveralls", "--verbose"]]
+
+[tool.tox.gh-actions]
+python = """
+3.10: py310, upload
+3.11: py311, upload
+3.12: py312, upload
+3.13: py313, upload
+3.14: py314, upload
+"""
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
