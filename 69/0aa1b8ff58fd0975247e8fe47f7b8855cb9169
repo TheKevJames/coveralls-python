@@ -1,0 +1,56 @@
+tests/api/reporter_test.py
+  s_6bb908cc05754e::t_1d6f5d5d046e74 10
+  s_6bb908cc05754e::t_e0bad4b71db452 273-278,282-283
+tests/api/wear_test.py
+  s_6bb908cc05754e::t_1132e253e8c69c 13,23-26,33-39,41-95,97-99,101-105,107,109-111,113-114,117-135,140-145,149-197,200-216,218-227,230-236,238-245,247,251-255,258-268,270-280,282-307,309-350
+  s_6bb908cc05754e::t_9057007df95394 308
+  s_6bb908cc05754e::t_96d3ea59055a4c 27
+  s_6bb908cc05754e::t_8d2283ddbad55a 7-8,28-32,40,198-199,217,228-229,237,256
+uv.lock
+  s_6bb908cc05754e::t_17efcce39a8caa 252,273,275
+coveralls/cli.py
+  s_6bb908cc05754e::t_1197cb05373ad6 86,111,258-265,325
+  s_6bb908cc05754e::t_be20830ad48a84 88
+tests/cli_test.py
+  s_6bb908cc05754e::t_305e7e8a30aa77 61
+coveralls/configuration.py
+  s_6bb908cc05754e::t_7936fdf26bf8f6 341
+  s_6bb908cc05754e::t_d955d06590be7a 30-31,104,122,124-137
+  s_6bb908cc05754e::t_4c717d07cf9937 94,123
+coveralls/api.py
+  s_6bb908cc05754e::t_1c903a326874f5 59
+  s_6bb908cc05754e::t_b1333e71ade597 130
+  s_6bb908cc05754e::t_282de58b2cd77f 140
+  s_6bb908cc05754e::t_6f84f1ae32f147 10-11,21-58
+  s_6bb908cc05754e::t_c58e2090acd79b 119-127,132-133,137,141-148,189-191
+tests/api/resolve_test.py
+  s_6bb908cc05754e::t_b9b051fb3ff0ae 255,272
+poetry.lock
+  s_6bb908cc05754e::t_298b68d34edf15 1014
+docs/usage/configuration.rst
+  s_6bb908cc05754e::t_31ab0a99ea56ec 94-101,117
+tests/api/config_test.py
+  s_6bb908cc05754e::t_7d94b6e9bf5a9b 149-154,156-166
+  s_6bb908cc05754e::t_6a75d9f464fdd7 70,87
+  s_6bb908cc05754e::t_279b058187cb1f 29
+  s_6bb908cc05754e::t_643b5ae7633bf1 167-168
+  s_6bb908cc05754e::t_e9cd2567714412 147-148,155
+pyproject.toml
+  s_6bb908cc05754e::t_387335210e603d 24-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "690aa1b8ff58fd0975247e8fe47f7b8855cb9169",
+  "prompts": {},
+  "sessions": {
+    "s_6bb908cc05754e": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8518-a18e-7dcf-8f6e-e69aeb370db6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
