@@ -4,6 +4,7 @@ import logging
 import os
 import pathlib
 import re
+from typing import Any
 
 import coverage
 import requests
@@ -20,7 +21,7 @@ log = logging.getLogger('coveralls.api')
 class Coveralls:
     config_filename = '.coveralls.yml'
 
-    def __init__(self, token_required=True, **kwargs):
+    def __init__(self, token_required: bool = True, **kwargs: Any) -> None:
         """
         Initialize the main Coveralls collection entrypoint.
 
@@ -40,7 +41,7 @@ class Coveralls:
           A unique identifier of the job on the service specified by
           service_name.
         """
-        self._data = None
+        self._data: dict[str, Any] | None = None
 
         self.config: Config = resolve(
             self.config_filename, kwargs, token_required=token_required,
@@ -48,7 +49,7 @@ class Coveralls:
 
         self.ensure_token()
 
-    def ensure_token(self):
+    def ensure_token(self) -> None:
         if self.config.repo_token or not self.config.token_required:
             return
 
@@ -65,19 +66,19 @@ class Coveralls:
             'COVERALLS_REPO_TOKEN env var.',
         )
 
-    def merge(self, path):
+    def merge(self, path: str) -> None:
         reader = codecs.getreader('utf-8')
         with open(path, 'rb') as fh:
             extra = json.load(reader(fh))
             self.create_data(extra)
 
-    def wear(self, dry_run=False):
+    def wear(self, dry_run: bool = False) -> dict[str, Any]:
         json_string = self.create_report()
         if dry_run:
             return {}
         return self.submit_report(json_string)
 
-    def submit_report(self, json_string):
+    def submit_report(self, json_string: str) -> dict[str, Any]:
         endpoint = f'{self.config.host.rstrip("/")}/api/v1/jobs'
         verify = not self.config.skip_ssl_verify
         timeout = self.config.request_timeout
@@ -107,7 +108,7 @@ class Coveralls:
 
         try:
             response.raise_for_status()
-            data = response.json()
+            data: dict[str, Any] = response.json()
         except Exception as e:
             raise RuntimeError(
                 f'Could not submit coverage: {e}',
@@ -116,8 +117,8 @@ class Coveralls:
         return data
 
     # https://docs.coveralls.io/parallel-build-webhook
-    def parallel_finish(self):
-        payload = {'payload': {'status': 'done'}}
+    def parallel_finish(self) -> dict[str, Any]:
+        payload: dict[str, Any] = {'payload': {'status': 'done'}}
 
         # required args
         if self.config.repo_token:
@@ -144,22 +145,22 @@ class Coveralls:
             ) from e
         try:
             response.raise_for_status()
-            response = response.json()
+            data: dict[str, Any] = response.json()
         except Exception as e:
             raise RuntimeError(
                 f'Parallel finish failed: {e}',
             ) from e
 
-        if 'error' in response:
-            exc = response['error']
+        if 'error' in data:
+            exc = data['error']
             raise RuntimeError(f'Parallel finish failed: {exc}')
 
-        if 'done' not in response or not response['done']:
+        if 'done' not in data or not data['done']:
             raise RuntimeError('Parallel finish failed')
 
-        return response
+        return data
 
-    def create_report(self):
+    def create_report(self) -> str:
         """Generate json dumped report for coveralls api."""
         data = self.create_data()
         try:
@@ -184,7 +185,7 @@ class Coveralls:
             )
         return json_string
 
-    def save_report(self, file_path):
+    def save_report(self, file_path: str) -> None:
         """Write coveralls report to file."""
         try:
             report = self.create_report()
@@ -193,7 +194,9 @@ class Coveralls:
         else:
             pathlib.Path(file_path).write_text(report, encoding='utf-8')
 
-    def create_data(self, extra=None):
+    def create_data(
+        self, extra: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         r"""
         Generate object for api.
 
@@ -232,7 +235,7 @@ class Coveralls:
 
         return self._data
 
-    def get_coverage(self):
+    def get_coverage(self) -> list[dict[str, Any]]:
         work = coverage.coverage(config_file=self.config.rcfile)
         work.load()
         work.get_data()
@@ -242,7 +245,7 @@ class Coveralls:
         ).coverage
 
     @staticmethod
-    def debug_bad_encoding(data):
+    def debug_bad_encoding(data: dict[str, Any]) -> None:
         """Let's try to help user figure out what is at fault."""
         at_fault_files = set()
         for source_file_data in data['source_files']:

@@ -3,6 +3,7 @@ import os
 import pathlib
 import subprocess
 import unittest.mock
+from typing import Any
 
 from coveralls import Coveralls
 
@@ -12,16 +13,18 @@ NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
 
 
 class EncodingTest(unittest.TestCase):
+    old_cwd: pathlib.Path
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         os.chdir(cls.old_cwd)
 
     @staticmethod
-    def test_non_unicode():
+    def test_non_unicode() -> None:
         os.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'nonunicode.py'],
@@ -37,7 +40,7 @@ class EncodingTest(unittest.TestCase):
         assert expected_json_part in actual_json
 
     @staticmethod
-    def test_malformed_encoding_declaration_py3_or_coverage4():
+    def test_malformed_encoding_declaration_py3_or_coverage4() -> None:
         os.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'malformed.py'],
@@ -56,7 +59,7 @@ class EncodingTest(unittest.TestCase):
         )
         assert 'branches' not in result[0]
 
-    def test_debug_bad_encoding(self):
+    def test_debug_bad_encoding(self) -> None:
         data = {
             'source_files': [
                 {
@@ -69,7 +72,7 @@ class EncodingTest(unittest.TestCase):
 
         original_json_dumps = json.dumps
 
-        def mock_json_dumps(value):
+        def mock_json_dumps(value: Any) -> str:
             if value == 'def foo():\n    return "foo"\n':
                 raise UnicodeDecodeError('utf8', b'', 0, 1, 'bad data')
 

@@ -1,4 +1,5 @@
 import os
+import pathlib
 import unittest.mock
 
 import pytest
@@ -17,7 +18,9 @@ from coveralls import Coveralls
 class TestConfigIntegration:
     @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
-    def test_reads_config_file(self, tmp_path, monkeypatch):
+    def test_reads_config_file(
+        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         monkeypatch.chdir(tmp_path)
         (tmp_path / '.coveralls.mock').write_text(
             'repo_token: xxx\nservice_name: jenkins\n',
@@ -40,7 +43,7 @@ class TestConfigIntegration:
         },
         clear=True,
     )
-    def test_reads_environment(self):
+    def test_reads_environment(self) -> None:
         cover = Coveralls()
 
         assert cover.config.host == 'https://enterprise.example.com'
@@ -49,7 +52,7 @@ class TestConfigIntegration:
         assert cover.config.service_name == 'bbb'
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
-    def test_overrides_win(self):
+    def test_overrides_win(self) -> None:
         cover = Coveralls(
             repo_token='yyy',
             service_name='coveralls-aaa',
@@ -65,7 +68,7 @@ class TestConfigIntegration:
         {'COVERALLS_REPO_TOKEN': 'xxx', 'COVERALLS_TIMEOUT': 'abc'},
         clear=True,
     )
-    def test_invalid_timeout_raises_on_construction(self):
+    def test_invalid_timeout_raises_on_construction(self) -> None:
         with pytest.raises(ValueError, match='must be a number'):
             Coveralls()
 
@@ -81,20 +84,20 @@ class TestEnsureToken:
         },
         clear=True,
     )
-    def test_repo_token_from_env(self):
+    def test_repo_token_from_env(self) -> None:
         cover = Coveralls()
         assert cover.config.service_name == 'travis-ci'
         assert cover.config.service_job_id == '777'
         assert cover.config.repo_token == 'yyy'
 
     @unittest.mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-    def test_travis_needs_no_token(self):
+    def test_travis_needs_no_token(self) -> None:
         cover = Coveralls()
-        assert cover.config.token_required is False
+        assert not cover.config.token_required
         assert cover.config.repo_token is None
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
-    def test_misconfigured(self):
+    def test_misconfigured(self) -> None:
         with pytest.raises(RuntimeError) as excinfo:
             Coveralls()
 
@@ -109,7 +112,7 @@ class TestEnsureToken:
         {'GITHUB_ACTIONS': 'true'},
         clear=True,
     )
-    def test_misconfigured_github(self):
+    def test_misconfigured_github(self) -> None:
         with pytest.raises(RuntimeError) as excinfo:
             Coveralls()
 

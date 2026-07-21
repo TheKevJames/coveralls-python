@@ -29,15 +29,17 @@ class IntegrationTest(unittest.TestCase):
         'GIT_MESSAGE': 'Ran the integration tests',
     }
 
+    old_cwd: pathlib.Path
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         os.chdir(cls.old_cwd)
 
-    def _test_harness(self, num, hits):
+    def _test_harness(self, num: int, hits: int) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             os.chdir(tempdir)
 
@@ -64,22 +66,23 @@ class IntegrationTest(unittest.TestCase):
             inttest = os.path.join(COVERAGE_TEMPLATE_PATH, 'inttest.py')
             self.assertIn(inttest, source_files)
 
-            lines = next(
+            lines: list[int | None] | None = next(
                 (
                     f['coverage'] for f in report['source_files']
                     if f['name'] == inttest
                 ), None,
             )
+            assert lines is not None
             assert sum(int(bool(x)) for x in lines) == hits
 
     @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_5(self):
+    def test_5(self) -> None:
         self._test_harness(5, 8)
 
     @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_7(self):
+    def test_7(self) -> None:
         self._test_harness(7, 9)
 
     @unittest.mock.patch.dict(os.environ, gitinfo, clear=True)
-    def test_11(self):
+    def test_11(self) -> None:
         self._test_harness(11, 9)

@@ -27,15 +27,17 @@ def in_git_dir() -> bool:
 
 
 class GitTest(unittest.TestCase):
+    old_cwd: pathlib.Path
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         os.chdir(cls.old_cwd)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.dir = tempfile.mkdtemp()
         os.chdir(self.dir)
 
@@ -66,7 +68,7 @@ class GitTest(unittest.TestCase):
         {'TRAVIS_BRANCH': 'master'},
         clear=True,
     )
-    def test_git(self):
+    def test_git(self) -> None:
         git_info = coveralls.git.git_info()
         commit_id = git_info['git']['head'].pop('id')
 
@@ -91,7 +93,7 @@ class GitTest(unittest.TestCase):
 
 class GitLogTest(GitTest):
     @pytest.mark.skipif(not in_git_dir(), reason='requires .git directory')
-    def test_gitlog(self):
+    def test_gitlog(self) -> None:
         git_info = coveralls.git.gitlog('%H')
         assert re.match(r'^[a-f0-9]{40}$', git_info)
 
@@ -103,15 +105,17 @@ class GitLogTest(GitTest):
 
 
 class GitInfoTest(unittest.TestCase):
+    old_cwd: pathlib.Path
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         os.chdir(cls.old_cwd)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.dir = tempfile.mkdtemp()
         os.chdir(self.dir)
 
@@ -128,7 +132,7 @@ class GitInfoTest(unittest.TestCase):
             'GIT_REMOTE': GIT_REMOTE,
         }, clear=True,
     )
-    def test_gitinfo_envvars(self):
+    def test_gitinfo_envvars(self) -> None:
         git_info = coveralls.git.git_info()
         commit_id = git_info['git']['head'].pop('id')
         assert re.match(r'^[a-f0-9]{40}$', commit_id)
@@ -150,7 +154,7 @@ class GitInfoTest(unittest.TestCase):
             },
         }
 
-    def test_gitinfo_not_a_git_repo(self):
+    def test_gitinfo_not_a_git_repo(self) -> None:
         git_info = coveralls.git.git_info()
 
         assert not git_info
@@ -166,7 +170,7 @@ class GitInfoOverridesTest(unittest.TestCase):
             'GITHUB_HEAD_REF': 'fixup-branch',
         }, clear=True,
     )
-    def test_gitinfo_github_pr(self):
+    def test_gitinfo_github_pr(self) -> None:
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'fixup-branch'
 
@@ -179,7 +183,7 @@ class GitInfoOverridesTest(unittest.TestCase):
             'GITHUB_HEAD_REF': '',
         }, clear=True,
     )
-    def test_gitinfo_github_branch(self):
+    def test_gitinfo_github_branch(self) -> None:
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'master'
 
@@ -192,6 +196,6 @@ class GitInfoOverridesTest(unittest.TestCase):
             'GITHUB_HEAD_REF': '',
         }, clear=True,
     )
-    def test_gitinfo_github_tag(self):
+    def test_gitinfo_github_tag(self) -> None:
         git_info = coveralls.git.git_info()
         assert git_info['git']['branch'] == 'v1.0'

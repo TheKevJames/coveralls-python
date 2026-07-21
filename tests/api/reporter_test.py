@@ -4,6 +4,7 @@ import pathlib
 import subprocess
 import textwrap
 import unittest.mock
+from typing import Any
 
 import pytest
 
@@ -14,7 +15,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
 
 
-def assert_coverage(actual, expected):
+def assert_coverage(
+    actual: dict[str, Any], expected: dict[str, Any],
+) -> None:
     assert actual['source'].strip() == expected['source'].strip()
     assert actual['name'] == expected['name']
     assert actual['coverage'] == expected['coverage']
@@ -22,15 +25,17 @@ def assert_coverage(actual, expected):
 
 
 class ReporterTest(unittest.TestCase):
+    old_cwd: pathlib.Path
+
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.old_cwd = pathlib.Path.cwd()
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         os.chdir(cls.old_cwd)
 
-    def setUp(self):
+    def setUp(self) -> None:
         os.chdir(EXAMPLE_DIR)
 
         with contextlib.suppress(Exception):
@@ -40,7 +45,9 @@ class ReporterTest(unittest.TestCase):
             pathlib.Path('extra.py').unlink()
 
     @staticmethod
-    def make_test_results(with_branches=False, name_prefix=''):
+    def make_test_results(
+        with_branches: bool = False, name_prefix: str = '',
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
         results = (
             {
                 'source': (
@@ -73,7 +80,7 @@ class ReporterTest(unittest.TestCase):
             results[1]['branches'] = [4, 0, 5, 1, 4, 0, 1, 0]
         return results
 
-    def test_reporter(self):
+    def test_reporter(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -87,7 +94,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_no_base_dir_arg(self):
+    def test_reporter_no_base_dir_arg(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -104,7 +111,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_base_dir_arg(self):
+    def test_reporter_with_base_dir_arg(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -124,7 +131,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_base_dir_trailing_sep(self):
+    def test_reporter_with_base_dir_trailing_sep(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -144,7 +151,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_src_dir_arg(self):
+    def test_reporter_with_src_dir_arg(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -164,7 +171,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_src_dir_trailing_sep(self):
+    def test_reporter_with_src_dir_trailing_sep(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -184,7 +191,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_both_base_dir_and_src_dir_args(self):
+    def test_reporter_with_both_base_dir_and_src_dir_args(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--omit=**/.tox/*',
@@ -205,7 +212,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_reporter_with_branches(self):
+    def test_reporter_with_branches(self) -> None:
         subprocess.call(
             [
                 'coverage', 'run', '--branch', '--omit=**/.tox/*',
@@ -223,7 +230,7 @@ class ReporterTest(unittest.TestCase):
         assert_coverage(results[0], expected_results[0])
         assert_coverage(results[1], expected_results[1])
 
-    def test_missing_file(self):
+    def test_missing_file(self) -> None:
         pathlib.Path('extra.py').write_text(
             'print("Python rocks!")\n', encoding='utf-8',
         )
@@ -239,7 +246,7 @@ class ReporterTest(unittest.TestCase):
         with pytest.raises(RuntimeError, match='No source for code'):
             Coveralls(repo_token='xxx').get_coverage()
 
-    def test_not_python(self):
+    def test_not_python(self) -> None:
         pathlib.Path('extra.py').write_text(
             'print("Python rocks!")\n', encoding='utf-8',
         )
@@ -260,7 +267,9 @@ class ReporterTest(unittest.TestCase):
             Coveralls(repo_token='xxx').get_coverage()
 
     @unittest.mock.patch('requests.post')
-    def test_submit_report_422_github(self, mock_post):
+    def test_submit_report_422_github(
+        self, mock_post: unittest.mock.MagicMock,
+    ) -> None:
         response_mock = unittest.mock.Mock()
         response_mock.status_code = 422
         mock_post.return_value = response_mock

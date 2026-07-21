@@ -102,6 +102,10 @@ repos:
       - id: mypy
         require_serial: True
         language: python
+        # These are coverage sample fixtures, not real code: deliberately
+        # trivial/non-idiomatic scripts that the tests run coverage against.
+        # nonunicode/ is likewise excluded from every other python hook.
+        exclude: '^(example|nonunicode|tests/data)/'
         # N.B. mypy requires an installed version of whatever third-party
         # library it is asked to check against. In practice, that means
         # whenever we see an error telling us to do so, we should add the
@@ -117,7 +121,7 @@ repos:
           - typer==0.27.0
         args:
           - --show-error-codes
-          # - --strict  # TODO: enable
+          - --strict
           - --strict-equality
           - --warn-unreachable
   - repo: https://github.com/asottile/yesqa

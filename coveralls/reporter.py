@@ -4,7 +4,7 @@ from typing import Any
 
 import coverage
 from coverage.plugin import FileReporter
-from coverage.report import get_analysis_to_report
+from coverage.report_core import get_analysis_to_report
 from coverage.results import Analysis
 
 
