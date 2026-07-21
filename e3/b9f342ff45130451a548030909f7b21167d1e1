@@ -1,0 +1,25 @@
+tests/git_test.py
+  s_c5631018f8024f::t_804add4a14f6f0 29-32,34-52,81-82,95,97-100,143
+  s_c5631018f8024f::t_0c518a57666a58 28,96
+tests/api/reporter_test.py
+  s_c5631018f8024f::t_2650a0af23cac9 27,29-30,88-90,99,107-109,118,129-131,140,151-153,162,173-175,184,195-197,206
+  s_c5631018f8024f::t_718eb929fece89 28
+tests/integration_test.py
+  s_c5631018f8024f::t_6c1bd908c80fc4 7-8,22-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e3b9f342ff45130451a548030909f7b21167d1e1",
+  "prompts": {},
+  "sessions": {
+    "s_c5631018f8024f": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8508-f21a-70be-be09-ad5c975aa918",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
