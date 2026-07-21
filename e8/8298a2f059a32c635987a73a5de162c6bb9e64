@@ -1,0 +1,39 @@
+tests/integration_test.py
+  s_d4403f36360117::t_ec7fd6296d6201 50
+tests/cli_test.py
+  s_d4403f36360117::t_59bfb642dfe91e 151,163,166,173,185,188
+  s_d4403f36360117::t_c6a197906c4f92 349,359
+  s_d4403f36360117::t_131ed898d8e3e2 306-307,310-313
+  s_d4403f36360117::t_336e58c62bbe5b 23-24,26-27,29-34
+  s_d4403f36360117::t_065c3528b566b4 2
+coveralls/cli.py
+  s_d4403f36360117::t_9e489b77f06fe0 118-121
+.pre-commit-config.yaml
+  s_d4403f36360117::t_38f46296cb9e62 137-147
+  s_d4403f36360117::t_6373988596535a 54
+  s_d4403f36360117::t_4da6c3c1efe2fa 53,55
+tests/api/resolve_test.py
+  s_d4403f36360117::t_798d3f53fde443 329-331,354,375,451,467,481
+tests/api/configuration_test.py
+  s_d4403f36360117::t_0b6cbebd73d8e8 24
+LINT_CLEANUP_PLAN.md
+  s_d4403f36360117::t_7e78f579ce8133 177-198
+tests/api/reporter_test.py
+  s_d4403f36360117::t_131e9b88d3054c 48,227-229,243-245,252-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e88298a2f059a32c635987a73a5de162c6bb9e64",
+  "prompts": {},
+  "sessions": {
+    "s_d4403f36360117": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8414-1919-7010-bb70-ddcb2bedea95",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
