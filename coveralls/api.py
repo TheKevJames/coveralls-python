@@ -60,8 +60,9 @@ class Coveralls:
             )
 
         raise RuntimeError(
-            'Not on TravisCI. You have to provide either repo_token in '
-            f'{self.config_filename} or set the COVERALLS_REPO_TOKEN env var.',
+            'No supported CI found and no repo token configured. You have to '
+            f'provide either repo_token in {self.config_filename} or set the '
+            'COVERALLS_REPO_TOKEN env var.',
         )
 
     def merge(self, path):

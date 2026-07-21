@@ -99,8 +99,9 @@ class TestEnsureToken:
             Coveralls()
 
         assert str(excinfo.value) == (
-            'Not on TravisCI. You have to provide either repo_token in '
-            '.coveralls.mock or set the COVERALLS_REPO_TOKEN env var.'
+            'No supported CI found and no repo token configured. You have to '
+            'provide either repo_token in .coveralls.mock or set the '
+            'COVERALLS_REPO_TOKEN env var.'
         )
 
     @unittest.mock.patch.dict(
