@@ -1,4 +1,3 @@
-import codecs
 import json
 import logging
 import os
@@ -67,10 +66,8 @@ class Coveralls:
         )
 
     def merge(self, path: str) -> None:
-        reader = codecs.getreader('utf-8')
-        with open(path, 'rb') as fh:
-            extra = json.load(reader(fh))
-            self.create_data(extra)
+        extra = json.loads(pathlib.Path(path).read_text(encoding='utf-8'))
+        self.create_data(extra)
 
     def wear(self, dry_run: bool = False) -> dict[str, Any]:
         json_string = self.create_report()
