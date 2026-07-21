@@ -1,4 +1,5 @@
 import importlib.metadata
+import inspect
 import logging
 import sys
 from collections.abc import Callable
@@ -168,9 +169,9 @@ def _action_debug(coverallz: Coveralls, merge: str | None) -> None:
     coverallz.wear(dry_run=True)
 
 
-# Shared modifier specs, defined once. Typer still needs each command to list
-# the options it exposes, so the per-command signatures repeat; these single
-# definitions keep the option names, help and deprecation status from drifting.
+# Shared modifier specs, defined once, then bundled into the option groups
+# below. Keeping the option names, help and deprecation status in one place
+# stops them drifting between commands.
 _ServiceName = Annotated[
     str | None,
     typer.Option(
@@ -299,31 +300,84 @@ _Finish = Annotated[
 _File = Annotated[str, typer.Argument(help='Coverage report file path.')]
 
 
+# Options bundled by the concern they serve, so a command opts into a whole
+# block with one entry instead of re-listing every parameter. Add a new
+# modifier to the group and every command in that group gains it (e.g. a future
+# retry flag on HTTP_OPTIONS reaches every command that talks to the API).
+# Each value is (annotated type, default). --merge and --parallel live with the
+# collection options: they shape the report a command builds before submitting.
+CollectionOption = tuple[Any, Any]
+COLLECTION_OPTIONS: dict[str, CollectionOption] = {
+    'service_name': (_ServiceName, None),
+    'service': (_Service, None),
+    'rcfile': (_Rcfile, None),
+    'base_dir': (_BaseDir, None),
+    'basedir': (_Basedir, None),
+    'src_dir': (_SrcDir, None),
+    'srcdir': (_Srcdir, None),
+    'merge': (_Merge, None),
+    'parallel': (_Parallel, None),
+}
+HTTP_OPTIONS: dict[str, CollectionOption] = {
+    'host': (_Host, None),
+    'skip_ssl_verify': (_SkipSslVerify, None),
+    'timeout': (_Timeout, None),
+    'connect_timeout': (_ConnectTimeout, None),
+    'read_timeout': (_ReadTimeout, None),
+}
+
+
+def with_options(
+    *groups: dict[str, CollectionOption],
+) -> Callable[[Callable[..., None]], Callable[..., None]]:
+    """
+    Splice shared option groups into a Typer command's signature.
+
+    Typer derives a command's options purely from its function signature, so
+    sharing a block of options otherwise means repeating those parameters in
+    every command. Instead, each command keeps a ``**opts`` catch-all and this
+    decorator appends the grouped options to the signature Typer introspects;
+    at call time Typer passes their parsed values through ``**opts``.
+    """
+    injected: dict[str, CollectionOption] = {}
+    for group in groups:
+        injected.update(group)
+
+    def decorate(func: Callable[..., None]) -> Callable[..., None]:
+        sig = inspect.signature(func)
+        # Drop the **opts catch-all from the signature Typer sees (it would
+        # otherwise be treated as a positional argument) but keep it on the
+        # real function so the injected values have somewhere to land.
+        params = [
+            p for p in sig.parameters.values()
+            if p.kind is not inspect.Parameter.VAR_KEYWORD
+        ]
+        for name, (annotation, default) in injected.items():
+            params.append(
+                inspect.Parameter(
+                    name, inspect.Parameter.KEYWORD_ONLY,
+                    default=default, annotation=annotation,
+                ),
+            )
+            func.__annotations__[name] = annotation
+        new_signature = sig.replace(parameters=params)
+        func.__signature__ = new_signature  # type: ignore[attr-defined]
+        return func
+
+    return decorate
+
+
 @app.callback(invoke_without_command=True)
+@with_options(COLLECTION_OPTIONS, HTTP_OPTIONS)
 def coveralls(
     ctx: typer.Context,
-    service_name: _ServiceName = None,
-    service: _Service = None,
-    rcfile: _Rcfile = None,
-    base_dir: _BaseDir = None,
-    basedir: _Basedir = None,
-    src_dir: _SrcDir = None,
-    srcdir: _Srcdir = None,
-    host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = None,
     verbose: _Verbose = False,
-    timeout: _Timeout = None,
-    connect_timeout: _ConnectTimeout = None,
-    read_timeout: _ReadTimeout = None,
-    merge: _Merge = None,
-    parallel: _Parallel = None,
     output: _Output = None,
     submit: _Submit = None,
     finish_flag: _Finish = False,
     version: _Version = None,
+    **opts: Any,
 ) -> None:
-    # pylint: disable=too-many-arguments,too-many-positional-arguments
-    # pylint: disable=too-many-locals
     """Collect coverage and submit it to coveralls.io."""
     _ = version
     verb_flags = [
@@ -352,134 +406,64 @@ def coveralls(
             f'{verb_flags[0]} cannot be combined with {verb_flags[1]}.',
         )
 
-    modifiers: dict[str, Any] = {
-        'service_name': service_name, 'service': service, 'rcfile': rcfile,
-        'base_dir': base_dir, 'basedir': basedir, 'src_dir': src_dir,
-        'srcdir': srcdir, 'host': host, 'skip_ssl_verify': skip_ssl_verify,
-        'parallel': parallel, 'timeout': timeout,
-        'connect_timeout': connect_timeout, 'read_timeout': read_timeout,
-    }
+    # --merge is consumed by the action, not forwarded to Coveralls.
+    merge = opts.pop('merge')
 
     if finish_flag:
         _warn_deprecated_verb('--finish', 'coveralls finish')
-        coverallz = _make_coveralls(token_required=True, **modifiers)
+        coverallz = _make_coveralls(token_required=True, **opts)
         _run_action(lambda: _action_finish(coverallz, merge))
     elif output is not None:
         _warn_deprecated_verb('--output', 'coveralls save FILE')
-        coverallz = _make_coveralls(token_required=False, **modifiers)
+        coverallz = _make_coveralls(token_required=False, **opts)
         _run_action(lambda: _action_save(coverallz, merge, output))
     elif submit is not None:
         _warn_deprecated_verb('--submit', 'coveralls upload FILE')
-        coverallz = _make_coveralls(token_required=True, **modifiers)
+        coverallz = _make_coveralls(token_required=True, **opts)
         _run_action(lambda: _action_upload(coverallz, submit, merge))
     else:
-        coverallz = _make_coveralls(token_required=True, **modifiers)
+        coverallz = _make_coveralls(token_required=True, **opts)
         _run_action(lambda: _action_submit(coverallz, merge))
 
 
 @app.command()
-def finish(
-    host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = None,
-    verbose: _Verbose = False,
-    timeout: _Timeout = None,
-    connect_timeout: _ConnectTimeout = None,
-    read_timeout: _ReadTimeout = None,
-) -> None:
+@with_options(HTTP_OPTIONS)
+def finish(verbose: _Verbose = False, **opts: Any) -> None:
     """Notify coveralls.io that all parallel jobs are done."""
     _configure_logging(verbose=verbose)
-    coverallz = _make_coveralls(
-        token_required=True, host=host, skip_ssl_verify=skip_ssl_verify,
-        timeout=timeout, connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
+    coverallz = _make_coveralls(token_required=True, **opts)
     _run_action(lambda: _action_finish(coverallz))
 
 
 @app.command()
-def upload(
-    file: _File,
-    host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = None,
-    verbose: _Verbose = False,
-    timeout: _Timeout = None,
-    connect_timeout: _ConnectTimeout = None,
-    read_timeout: _ReadTimeout = None,
-) -> None:
+@with_options(HTTP_OPTIONS)
+def upload(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
     """Upload a previously generated coverage report FILE."""
     _configure_logging(verbose=verbose)
-    coverallz = _make_coveralls(
-        token_required=True, host=host, skip_ssl_verify=skip_ssl_verify,
-        timeout=timeout, connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
+    coverallz = _make_coveralls(token_required=True, **opts)
     _run_action(lambda: _action_upload(coverallz, file))
 
 
 @app.command()
-def save(
-    file: _File,
-    service_name: _ServiceName = None,
-    service: _Service = None,
-    rcfile: _Rcfile = None,
-    base_dir: _BaseDir = None,
-    basedir: _Basedir = None,
-    src_dir: _SrcDir = None,
-    srcdir: _Srcdir = None,
-    host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = None,
-    verbose: _Verbose = False,
-    timeout: _Timeout = None,
-    connect_timeout: _ConnectTimeout = None,
-    read_timeout: _ReadTimeout = None,
-    merge: _Merge = None,
-    parallel: _Parallel = None,
-) -> None:
-    # pylint: disable=too-many-arguments,too-many-positional-arguments
-    # pylint: disable=too-many-locals
+@with_options(COLLECTION_OPTIONS, HTTP_OPTIONS)
+def save(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
     """Build the coverage report and write it to FILE without sending it."""
     _configure_logging(verbose=verbose)
     # --parallel is accepted although nothing is sent: it is baked into the
     # written JSON so a later `coveralls upload` submits the job as parallel.
-    coverallz = _make_coveralls(
-        token_required=False, service_name=service_name, service=service,
-        rcfile=rcfile, base_dir=base_dir, basedir=basedir, src_dir=src_dir,
-        srcdir=srcdir, host=host, skip_ssl_verify=skip_ssl_verify,
-        parallel=parallel, timeout=timeout, connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
+    merge = opts.pop('merge')
+    coverallz = _make_coveralls(token_required=False, **opts)
     _run_action(lambda: _action_save(coverallz, merge, file))
 
 
 @app.command(help=DEBUG_HELP)
-def debug(
-    service_name: _ServiceName = None,
-    service: _Service = None,
-    rcfile: _Rcfile = None,
-    base_dir: _BaseDir = None,
-    basedir: _Basedir = None,
-    src_dir: _SrcDir = None,
-    srcdir: _Srcdir = None,
-    host: _Host = None,
-    skip_ssl_verify: _SkipSslVerify = None,
-    timeout: _Timeout = None,
-    connect_timeout: _ConnectTimeout = None,
-    read_timeout: _ReadTimeout = None,
-    merge: _Merge = None,
-    parallel: _Parallel = None,
-) -> None:
-    # pylint: disable=too-many-arguments,too-many-positional-arguments
-    # pylint: disable=too-many-locals
+@with_options(COLLECTION_OPTIONS, HTTP_OPTIONS)
+def debug(**opts: Any) -> None:
     # debug always forces verbose and sends nothing, so it omits its own
     # (always-on, thus meaningless) --verbose flag.
     _configure_logging(verbose=True)
-    coverallz = _make_coveralls(
-        token_required=False, service_name=service_name, service=service,
-        rcfile=rcfile, base_dir=base_dir, basedir=basedir, src_dir=src_dir,
-        srcdir=srcdir, host=host, skip_ssl_verify=skip_ssl_verify,
-        parallel=parallel, timeout=timeout, connect_timeout=connect_timeout,
-        read_timeout=read_timeout,
-    )
+    merge = opts.pop('merge')
+    coverallz = _make_coveralls(token_required=False, **opts)
     _run_action(lambda: _action_debug(coverallz, merge))
 
 
