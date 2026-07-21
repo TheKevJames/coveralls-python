@@ -1,4 +1,3 @@
-import collections
 import logging
 import os
 from typing import Any
@@ -39,11 +38,9 @@ class CoverallReporter:
         try:
             for (fr, analysis) in get_analysis_to_report(cov, None):
                 self.parse_file(fr, analysis)
+        except coverage.exceptions.NoDataError:
+            return
         except Exception as e:
-            # As of coverage v6.2, this is a coverage.exceptions.NoDataError
-            if str(e) == 'No data to report.':
-                return
-
             raise RuntimeError(f'Got coverage library error: {e}') from e
 
     @staticmethod
@@ -76,7 +73,6 @@ class CoverallReporter:
         3. branch-number
         4. hits (we only get 1/0 from coverage.py)
         """
-        # pylint: disable=too-complex
         has_arcs: bool
         try:
             has_arcs = analysis.has_arcs()  # type: ignore[operator]
@@ -88,20 +84,7 @@ class CoverallReporter:
             return []
 
         missing_arcs: dict[int, list[int]] = analysis.missing_branch_arcs()
-        try:
-            # coverage v6.3+
-            executed_arcs = analysis.executed_branch_arcs()
-        except AttributeError:
-            # COPIED ~VERBATIM
-            executed = analysis.arcs_executed()  # type: ignore[operator]
-            lines = analysis._branch_lines()  # pylint: disable=W0212
-            branch_lines = set(lines)
-            eba = collections.defaultdict(list)
-            for l1, l2 in executed:
-                if l1 in branch_lines:
-                    eba[l1].append(l2)
-            # END COPY
-            executed_arcs = eba
+        executed_arcs = analysis.executed_branch_arcs()
 
         branches: list[int] = []
         for l1, l2s in executed_arcs.items():

@@ -13,7 +13,7 @@ body = """
             {{ commit.message | upper_first }}\
             {% for footer in commit.footers %}\
               {% if footer.token == "changelog" %}\
-                {{ footer.value | trim | indent(prefix="  ", first=true) }}\
+                \n\n{{ footer.value | trim | indent(prefix="  ", first=true) }}\n\
               {% endif %}\
             {% endfor %}\
     {% endfor %}
