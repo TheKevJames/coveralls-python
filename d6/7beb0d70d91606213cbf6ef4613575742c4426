@@ -1,0 +1,19 @@
+pyproject.toml
+  s_b453c7eed5482a::t_5b5b8baf2f5e38 60-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d67beb0d70d91606213cbf6ef4613575742c4426",
+  "prompts": {},
+  "sessions": {
+    "s_b453c7eed5482a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f84ce-6ab7-7079-a3fc-bc65d703eaf3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
