@@ -26,6 +26,7 @@ def test_defaults() -> None:
     assert config.timeout is None
     assert config.connect_timeout is None
     assert config.read_timeout is None
+    assert config.retries == 0
 
 
 def test_to_payload_includes_only_set_payload_fields() -> None:
@@ -66,6 +67,7 @@ CLIENT_ONLY_FIELDS = (
     'timeout',
     'connect_timeout',
     'read_timeout',
+    'retries',
 )
 
 
@@ -82,6 +84,7 @@ def test_client_settings_never_leak_into_payload() -> None:
         timeout=30,
         connect_timeout=5,
         read_timeout=25,
+        retries=3,
     ).to_payload()
     for name in CLIENT_ONLY_FIELDS:
         assert name not in payload
@@ -139,6 +142,28 @@ def test_request_timeout_phase_specific_falls_back_to_default() -> None:
     assert Config(connect_timeout=5).request_timeout == (
         5.0, DEFAULT_READ_TIMEOUT,
     )
+
+
+def test_retries_defaults_to_zero() -> None:
+    assert Config().retries == 0
+
+
+@pytest.mark.parametrize(('raw', 'expected'), [(0, 0), (3, 3), ('5', 5)])
+def test_retries_accepts_non_negative_integers(
+    raw: Any, expected: int,
+) -> None:
+    assert Config(retries=raw).retries == expected
+
+
+@pytest.mark.parametrize('raw', ['abc', '1.5', '2.0', 2.5, 2.0, True, False])
+def test_retries_rejects_non_integers(raw: Any) -> None:
+    with pytest.raises(ValueError, match='must be an integer'):
+        Config(retries=raw)
+
+
+def test_retries_rejects_negative() -> None:
+    with pytest.raises(ValueError, match='must not be negative'):
+        Config(retries=-1)
 
 
 @pytest.mark.parametrize(

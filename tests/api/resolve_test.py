@@ -252,6 +252,7 @@ def test_generic_ci_name_wins_over_specific_service() -> None:
         'COVERALLS_SERVICE_JOB_NUMBER': '1234',
         'COVERALLS_SKIP_SSL_VERIFY': '1',
         'COVERALLS_TIMEOUT': '30',
+        'COVERALLS_RETRIES': '4',
         'COVERALLS_RCFILE': 'custom.rc',
         'COVERALLS_BASE_DIR': 'base',
         'COVERALLS_SRC_DIR': 'src',
@@ -268,6 +269,7 @@ def test_environment_variables() -> None:
     assert config.service_job_number == '1234'
     assert config.skip_ssl_verify
     assert config.timeout == 30.0
+    assert config.retries == 4
     # base_dir/src_dir/rcfile complete the convention on the env interface
     assert config.rcfile == 'custom.rc'
     assert config.base_dir == 'base'

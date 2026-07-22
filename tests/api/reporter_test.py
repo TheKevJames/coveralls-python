@@ -7,6 +7,7 @@ import unittest.mock
 from typing import Any
 
 import pytest
+import responses
 
 from coveralls import Coveralls
 
@@ -269,17 +270,16 @@ class TestReporter:
         ):
             Coveralls(repo_token='xxx').get_coverage()
 
-    @unittest.mock.patch('requests.post')
-    def test_submit_report_422_github(
-        self, mock_post: unittest.mock.MagicMock,
-    ) -> None:
-        response_mock = unittest.mock.Mock()
-        response_mock.status_code = 422
-        mock_post.return_value = response_mock
-
+    @responses.activate
+    def test_submit_report_422_github(self) -> None:
+        responses.add(
+            responses.POST, 'https://coveralls.io/api/v1/jobs',
+            json={'error': 'nope'}, status=422,
+        )
         cov = Coveralls(repo_token='test_token', service_name='github')
 
         with unittest.mock.patch('coveralls.api.log.warning') as mock_warn:
-            cov.submit_report('{}')
+            with pytest.raises(RuntimeError):
+                cov.submit_report('{}')
             mock_warn.assert_called()
             assert '422' in mock_warn.call_args_list[0][0][0]
