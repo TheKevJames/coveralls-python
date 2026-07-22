@@ -86,8 +86,6 @@ def _caused_by_timeout(exc: requests.exceptions.RequestException) -> bool:
 
 
 class Coveralls:
-    config_filename = '.coveralls.yml'
-
     def __init__(self, token_required: bool = True, **kwargs: Any) -> None:
         """
         Initialize the main Coveralls collection entrypoint.
@@ -111,27 +109,10 @@ class Coveralls:
         self._data: dict[str, Any] | None = None
 
         self.config: Config = resolve(
-            self.config_filename, kwargs, token_required=token_required,
+            kwargs, token_required=token_required,
         )
 
-        self.ensure_token()
-
-    def ensure_token(self) -> None:
-        if self.config.repo_token or not self.config.token_required:
-            return
-
-        if os.environ.get('GITHUB_ACTIONS'):
-            raise RuntimeError(
-                'Running on Github Actions but GITHUB_TOKEN is not set. Add '
-                '"env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to your '
-                'step config.',
-            )
-
-        raise RuntimeError(
-            'No supported CI found and no repo token configured. You have to '
-            f'provide either repo_token in {self.config_filename} or set the '
-            'COVERALLS_REPO_TOKEN env var.',
-        )
+        self.config.ensure_token()
 
     def merge(self, path: str) -> None:
         extra = json.loads(pathlib.Path(path).read_text(encoding='utf-8'))

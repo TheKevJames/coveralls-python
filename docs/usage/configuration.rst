@@ -15,7 +15,7 @@ precedence order where the **latest value is used**:
 * first, the CI environment will be loaded
 * second, any environment variables will be loaded (eg. those which begin with
   ``COVERALLS_``
-* third, the config file is loaded (eg. ``./..coveralls.yml``)
+* third, the config file is loaded (see :ref:`config-files` below)
 * finally, any command line flags are evaluated
 
 Most often, you will simply need to run coveralls-python with no additional
@@ -103,9 +103,33 @@ If you are using named jobs, you can set::
 
     COVERALLS_FLAG_NAME="insert-name-here"
 
-You can also set any of these values in a ``.coveralls.yml`` file in the root of your project repository. If you are planning to use this method, please ensure you install ``coveralls[yaml]`` instead of just the base ``coveralls`` package.
+.. _config-files:
 
-Sample ``.coveralls.yml`` file::
+Config files
+------------
+
+You can also set any of these values in a config file in the root of your
+project repository. Two file formats are supported:
+
+* ``pyproject.toml`` (recommended), under a ``[tool.coveralls]`` table
+* ``.coveralls.yml`` (legacy)
+
+TOML support is always available, so the recommended approach needs no extra
+dependencies. Sample ``pyproject.toml``::
+
+    [tool.coveralls]
+    service_name = "travis-pro"
+    repo_token = "mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy"
+    parallel = true
+    host = "https://coveralls.aperture.com"
+    timeout = 30
+    connect_timeout = 5
+    read_timeout = 90
+    retries = 3
+
+The legacy ``.coveralls.yml`` remains fully supported. If you use it, please
+ensure you install ``coveralls[yaml]`` instead of just the base ``coveralls``
+package. Sample ``.coveralls.yml`` file::
 
     service_name: travis-pro
     repo_token: mV2Jajb8y3c6AFlcVNagHO20fiZNkXPVy
@@ -116,9 +140,15 @@ Sample ``.coveralls.yml`` file::
     read_timeout: 90
     retries: 3
 
+The two files are never merged. If both provide settings, the legacy
+``.coveralls.yml`` takes precedence and ``pyproject.toml`` is ignored (with a
+warning). New projects should prefer ``pyproject.toml``; if you are migrating,
+move your settings across and delete ``.coveralls.yml`` so the TOML config
+takes effect.
+
 .. note::
 
-    ``coveralls_host`` and ``host`` are both accepted (in ``.coveralls.yml``
+    ``coveralls_host`` and ``host`` are both accepted (in either config file
     and as ``Coveralls()`` keyword arguments) and are equivalent long-term
     spellings -- ``coveralls_host`` reads more clearly in a config file, while
     ``host`` matches the ``COVERALLS_HOST`` environment variable and ``--host``
