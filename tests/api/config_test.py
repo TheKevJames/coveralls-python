@@ -3,12 +3,12 @@ from typing import Any
 
 import pytest
 
-from coveralls.configuration import _parse_pr_number
 from coveralls.configuration import Config
-from coveralls.configuration import DEFAULT_CONNECT_TIMEOUT
-from coveralls.configuration import DEFAULT_HOST
-from coveralls.configuration import DEFAULT_READ_TIMEOUT
-from coveralls.configuration import PAYLOAD_FIELDS
+from coveralls.configuration.ci import _parse_pr_number
+from coveralls.configuration.helpers import DEFAULT_CONNECT_TIMEOUT
+from coveralls.configuration.helpers import DEFAULT_HOST
+from coveralls.configuration.helpers import DEFAULT_READ_TIMEOUT
+from coveralls.configuration.helpers import PAYLOAD_FIELDS
 
 
 def test_defaults() -> None:

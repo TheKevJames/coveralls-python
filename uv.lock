@@ -248,6 +248,7 @@ source = { editable = "." }
 dependencies = [
     { name = "coverage", extra = ["toml"] },
     { name = "requests" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typer" },
     { name = "urllib3" },
 ]
@@ -271,6 +272,7 @@ requires-dist = [
     { name = "coverage", extras = ["toml"], specifier = ">=6.3,<8.0" },
     { name = "pyyaml", marker = "extra == 'yaml'", specifier = ">=3.10,<7.0" },
     { name = "requests", specifier = ">=2.30.0,<3.0.0" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=1.1.0" },
     { name = "typer", specifier = ">=0.12.0,<1.0.0" },
     { name = "urllib3", specifier = ">=2.0.0,<3.0.0" },
 ]

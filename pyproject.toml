@@ -22,6 +22,7 @@ classifiers = [
 dependencies = [
     "coverage[toml] (>=6.3,<8.0)",
     "requests (>=2.30.0,<3.0.0)",
+    "tomli (>=1.1.0) ; python_version < '3.11'",
     "typer (>=0.12.0,<1.0.0)",
     "urllib3 (>=2.0.0,<3.0.0)"
 ]

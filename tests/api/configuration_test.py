@@ -11,18 +11,17 @@ except ImportError:
 from coveralls import Coveralls
 
 
+pytestmark = pytest.mark.usefixtures('isolate_cwd')
+
+
 # The per-source resolution rules (CI detection, env vars, file loading,
 # precedence) are covered in resolve_test.py and config_test.py. These tests
 # assert the Coveralls entrypoint consumes a resolved, typed Config correctly.
-@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class TestConfigIntegration:
     @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
-    def test_reads_config_file(
-        self, tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
-    ) -> None:
-        monkeypatch.chdir(tmp_path)
-        (tmp_path / '.coveralls.mock').write_text(
+    def test_reads_config_file(self, tmp_path: pathlib.Path) -> None:
+        (tmp_path / '.coveralls.yml').write_text(
             'repo_token: xxx\nservice_name: jenkins\n',
             encoding='utf-8',
         )
@@ -73,7 +72,6 @@ class TestConfigIntegration:
             Coveralls()
 
 
-@unittest.mock.patch.object(Coveralls, 'config_filename', '.coveralls.mock')
 class TestEnsureToken:
     @unittest.mock.patch.dict(
         os.environ,
@@ -103,8 +101,8 @@ class TestEnsureToken:
 
         assert str(excinfo.value) == (
             'No supported CI found and no repo token configured. You have to '
-            'provide either repo_token in .coveralls.mock or set the '
-            'COVERALLS_REPO_TOKEN env var.'
+            'provide repo_token in pyproject.toml ([tool.coveralls]) or '
+            '.coveralls.yml, or set the COVERALLS_REPO_TOKEN env var.'
         )
 
     @unittest.mock.patch.dict(
