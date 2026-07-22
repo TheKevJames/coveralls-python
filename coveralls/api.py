@@ -186,6 +186,11 @@ class Coveralls:
         if self.config.service_number:
             payload['payload']['build_num'] = self.config.service_number
 
+        # A top-level (not nested under payload) comma-separated flag list;
+        # empty/unset is omitted so the webhook ignores it.
+        if self.config.carryforward:
+            payload['carryforward'] = self.config.carryforward
+
         # service-specific parameters
         if os.environ.get('GITHUB_REPOSITORY'):
             # Github Actions only

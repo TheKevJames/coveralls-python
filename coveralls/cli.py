@@ -81,6 +81,7 @@ def _make_coveralls(
     src_dir: str | None = None, srcdir: str | None = None,
     host: str | None = None, skip_ssl_verify: bool | None = None,
     parallel: bool | None = None,
+    carryforward: str | None = None,
     timeout: float | None = None,
     connect_timeout: float | None = None, read_timeout: float | None = None,
     retries: int | None = None,
@@ -104,6 +105,7 @@ def _make_coveralls(
         'src_dir': src_dir,
         'host': host,
         'parallel': parallel,
+        'carryforward': carryforward,
         'skip_ssl_verify': skip_ssl_verify,
         'timeout': timeout,
         'connect_timeout': connect_timeout,
@@ -221,6 +223,14 @@ _Parallel = Annotated[
 _Host = Annotated[
     str | None,
     typer.Option('--host', help='Coveralls API host base URL.'),
+]
+_Carryforward = Annotated[
+    str | None,
+    typer.Option(
+        '--carryforward',
+        help='Comma-separated list of parallel job flags to carry forward '
+             'for missing jobs.',
+    ),
 ]
 _SkipSslVerify = Annotated[
     bool | None,
@@ -427,10 +437,16 @@ def coveralls(
 
 @app.command()
 @with_options(HTTP_OPTIONS)
-def finish(verbose: _Verbose = False, **opts: Any) -> None:
+def finish(
+    verbose: _Verbose = False,
+    carryforward: _Carryforward = None,
+    **opts: Any,
+) -> None:
     """Notify coveralls.io that all parallel jobs are done."""
     _configure_logging(verbose=verbose)
-    coverallz = _make_coveralls(token_required=True, **opts)
+    coverallz = _make_coveralls(
+        token_required=True, carryforward=carryforward, **opts,
+    )
     _action_finish(coverallz)
 
 
