@@ -9,6 +9,7 @@ from .files import _from_files
 from .helpers import _canonicalize_keys
 from .helpers import _filter_known
 from .helpers import Config
+from .helpers import default_run_at
 
 __all__ = ['Config', 'resolve']
 
@@ -23,6 +24,9 @@ def resolve(
 
     Precedence (later wins): CI environment, ``COVERALLS_*`` env vars, the
     config file, then explicit overrides (e.g. CLI flags).
+
+    ``run_at`` additionally gains a computed default: when no source provides
+    it, it is set to the current time (see :func:`default_run_at`).
 
     ``token_required`` is not a config value read from any of those sources: it
     is a guard against accidental tokenless uploads, calculated here from the
@@ -54,6 +58,10 @@ def resolve(
     merged['token_required'] = (
         token_required and name not in TOKENLESS_CI_SERVICES
     )
+    # run_at is optional to the API (it timestamps on receipt when absent), but
+    # the official reporter always sends one: default to now when no source set
+    # it, matching coverallsapp/coverage-reporter's COVERALLS_RUN_AT-or-now.
+    merged.setdefault('run_at', default_run_at())
     # Coerce the boolean flags: a config file may carry a non-bool (e.g. a
     # quoted ``parallel: "yes"``), which must not reach the API or a client
     # toggle as a stray string.

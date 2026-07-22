@@ -1,4 +1,5 @@
 import dataclasses
+import datetime
 import logging
 import os
 from collections.abc import Mapping
@@ -24,6 +25,17 @@ DEFAULT_CONNECT_TIMEOUT = 10
 DEFAULT_READ_TIMEOUT = 60
 
 DEFAULT_RETRIES = 0
+
+
+def default_run_at() -> str:
+    """Current local time as an RFC 3339 timestamp, e.g. the /jobs run_at."""
+    return (
+        datetime.datetime.now()
+        .astimezone()
+        .replace(microsecond=0)
+        .isoformat()
+    )
+
 
 # Fields sent to the coveralls.io API -- every job parameter the /jobs endpoint
 # accepts and lets the caller set. Everything else on Config controls local
@@ -71,9 +83,12 @@ class Config:
     # None means "unset"; an explicit True/False is forwarded to the API so a
     # caller can positively mark a job as non-parallel.
     parallel: bool | None = None
-    # No CI/env loader populates run_at; it is a caller-only field, set via the
-    # config file or a Coveralls() kwarg, and forwarded because the API accepts
-    # it (a job timestamp, per the /jobs endpoint).
+    # A job timestamp (per the /jobs endpoint). Sourced from COVERALLS_RUN_AT,
+    # the config file, or a Coveralls() kwarg; when none is provided, resolve()
+    # defaults it to the current time. This mirrors the official
+    # coverallsapp/coverage-reporter, which reads COVERALLS_RUN_AT and falls
+    # back to the current timestamp. Left None on a bare Config() (the default
+    # is applied only through resolve(), the upload path).
     run_at: str | None = None
 
     # client settings

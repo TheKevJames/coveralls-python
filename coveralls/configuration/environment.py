@@ -21,6 +21,7 @@ def _from_environment() -> dict[str, Any]:
         'COVERALLS_READ_TIMEOUT': 'read_timeout',
         'COVERALLS_REPO_TOKEN': 'repo_token',
         'COVERALLS_RETRIES': 'retries',
+        'COVERALLS_RUN_AT': 'run_at',
         'COVERALLS_SERVICE_JOB_ID': 'service_job_id',
         'COVERALLS_SERVICE_JOB_NUMBER': 'service_job_number',
         'COVERALLS_SERVICE_NAME': 'service_name',
