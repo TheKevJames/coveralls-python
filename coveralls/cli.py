@@ -1,6 +1,7 @@
 import importlib.metadata
 import inspect
 import logging
+import pathlib
 from collections.abc import Callable
 from typing import Annotated
 from typing import Any
@@ -142,8 +143,8 @@ def _action_upload(
 ) -> None:
     if merge:
         coverallz.merge(merge)
-    with open(path, encoding='utf-8') as report_file:
-        coverallz.submit_report(report_file.read())
+    report = pathlib.Path(path).read_text(encoding='utf-8')
+    coverallz.submit_report(report)
 
 
 def _action_finish(coverallz: Coveralls, merge: str | None = None) -> None:

@@ -17,7 +17,7 @@ import inttest
 inttest.test_func({:d})
 """
 
-COVERAGE_TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'data')
+COVERAGE_TEMPLATE_PATH = pathlib.Path(__file__).parent / 'data'
 
 GITINFO = {
     'GIT_ID': 'asdf1234',
@@ -56,7 +56,7 @@ class TestIntegration:
 
         source_files = {f['name'] for f in report['source_files']}
         print(source_files)
-        inttest = os.path.join(COVERAGE_TEMPLATE_PATH, 'inttest.py')
+        inttest = str(COVERAGE_TEMPLATE_PATH / 'inttest.py')
         assert inttest in source_files
 
         lines: list[int | None] | None = next(

@@ -1,5 +1,5 @@
 import json
-import os
+import pathlib
 import subprocess
 import unittest.mock
 from typing import Any
@@ -9,8 +9,8 @@ import pytest
 from coveralls import Coveralls
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
+BASE_DIR = pathlib.Path(__file__).parents[2]
+NONUNICODE_DIR = BASE_DIR / 'nonunicode'
 
 
 class TestEncoding:

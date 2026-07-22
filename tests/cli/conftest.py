@@ -1,6 +1,6 @@
 import json
 import logging
-import os
+import pathlib
 from typing import Any
 from unittest import mock
 
@@ -14,10 +14,8 @@ EXC = RuntimeError('bad stuff happened')
 
 # Resolve the repo's example dir from this module (tests/cli/conftest.py), so
 # the upload tests can reach example/example.json regardless of cwd.
-_REPO_ROOT = os.path.dirname(
-    os.path.dirname(os.path.dirname(__file__)),
-)
-EXAMPLE_DIR = os.path.join(_REPO_ROOT, 'example')
+_REPO_ROOT = pathlib.Path(__file__).parents[2]
+EXAMPLE_DIR = _REPO_ROOT / 'example'
 
 
 # The Config override keys the CLI always forwards to Coveralls(), derived

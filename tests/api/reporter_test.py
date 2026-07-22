@@ -1,5 +1,4 @@
 import contextlib
-import os
 import pathlib
 import subprocess
 import textwrap
@@ -12,8 +11,8 @@ import responses
 from coveralls import Coveralls
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-EXAMPLE_DIR = os.path.join(BASE_DIR, 'example')
+BASE_DIR = pathlib.Path(__file__).parents[2]
+EXAMPLE_DIR = BASE_DIR / 'example'
 
 
 def assert_coverage(
@@ -43,7 +42,7 @@ class TestReporter:
         results = (
             {
                 'source': (
-                    pathlib.Path(EXAMPLE_DIR) / 'project.py'
+                    EXAMPLE_DIR / 'project.py'
                 ).read_text(encoding='utf-8'),
                 'name': f'{name_prefix}project.py',
                 'coverage': [

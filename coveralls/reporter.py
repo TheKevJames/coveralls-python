@@ -1,5 +1,5 @@
 import logging
-import os
+import pathlib
 from typing import Any
 
 import coverage
@@ -36,7 +36,7 @@ class CoverallReporter:
     @staticmethod
     def sanitize_dir(directory: str) -> str:
         if directory:
-            directory = directory.replace(os.path.sep, '/')
+            directory = pathlib.PurePath(directory).as_posix()
             if directory[-1] != '/':
                 directory += '/'
         return directory
@@ -106,7 +106,7 @@ class CoverallReporter:
     def parse_file(self, cu: FileReporter, analysis: Analysis) -> None:
         """Generate data for single file."""
         # ensure results are properly merged between platforms
-        posix_filename = cu.relative_filename().replace(os.path.sep, '/')
+        posix_filename = pathlib.PurePath(cu.relative_filename()).as_posix()
         if self.base_dir and posix_filename.startswith(self.base_dir):
             posix_filename = posix_filename[len(self.base_dir):]
         posix_filename = self.src_dir + posix_filename
