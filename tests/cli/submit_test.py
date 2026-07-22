@@ -5,8 +5,8 @@ from unittest import mock
 import pytest
 
 import coveralls.cli
-from tests.cli.helpers import coveralls_kwargs
-from tests.cli.helpers import EXC
+from tests.cli.conftest import coveralls_kwargs
+from tests.cli.conftest import EXC
 
 
 @mock.patch.object(coveralls.cli.log, 'info')

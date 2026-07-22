@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 import coveralls.cli
-from tests.cli.helpers import coveralls_kwargs
+from tests.cli.conftest import coveralls_kwargs
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)

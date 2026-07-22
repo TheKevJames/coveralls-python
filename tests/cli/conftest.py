@@ -2,19 +2,37 @@ import json
 import logging
 import os
 from typing import Any
+from unittest import mock
 
 import pytest
+
+import coveralls.cli
 
 
 EXC = RuntimeError('bad stuff happened')
 
 
-# Resolve the repo's example dir from this module (tests/cli/helpers.py), so
+# Resolve the repo's example dir from this module (tests/cli/conftest.py), so
 # the upload tests can reach example/example.json regardless of cwd.
 _REPO_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(__file__)),
 )
 EXAMPLE_DIR = os.path.join(_REPO_ROOT, 'example')
+
+
+# The Config override keys the CLI always forwards to Coveralls(), derived
+# from _make_coveralls itself (with a mocked constructor) rather than hand
+# listed: a hardcoded mirror silently rots as options are added/removed, so
+# instead the baseline tracks the real call site and cannot drift.
+def _forwarded_override_keys() -> frozenset[str]:
+    # pylint: disable=protected-access
+    with mock.patch.object(coveralls.cli, 'Coveralls') as fake:
+        coveralls.cli._make_coveralls(token_required=True)
+    _, kwargs = fake.call_args
+    return frozenset(kwargs)
+
+
+_FORWARDED_OVERRIDE_KEYS = _forwarded_override_keys()
 
 
 def github_finish_env() -> dict[str, str]:
@@ -51,25 +69,10 @@ def coveralls_kwargs(**overrides: Any) -> dict[str, Any]:
     """Expected Coveralls() override kwargs: everything unset (None) initially.
 
     The CLI forwards every value as-is and lets resolve() drop the unset ones,
-    so the constructor is always called with the full override set.
-
-    Keep this in sync with the CLI option set: a new forwarded option must be
-    added here, otherwise every test that uses the default set will silently
-    under-assert on it.
+    so the constructor is always called with the full override set. The unset
+    baseline is derived from _make_coveralls (see _forwarded_override_keys), so
+    a newly added CLI option is asserted automatically without editing here.
     """
-    kwargs = {
-        'rcfile': None,
-        'service_name': None,
-        'base_dir': None,
-        'src_dir': None,
-        'host': None,
-        'parallel': None,
-        'carryforward': None,
-        'skip_ssl_verify': None,
-        'timeout': None,
-        'connect_timeout': None,
-        'read_timeout': None,
-        'retries': None,
-    }
+    kwargs: dict[str, Any] = {key: None for key in _FORWARDED_OVERRIDE_KEYS}
     kwargs.update(overrides)
     return kwargs

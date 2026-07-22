@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 import coveralls.cli
-from tests.cli.helpers import EXAMPLE_DIR
+from tests.cli.conftest import EXAMPLE_DIR
 
 
 @mock.patch.object(coveralls.Coveralls, 'submit_report')

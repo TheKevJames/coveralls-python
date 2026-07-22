@@ -43,9 +43,7 @@ repos:
       - id: double-quote-string-fixer
         exclude: nonunicode/.*
       - id: name-tests-test
-        # tests/data holds fixtures, not tests; helpers.py is a shared
-        # (non-test) support module imported by the tests/cli/ suite.
-        exclude: tests/data/.*|tests/cli/helpers\.py
+        exclude: tests/data/.*
       - id: requirements-txt-fixer
   - repo: https://github.com/PyCQA/pylint
     rev: v4.0.6

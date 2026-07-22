@@ -6,9 +6,9 @@ import pytest
 import responses
 
 import coveralls.cli
-from tests.cli.helpers import assert_logged_error
-from tests.cli.helpers import github_finish_env
-from tests.cli.helpers import req_json
+from tests.cli.conftest import assert_logged_error
+from tests.cli.conftest import github_finish_env
+from tests.cli.conftest import req_json
 
 
 @mock.patch.dict(os.environ, github_finish_env(), clear=True)

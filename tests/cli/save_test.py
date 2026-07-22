@@ -2,7 +2,7 @@ import os
 from unittest import mock
 
 import coveralls.cli
-from tests.cli.helpers import coveralls_kwargs
+from tests.cli.conftest import coveralls_kwargs
 
 
 @mock.patch.object(coveralls.Coveralls, 'save_report')
