@@ -1,0 +1,32 @@
+tests/cli/submit_test.py
+  s_84df77d1f2d023::t_0d035d9ca9de52 8-9
+tests/cli/finish_test.py
+  s_84df77d1f2d023::t_0d035d9ca9de52 9-11
+.pre-commit-config.yaml
+  s_84df77d1f2d023::t_725bb78eb4be2e 46
+tests/cli/debug_test.py
+  s_84df77d1f2d023::t_0d035d9ca9de52 7
+tests/cli/save_test.py
+  s_84df77d1f2d023::t_0d035d9ca9de52 5
+tests/cli/conftest.py
+  s_84df77d1f2d023::t_c6cd3e606bd058 28
+  s_84df77d1f2d023::t_ab5463c3f61726 5-27,29-76
+tests/cli/upload_test.py
+  s_84df77d1f2d023::t_0d035d9ca9de52 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3fe21e3bd888565809f24232f490bb6c4d76191e",
+  "prompts": {},
+  "sessions": {
+    "s_84df77d1f2d023": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8ac9-0bd0-7118-8eda-a935e5c01b37",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
