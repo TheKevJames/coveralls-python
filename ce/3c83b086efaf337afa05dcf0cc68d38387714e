@@ -1,0 +1,53 @@
+docs/usage/configuration.rst
+  s_84df77d1f2d023::t_98ca6ea372db19 71-78
+coveralls/api.py
+  s_84df77d1f2d023::t_578caced2c8929 189-193
+tests/cli/save_test.py
+  s_84df77d1f2d023::t_eda5bf1ae437d8 1-49
+tests/api/wear_test.py
+  s_84df77d1f2d023::t_fc12ffbfee13f1 342
+  s_84df77d1f2d023::t_6c6d4d21423976 38-41
+  s_84df77d1f2d023::t_d2798424738890 329-333,335-341,343-344
+  s_84df77d1f2d023::t_2c8c7bcd4672f1 334
+tests/cli/helpers.py
+  s_84df77d1f2d023::t_932ea3c6fe8291 1-75
+coveralls/configuration/helpers.py
+  s_84df77d1f2d023::t_636ea2d0c7dfad 95-98
+coveralls/configuration/environment.py
+  s_84df77d1f2d023::t_83b2aaa046bc2a 18
+coveralls/cli.py
+  s_84df77d1f2d023::t_0eae3ecf00ff6c 84,108,227-234,440-444,447-449
+tests/api/resolve_test.py
+  s_84df77d1f2d023::t_96219b2413381b 128-129,137
+  s_84df77d1f2d023::t_30d92161db8bc4 34,52
+tests/api/config_test.py
+  s_84df77d1f2d023::t_a2c110a56336dd 61
+tests/cli/submit_test.py
+  s_84df77d1f2d023::t_74bd6944f9a77d 8-9
+tests/cli/finish_test.py
+  s_84df77d1f2d023::t_7dcdf604090e81 1-136
+tests/cli/debug_test.py
+  s_84df77d1f2d023::t_c383251b963fff 1-47
+tests/api/resolve_ci_test.py
+  s_84df77d1f2d023::t_cb2c47260d8d0c 1-236
+tests/cli/upload_test.py
+  s_84df77d1f2d023::t_2e409d1475410d 1-51
+.pre-commit-config.yaml
+  s_84df77d1f2d023::t_c888bf02a71a71 46-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ce3c83b086efaf337afa05dcf0cc68d38387714e",
+  "prompts": {},
+  "sessions": {
+    "s_84df77d1f2d023": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8ac9-0bd0-7118-8eda-a935e5c01b37",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
