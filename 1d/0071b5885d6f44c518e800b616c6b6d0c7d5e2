@@ -1,0 +1,61 @@
+uv.lock
+  s_ab4504053b97b2::t_5f6c6f81a49e08 251,275
+docs/usage/configuration.rst
+  s_ab4504053b97b2::t_9423642461cefe 18,106,108-132,143-148,151
+tests/api/resolve_test.py
+  s_ab4504053b97b2::t_8c7c7e90f5ef79 23
+  s_ab4504053b97b2::t_6c67dfebe8870d 17
+  s_ab4504053b97b2::t_06629c229b8d8e 1,342,348,353-356,376-378,382,387-388,393-395,401,403-404,412-414,417,422,426-429,432-434,481,489,494-499
+  s_ab4504053b97b2::t_b2f443506d63a7 315,320,323,344,349,362,366,370,396-399,402,451,455,457,466,470,474,483,490
+  s_ab4504053b97b2::t_53176096df3aa4 18-19
+tests/api/configuration_test.py
+  s_ab4504053b97b2::t_4b44b2572675d4 15-16,23-24,104-105
+  s_ab4504053b97b2::t_8c178bf670dfa9 14
+coveralls/configuration/ci.py
+  s_ab4504053b97b2::t_ff08c5d61508e6 1-141
+tests/api/toml_config_test.py
+  s_ab4504053b97b2::t_e283f29ead0086 21
+  s_ab4504053b97b2::t_b10432a3376054 2-20,22-41,45-48,50-51,53-65,69-72,74-75,78-80,84-90,92-94,100-139,143-151,153-155,160-163,167-173,175-177
+  s_ab4504053b97b2::t_23ef218f804780 1,42-44,49,52,66-68,73,76-77,81-83,91,95-99,140-142,152,156-159,164-166,174,178
+coveralls/configuration/files.py
+  s_ab4504053b97b2::t_3127b11b6a5091 1,16-17
+  s_ab4504053b97b2::t_551d5b1e4a5929 8-9
+  s_ab4504053b97b2::t_af61e1061f25f0 2-7,10-15,18-95
+tests/api/conftest.py
+  s_ab4504053b97b2::t_e256c3daed5d35 1-5,7-20
+  s_ab4504053b97b2::t_aa75ddefd3577a 6
+coveralls/configuration/__init__.py
+  s_ab4504053b97b2::t_4b295e2dfd56b5 1-64
+tests/api/config_test.py
+  s_ab4504053b97b2::t_31db90da40fa77 7-11
+coveralls/configuration/environment.py
+  s_ab4504053b97b2::t_635b55e8b76328 1-36
+poetry.lock
+  s_ab4504053b97b2::t_6c016d38771f86 1014
+coveralls/api.py
+  s_ab4504053b97b2::t_bdfcbf8e21f069 112
+  s_ab4504053b97b2::t_10bbbb04674de8 115
+pyproject.toml
+  s_ab4504053b97b2::t_a0467d8d899702 25
+coveralls/configuration/helpers.py
+  s_ab4504053b97b2::t_b0e724e246c1db 10-13,160-176
+  s_ab4504053b97b2::t_419bdc0466bd94 177
+  s_ab4504053b97b2::t_19fdeb227c8de2 8
+  s_ab4504053b97b2::t_7b663096484ac6 195,245-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "1d0071b5885d6f44c518e800b616c6b6d0c7d5e2",
+  "prompts": {},
+  "sessions": {
+    "s_ab4504053b97b2": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f89ac-7e3c-756f-b0bc-4bda63f78459",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
