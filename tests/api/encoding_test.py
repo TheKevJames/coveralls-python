@@ -1,9 +1,10 @@
 import json
 import os
-import pathlib
 import subprocess
 import unittest.mock
 from typing import Any
+
+import pytest
 
 from coveralls import Coveralls
 
@@ -12,20 +13,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 NONUNICODE_DIR = os.path.join(BASE_DIR, 'nonunicode')
 
 
-class EncodingTest(unittest.TestCase):
-    old_cwd: pathlib.Path
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.old_cwd = pathlib.Path.cwd()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.chdir(cls.old_cwd)
-
+class TestEncoding:
     @staticmethod
-    def test_non_unicode() -> None:
-        os.chdir(NONUNICODE_DIR)
+    def test_non_unicode(monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'nonunicode.py'],
             cwd=NONUNICODE_DIR,
@@ -40,8 +31,10 @@ class EncodingTest(unittest.TestCase):
         assert expected_json_part in actual_json
 
     @staticmethod
-    def test_malformed_encoding_declaration_py3_or_coverage4() -> None:
-        os.chdir(NONUNICODE_DIR)
+    def test_malformed_encoding_declaration_py3_or_coverage4(
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(NONUNICODE_DIR)
         subprocess.call(
             ['coverage', 'run', 'malformed.py'],
             cwd=NONUNICODE_DIR,
@@ -59,7 +52,8 @@ class EncodingTest(unittest.TestCase):
         )
         assert 'branches' not in result[0]
 
-    def test_debug_bad_encoding(self) -> None:
+    @staticmethod
+    def test_debug_bad_encoding() -> None:
         data = {
             'source_files': [
                 {
