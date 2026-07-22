@@ -58,6 +58,7 @@ def test_to_payload_forwards_explicitly_set_falsey_fields() -> None:
 # listed here. test_payload_and_client_fields_..._cover_the_dataclass enforces
 # this, so add new fields to one list or the other.
 CLIENT_ONLY_FIELDS = (
+    'carryforward',
     'host',
     'skip_ssl_verify',
     'token_required',

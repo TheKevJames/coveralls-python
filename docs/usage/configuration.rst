@@ -68,6 +68,14 @@ Later on, you can use ``coveralls finish`` to let the Coveralls service know you
 
     coveralls finish
 
+To carry forward coverage flags from a previous build for any jobs missing in the current build (useful for `monorepos <https://coveralls.io/better-monorepo-support>`_), pass a comma-separated list of flag names::
+
+    coveralls finish --carryforward=flag1,flag2
+    # or, via env var:
+    COVERALLS_CARRYFORWARD=flag1,flag2 coveralls finish
+
+This may also be set via the ``carryforward`` key in the config file.
+
 If you are using a non-public coveralls.io instance (for example: self-hosted Coveralls Enterprise), you can set the host to the base URL of that instance::
 
     COVERALLS_HOST="https://coveralls.aperture.com" coveralls

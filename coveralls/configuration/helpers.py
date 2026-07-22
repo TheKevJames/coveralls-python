@@ -92,6 +92,10 @@ class Config:
     run_at: str | None = None
 
     # client settings
+    # Comma-separated parallel-job flags to carry forward for missing jobs;
+    # webhook/finish-only, so deliberately kept out of PAYLOAD_FIELDS (it is
+    # sent by parallel_finish() to /webhook, never to the /jobs endpoint).
+    carryforward: str | None = None
     host: str = DEFAULT_HOST
     skip_ssl_verify: bool = False
     token_required: bool = True

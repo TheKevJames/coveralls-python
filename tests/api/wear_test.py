@@ -35,6 +35,10 @@ def req_kwargs(call: Any) -> Any:
     return call.request.req_kwargs
 
 
+def req_json(call: Any) -> Any:
+    return json.loads(call.request.body)
+
+
 @pytest.fixture(autouse=True)
 def _no_coverage_file() -> None:
     with contextlib.suppress(Exception):
@@ -320,6 +324,22 @@ def test_parallel_finish_uses_default_timeout() -> None:
     responses.add(responses.POST, WEBHOOK_URL, json={'done': True}, status=200)
     coveralls.Coveralls(repo_token='xxx').parallel_finish()
     assert req_kwargs(responses.calls[0])['timeout'] == (10, 60)
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+@responses.activate
+def test_parallel_finish_sends_carryforward() -> None:
+    responses.add(responses.POST, WEBHOOK_URL, json={'done': True}, status=200)
+    coveralls.Coveralls(repo_token='xxx', carryforward='a,b').parallel_finish()
+    assert req_json(responses.calls[0])['carryforward'] == 'a,b'
+
+
+@unittest.mock.patch.dict(os.environ, {}, clear=True)
+@responses.activate
+def test_parallel_finish_omits_unset_carryforward() -> None:
+    responses.add(responses.POST, WEBHOOK_URL, json={'done': True}, status=200)
+    coveralls.Coveralls(repo_token='xxx').parallel_finish()
+    assert 'carryforward' not in req_json(responses.calls[0])
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)

@@ -15,6 +15,7 @@ def _from_environment() -> dict[str, Any]:
 
     fields = {
         'COVERALLS_BASE_DIR': 'base_dir',
+        'COVERALLS_CARRYFORWARD': 'carryforward',
         'COVERALLS_CONNECT_TIMEOUT': 'connect_timeout',
         'COVERALLS_FLAG_NAME': 'flag_name',
         'COVERALLS_RCFILE': 'rcfile',
