@@ -1,0 +1,20 @@
+tests/api/encoding_test.py
+  s_ca316e775b4d96::t_73d8bf6428fdf9 55-56
+  s_ca316e775b4d96::t_ee15bff8503820 7-8,16,18-19,34-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "aefbad0fe9fed5dd5b2b8ea4b831530cfb47806a",
+  "prompts": {},
+  "sessions": {
+    "s_ca316e775b4d96": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019f8b07-4cf6-7d51-bc0d-320c06f1f8a9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Kevin James <KevinJames@thekev.in>"
+    }
+  }
+}
