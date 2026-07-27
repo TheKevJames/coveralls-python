@@ -223,7 +223,7 @@ repos:
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.37.4
     hooks:
-      - id: check-circle-ci
+      # - id: check-circle-ci  # TODO: blocked on url orb support
       - id: check-github-workflows
       - id: check-renovate
         language: python
