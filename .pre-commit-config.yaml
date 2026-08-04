@@ -118,7 +118,7 @@ repos:
           - responses==0.26.2
           - types-pyyaml==6.0.12.20260724
           - types-requests==2.33.0.20260712
-          - typer==0.27.0
+          - typer==0.27.1
         args:
           - --show-error-codes
           - --strict
