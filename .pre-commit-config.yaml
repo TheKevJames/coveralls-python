@@ -97,7 +97,7 @@ repos:
       - id: add-trailing-comma
         exclude: nonunicode/.*
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.0
+    rev: v2.3.1
     hooks:
       - id: mypy
         require_serial: True
