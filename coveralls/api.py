@@ -16,7 +16,6 @@ from .configuration import resolve
 from .git import git_info
 from .reporter import CoverallReporter
 
-
 log = logging.getLogger('coveralls.api')
 
 # Transient failures worth retrying: server-side 5xx and rate limiting (429).
@@ -48,7 +47,10 @@ def _build_session(retries: int) -> requests.Session:
     # so the no-retry path still surfaces read timeouts as TimeoutError.
     read = retries or False
     retry = Retry(
-        total=retries, connect=retries, read=read, status=retries,
+        total=retries,
+        connect=retries,
+        read=read,
+        status=retries,
         other=retries,
         status_forcelist=RETRY_STATUSES,
         allowed_methods=RETRY_METHODS,
@@ -108,9 +110,7 @@ class Coveralls:
         """
         self._data: dict[str, Any] | None = None
 
-        self.config: Config = resolve(
-            kwargs, token_required=token_required,
-        )
+        self.config: Config = resolve(kwargs, token_required=token_required)
 
         self.config.ensure_token()
 
@@ -140,12 +140,12 @@ class Coveralls:
         try:
             with _build_session(self.config.retries) as session:
                 return session.post(
-                    endpoint, verify=verify, timeout=timeout, **kwargs,
+                    endpoint, verify=verify, timeout=timeout, **kwargs
                 )
         except requests.exceptions.RequestException as e:
             if _caused_by_timeout(e):
                 raise TimeoutError(
-                    f'Request timeout: {endpoint} (timeout={timeout})',
+                    f'Request timeout: {endpoint} (timeout={timeout})'
                 ) from e
             raise RuntimeError(f'Could not submit coverage: {e}') from e
 
@@ -163,16 +163,14 @@ class Coveralls:
                     'COVERALLS_REPO_TOKEN instead, please manually override '
                     '$COVERALLS_SERVICE_NAME to "github-actions". For more '
                     'info, see https://coveralls-python.readthedocs.io/en'
-                    '/latest/usage/configuration.html#github-actions-support',
+                    '/latest/usage/configuration.html#github-actions-support'
                 )
 
         try:
             response.raise_for_status()
             data: dict[str, Any] = response.json()
         except Exception as e:
-            raise RuntimeError(
-                f'Could not submit coverage: {e}',
-            ) from e
+            raise RuntimeError(f'Could not submit coverage: {e}') from e
 
         return data
 
@@ -224,15 +222,14 @@ class Coveralls:
             raise
 
         log_string = re.sub(
-            r'"repo_token": "(.+?)"',
-            '"repo_token": "[secure]"',
-            json_string,
+            r'"repo_token": "(.+?)"', '"repo_token": "[secure]"', json_string
         )
         log.debug(log_string)
         log.debug('==\nReporting %s files\n==\n', len(data['source_files']))
         for source_file in data['source_files']:
             log.debug(
-                '%s - %d/%d', source_file['name'],
+                '%s - %d/%d',
+                source_file['name'],
                 sum(filter(None, source_file['coverage'])),
                 len(source_file['coverage']),
             )
@@ -248,7 +245,7 @@ class Coveralls:
             pathlib.Path(file_path).write_text(report, encoding='utf-8')
 
     def create_data(
-        self, extra: dict[str, Any] | None = None,
+        self, extra: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         r"""
         Generate object for api.
@@ -283,7 +280,7 @@ class Coveralls:
             else:
                 log.warning(
                     'No data to be merged; does the json file contain '
-                    '"source_files" data?',
+                    '"source_files" data?'
                 )
 
         return self._data
@@ -294,7 +291,7 @@ class Coveralls:
         work.get_data()
 
         return CoverallReporter(
-            work, self.config.base_dir, self.config.src_dir,
+            work, self.config.base_dir, self.config.src_dir
         ).coverage
 
     @staticmethod

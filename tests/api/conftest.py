@@ -5,7 +5,7 @@ import pytest
 
 @pytest.fixture(scope='function')
 def isolate_cwd(
-    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch,
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """
     Run a test in a clean, empty working directory.

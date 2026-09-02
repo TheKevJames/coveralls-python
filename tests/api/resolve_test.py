@@ -5,6 +5,7 @@ import unittest.mock
 from typing import Any
 
 import pytest
+
 try:
     import yaml
 except ImportError:
@@ -13,13 +14,10 @@ except ImportError:
 from coveralls.configuration import Config
 from coveralls.configuration import resolve
 
-
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
 
-def resolve_config(
-    *, token_required: bool = True, **overrides: Any,
-) -> Config:
+def resolve_config(*, token_required: bool = True, **overrides: Any) -> Config:
     return resolve(overrides, token_required=token_required)
 
 
@@ -76,9 +74,7 @@ def test_none_overrides_do_not_clobber() -> None:
     assert config.service_name == 'env'
 
 
-@unittest.mock.patch.dict(
-    os.environ, {'TRAVIS': 'True'}, clear=True,
-)
+@unittest.mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
 def test_override_cannot_reimpose_waived_token() -> None:
     # debug/output pass token_required implicitly; travis waives it. Neither an
     # explicit True override nor travis should be able to flip it back on.
@@ -101,7 +97,7 @@ def test_config_file_cannot_waive_token_required(
     # token_required: false in the config file must be ignored so a committed
     # .coveralls.yml cannot silently disable the check.
     (tmp_path / '.coveralls.yml').write_text(
-        'token_required: false\n', encoding='utf-8',
+        'token_required: false\n', encoding='utf-8'
     )
     config = resolve({})
     assert config.token_required
@@ -122,7 +118,7 @@ def test_bool_override_precedence_is_owned_by_resolve() -> None:
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_file_source_and_unknown_key_warning(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     (tmp_path / '.coveralls.yml').write_text(
         'repo_token: xxx\nservice_name: jenkins\n'
@@ -176,12 +172,12 @@ def test_unknown_override_key_warns_and_is_dropped(
 @pytest.mark.skipif(yaml is not None, reason='requires no PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_file_source_without_yaml_warns(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     # The warning fires only when the YAML file actually exists: an absent file
     # is silent so a TOML-only or env-only user is never nagged about PyYAML.
     (tmp_path / '.coveralls.yml').write_text(
-        'repo_token: xxx\n', encoding='utf-8',
+        'repo_token: xxx\n', encoding='utf-8'
     )
     with caplog.at_level(logging.WARNING):
         resolve({})
@@ -201,7 +197,7 @@ def test_coveralls_host_alias_is_permanent_and_silent(
     # host and must NOT emit a deprecation warning.
     with caplog.at_level(logging.WARNING):
         config = resolve_config(
-            repo_token='x', coveralls_host='https://old.example.com',
+            repo_token='x', coveralls_host='https://old.example.com'
         )
     assert config.host == 'https://old.example.com'
     assert not caplog.records
@@ -233,7 +229,7 @@ def test_alias_does_not_override_explicit_canonical() -> None:
 @pytest.mark.parametrize('content', ['', '\n\n', '# only a comment\n'])
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_empty_config_file_is_ignored(
-    content: str, tmp_path: pathlib.Path,
+    content: str, tmp_path: pathlib.Path
 ) -> None:
     # yaml.safe_load() returns None for empty/comment-only files; resolve must
     # treat that as no config rather than crashing on a None update.
@@ -247,14 +243,11 @@ def test_empty_config_file_is_ignored(
 
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
-def test_none_rcfile_override_keeps_file_value(
-    tmp_path: pathlib.Path,
-) -> None:
+def test_none_rcfile_override_keeps_file_value(tmp_path: pathlib.Path) -> None:
     # The CLI forwards rcfile=None when --rcfile is not passed; that must not
     # override an rcfile/config_file set in the config file.
     (tmp_path / '.coveralls.yml').write_text(
-        'repo_token: xxx\nconfig_file: from_yaml.rc\n',
-        encoding='utf-8',
+        'repo_token: xxx\nconfig_file: from_yaml.rc\n', encoding='utf-8'
     )
     config = resolve({'rcfile': None})
     assert config.rcfile == 'from_yaml.rc'
@@ -263,7 +256,7 @@ def test_none_rcfile_override_keeps_file_value(
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_alias_and_deprecated_file_keys_still_work(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     (tmp_path / '.coveralls.yml').write_text(
         'repo_token: xxx\n'

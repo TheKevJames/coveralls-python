@@ -7,13 +7,10 @@ import pytest
 from coveralls.configuration import Config
 from coveralls.configuration import resolve
 
-
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
 
-def resolve_config(
-    *, token_required: bool = True, **overrides: Any,
-) -> Config:
+def resolve_config(*, token_required: bool = True, **overrides: Any) -> Config:
     return resolve(overrides, token_required=token_required)
 
 
@@ -26,9 +23,7 @@ def test_no_environment_defaults() -> None:
 
 
 @unittest.mock.patch.dict(
-    os.environ,
-    {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'},
-    clear=True,
+    os.environ, {'TRAVIS': 'True', 'TRAVIS_JOB_ID': '777'}, clear=True
 )
 def test_travis_waives_token_requirement() -> None:
     config = resolve_config()

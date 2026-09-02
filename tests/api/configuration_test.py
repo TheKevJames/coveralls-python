@@ -3,13 +3,13 @@ import pathlib
 import unittest.mock
 
 import pytest
+
 try:
     import yaml
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
 from coveralls import Coveralls
-
 
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
@@ -22,8 +22,7 @@ class TestConfigIntegration:
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_reads_config_file(self, tmp_path: pathlib.Path) -> None:
         (tmp_path / '.coveralls.yml').write_text(
-            'repo_token: xxx\nservice_name: jenkins\n',
-            encoding='utf-8',
+            'repo_token: xxx\nservice_name: jenkins\n', encoding='utf-8'
         )
 
         cover = Coveralls()
@@ -106,14 +105,12 @@ class TestEnsureToken:
         )
 
     @unittest.mock.patch.dict(
-        os.environ,
-        {'GITHUB_ACTIONS': 'true'},
-        clear=True,
+        os.environ, {'GITHUB_ACTIONS': 'true'}, clear=True
     )
     def test_misconfigured_github(self) -> None:
         with pytest.raises(RuntimeError) as excinfo:
             Coveralls()
 
         assert str(excinfo.value).startswith(
-            'Running on Github Actions but GITHUB_TOKEN is not set.',
+            'Running on Github Actions but GITHUB_TOKEN is not set.'
         )

@@ -1,6 +1,5 @@
 from coveralls import __version__
 
-
 master_doc = 'index'
 source_suffix = '.rst'
 pygments_style = 'sphinx'

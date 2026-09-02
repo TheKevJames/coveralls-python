@@ -10,9 +10,7 @@ try:
     # coverage v7.5+ moved get_analysis_to_report into report_core
     from coverage.report_core import get_analysis_to_report
 except ImportError:
-    from coverage.report import (  # type: ignore[attr-defined]
-        get_analysis_to_report,
-    )
+    from coverage.report import get_analysis_to_report  # type: ignore[attr-defined]
 
 
 log = logging.getLogger('coveralls.reporter')
@@ -22,10 +20,7 @@ class CoverallReporter:
     """Custom coverage.py reporter for coveralls.io."""
 
     def __init__(
-            self,
-            cov: coverage.Coverage,
-            base_dir: str = '',
-            src_dir: str = '',
+        self, cov: coverage.Coverage, base_dir: str = '', src_dir: str = ''
     ) -> None:
         self.base_dir = self.sanitize_dir(base_dir)
         self.src_dir = self.sanitize_dir(src_dir)
@@ -43,7 +38,7 @@ class CoverallReporter:
 
     def report(self, cov: coverage.Coverage) -> None:
         try:
-            for (fr, analysis) in get_analysis_to_report(cov, None):
+            for fr, analysis in get_analysis_to_report(cov, None):
                 self.parse_file(fr, analysis)
         except coverage.exceptions.NoDataError:
             return
@@ -108,13 +103,12 @@ class CoverallReporter:
         # ensure results are properly merged between platforms
         posix_filename = pathlib.PurePath(cu.relative_filename()).as_posix()
         if self.base_dir and posix_filename.startswith(self.base_dir):
-            posix_filename = posix_filename[len(self.base_dir):]
+            posix_filename = posix_filename[len(self.base_dir) :]
         posix_filename = self.src_dir + posix_filename
 
         token_lines = cu.source_token_lines()
         coverage_lines = [
-            self.get_hits(i, analysis)
-            for i, _ in enumerate(token_lines, 1)
+            self.get_hits(i, analysis) for i, _ in enumerate(token_lines, 1)
         ]
 
         results = {

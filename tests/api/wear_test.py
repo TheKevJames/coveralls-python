@@ -16,10 +16,9 @@ import responses
 from requests.adapters import HTTPAdapter
 
 import coveralls
+from coveralls.api import RETRY_BACKOFF_MAX
 from coveralls.api import _build_session
 from coveralls.api import log
-from coveralls.api import RETRY_BACKOFF_MAX
-
 
 EXPECTED = {
     'message': 'Job #7.1 - 44.58% Covered',
@@ -80,8 +79,14 @@ def test_client_settings_do_not_leak_into_payload() -> None:
         data = api.create_data()
 
     for leaked in (
-        'base_dir', 'src_dir', 'rcfile', 'config_file',
-        'timeout', 'connect_timeout', 'read_timeout', 'retries',
+        'base_dir',
+        'src_dir',
+        'rcfile',
+        'config_file',
+        'timeout',
+        'connect_timeout',
+        'read_timeout',
+        'retries',
     ):
         assert leaked not in data
     assert data['repo_token'] == 'xxx'
@@ -111,7 +116,7 @@ def test_set_payload_fields_are_forwarded_including_falsey() -> None:
 def test_merge() -> None:
     with tempfile.NamedTemporaryFile() as coverage_file:
         coverage_file.write(
-            b'{"source_files": [{"name": "foobar", "coverage": []}]}',
+            b'{"source_files": [{"name": "foobar", "coverage": []}]}'
         )
         coverage_file.seek(0)
 
@@ -151,7 +156,7 @@ def test_merge_invalid_data() -> None:
 
         logger.assert_called_once_with(
             'No data to be merged; does the json file contain '
-            '"source_files" data?',
+            '"source_files" data?'
         )
 
 
@@ -173,8 +178,7 @@ def test_repo_token_in_not_compromised_verbose() -> None:
 @responses.activate
 def test_coveralls_unavailable() -> None:
     responses.add(
-        responses.POST, JOBS_URL,
-        body='<html>Http 1./1 500</html>', status=500,
+        responses.POST, JOBS_URL, body='<html>Http 1./1 500</html>', status=500
     )
     with pytest.raises(RuntimeError):
         coveralls.Coveralls(repo_token='xxx').wear()
@@ -194,7 +198,8 @@ def test_no_coverage(report_files: unittest.mock.MagicMock) -> None:
     {
         'COVERALLS_HOST': 'https://coveralls.my-enterprise.info',
         'COVERALLS_SKIP_SSL_VERIFY': '1',
-    }, clear=True,
+    },
+    clear=True,
 )
 @responses.activate
 def test_coveralls_host_env_var_overrides_api_url() -> None:
@@ -250,7 +255,8 @@ def test_submit_report_uses_default_timeout() -> None:
 @responses.activate
 def test_submit_report_raises_on_timeout() -> None:
     responses.add(
-        responses.POST, JOBS_URL,
+        responses.POST,
+        JOBS_URL,
         body=requests.exceptions.ConnectTimeout('boom'),
     )
     with pytest.raises(TimeoutError, match=r'Request timeout'):
@@ -297,8 +303,7 @@ def test_submit_report_read_timeout_raises_timeout_error() -> None:
     # coverage" RuntimeError. See _build_session's read=0/False handling.
     with _hanging_server() as host:
         api = coveralls.Coveralls(
-            repo_token='xxx', host=host,
-            connect_timeout=5, read_timeout=0.5,
+            repo_token='xxx', host=host, connect_timeout=5, read_timeout=0.5
         )
         with pytest.raises(TimeoutError, match=r'Request timeout'):
             api.wear(dry_run=False)
@@ -311,8 +316,11 @@ def test_submit_report_exhausted_read_timeout_raises_timeout_error() -> None:
     # the detailed TimeoutError, not the generic RuntimeError.
     with _hanging_server() as host:
         api = coveralls.Coveralls(
-            repo_token='xxx', host=host,
-            connect_timeout=5, read_timeout=0.3, retries=2,
+            repo_token='xxx',
+            host=host,
+            connect_timeout=5,
+            read_timeout=0.3,
+            retries=2,
         )
         with pytest.raises(TimeoutError, match=r'Request timeout'):
             api.wear(dry_run=False)
@@ -346,7 +354,8 @@ def test_parallel_finish_omits_unset_carryforward() -> None:
 @responses.activate
 def test_parallel_finish_raises_on_timeout() -> None:
     responses.add(
-        responses.POST, WEBHOOK_URL,
+        responses.POST,
+        WEBHOOK_URL,
         body=requests.exceptions.ConnectTimeout('boom'),
     )
     with pytest.raises(TimeoutError, match=r'Request timeout'):
@@ -361,7 +370,7 @@ def test_submit_report_retries_transient_then_succeeds() -> None:
     responses.add(responses.POST, JOBS_URL, json=EXPECTED, status=200)
 
     result = coveralls.Coveralls(repo_token='xxx', retries=2).wear(
-        dry_run=False,
+        dry_run=False
     )
 
     assert result == EXPECTED
@@ -388,7 +397,7 @@ def test_submit_report_retries_on_429() -> None:
     responses.add(responses.POST, JOBS_URL, json=EXPECTED, status=200)
 
     result = coveralls.Coveralls(repo_token='xxx', retries=1).wear(
-        dry_run=False,
+        dry_run=False
     )
 
     assert result == EXPECTED

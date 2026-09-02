@@ -4,9 +4,9 @@ import sys
 from collections.abc import Mapping
 from typing import Any
 
-from .helpers import _canonicalize_and_filter
 from .helpers import TOML_CONFIG_FILE
 from .helpers import YAML_CONFIG_FILE
+from .helpers import _canonicalize_and_filter
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -60,7 +60,7 @@ def _read_toml() -> dict[str, Any] | None:
     if not isinstance(section, Mapping):
         raise TypeError(
             f'Invalid [tool.coveralls] in {TOML_CONFIG_FILE}: expected a '
-            f'table, got {type(section).__name__}.',
+            f'table, got {type(section).__name__}.'
         )
     return dict(section) or None
 
@@ -83,8 +83,11 @@ def _from_files() -> dict[str, Any]:
             'Both %s and [tool.coveralls] in %s were found; using %s and '
             'ignoring %s. The YAML config is legacy -- consider consolidating '
             'into %s.',
-            YAML_CONFIG_FILE, TOML_CONFIG_FILE, YAML_CONFIG_FILE,
-            TOML_CONFIG_FILE, TOML_CONFIG_FILE,
+            YAML_CONFIG_FILE,
+            TOML_CONFIG_FILE,
+            YAML_CONFIG_FILE,
+            TOML_CONFIG_FILE,
+            TOML_CONFIG_FILE,
         )
 
     if yaml_config is not None:

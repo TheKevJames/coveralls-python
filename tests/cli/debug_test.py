@@ -20,7 +20,7 @@ def test_debug(mock_wear: mock.MagicMock, mock_log: mock.MagicMock) -> None:
 @mock.patch.object(coveralls.cli.log, 'info')
 @mock.patch.object(coveralls.Coveralls, 'wear')
 def test_debug_no_token(
-    mock_wear: mock.MagicMock, mock_log: mock.MagicMock,
+    mock_wear: mock.MagicMock, mock_log: mock.MagicMock
 ) -> None:
     coveralls.cli.main(argv=['debug'])
     mock_wear.assert_called_with(dry_run=True)
@@ -36,7 +36,7 @@ def test_debug_accepts_options_after_subcommand(
     # (a long-standing, load-bearing invocation for debug).
     coveralls.cli.main(argv=['debug', '--rcfile=coveragerc', '--host=h'])
     mock_coveralls.assert_called_with(
-        False, **coveralls_kwargs(rcfile='coveragerc', host='h'),
+        False, **coveralls_kwargs(rcfile='coveragerc', host='h')
     )
 
 

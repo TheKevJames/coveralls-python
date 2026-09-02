@@ -10,14 +10,11 @@ import responses
 
 from coveralls import Coveralls
 
-
 BASE_DIR = pathlib.Path(__file__).parents[2]
 EXAMPLE_DIR = BASE_DIR / 'example'
 
 
-def assert_coverage(
-    actual: dict[str, Any], expected: dict[str, Any],
-) -> None:
+def assert_coverage(actual: dict[str, Any], expected: dict[str, Any]) -> None:
     assert actual['source'].strip() == expected['source'].strip()
     assert actual['name'] == expected['name']
     assert actual['coverage'] == expected['coverage']
@@ -37,19 +34,35 @@ class TestReporter:
 
     @staticmethod
     def make_test_results(
-        with_branches: bool = False, name_prefix: str = '',
+        with_branches: bool = False, name_prefix: str = ''
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         results = (
             {
-                'source': (
-                    EXAMPLE_DIR / 'project.py'
-                ).read_text(encoding='utf-8'),
+                'source': (EXAMPLE_DIR / 'project.py').read_text(
+                    encoding='utf-8'
+                ),
                 'name': f'{name_prefix}project.py',
                 'coverage': [
-                    1, 1, None, None, 1, None, None,
-                    None, 1, 0, None, 1, 1, 1, 1, 1,
+                    1,
+                    1,
+                    None,
+                    None,
+                    1,
+                    None,
+                    None,
+                    None,
+                    1,
+                    0,
+                    None,
+                    None,
+                    1,
+                    1,
+                    1,
+                    1,
+                    1,
                 ],
-            }, {
+            },
+            {
                 'source': textwrap.dedent("""
                 from project import branch  # type: ignore[import-not-found]
                 from project import hello
@@ -65,18 +78,30 @@ class TestReporter:
         )
         if with_branches:
             results[0]['branches'] = [
-                13, 0, 14, 1, 13, 0, 15, 1, 15, 0, 16, 1,
-                15, 0, 12, 0,
+                14,
+                0,
+                15,
+                1,
+                14,
+                0,
+                16,
+                1,
+                16,
+                0,
+                17,
+                1,
+                16,
+                0,
+                13,
+                0,
             ]
             results[1]['branches'] = [4, 0, 5, 1, 4, 0, 1, 0]
         return results
 
     def test_reporter(self) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'runtests.py',
-            ], cwd=EXAMPLE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'runtests.py'],
+            cwd=EXAMPLE_DIR,
         )
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -86,13 +111,11 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_no_base_dir_arg(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
@@ -105,20 +128,17 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_with_base_dir_arg(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
-            repo_token='xxx',
-            base_dir='example',
+            repo_token='xxx', base_dir='example'
         ).get_coverage()
         assert len(results) == 2
 
@@ -127,20 +147,17 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_with_base_dir_trailing_sep(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
-            repo_token='xxx',
-            base_dir='example/',
+            repo_token='xxx', base_dir='example/'
         ).get_coverage()
         assert len(results) == 2
 
@@ -149,21 +166,16 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_with_src_dir_arg(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(
-            repo_token='xxx',
-            src_dir='src',
-        ).get_coverage()
+        results = Coveralls(repo_token='xxx', src_dir='src').get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results(name_prefix='src/example/')
@@ -171,21 +183,16 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_with_src_dir_trailing_sep(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(
-            repo_token='xxx',
-            src_dir='src/',
-        ).get_coverage()
+        results = Coveralls(repo_token='xxx', src_dir='src/').get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results(name_prefix='src/example/')
@@ -193,21 +200,17 @@ class TestReporter:
         assert_coverage(results[1], expected_results[1])
 
     def test_reporter_with_both_base_dir_and_src_dir_args(
-        self, monkeypatch: pytest.MonkeyPatch,
+        self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'example/runtests.py',
-            ], cwd=BASE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'example/runtests.py'],
+            cwd=BASE_DIR,
         )
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
         results = Coveralls(
-            repo_token='xxx',
-            base_dir='example',
-            src_dir='src',
+            repo_token='xxx', base_dir='example', src_dir='src'
         ).get_coverage()
         assert len(results) == 2
 
@@ -217,10 +220,8 @@ class TestReporter:
 
     def test_reporter_with_branches(self) -> None:
         subprocess.call(
-            [
-                'coverage', 'run', '--branch', '--omit=**/.tox/*',
-                'runtests.py',
-            ], cwd=EXAMPLE_DIR,
+            ['coverage', 'run', '--branch', '--omit=**/.tox/*', 'runtests.py'],
+            cwd=EXAMPLE_DIR,
         )
         results = Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
@@ -235,13 +236,11 @@ class TestReporter:
 
     def test_missing_file(self) -> None:
         pathlib.Path('extra.py').write_text(
-            'print("Python rocks!")\n', encoding='utf-8',
+            'print("Python rocks!")\n', encoding='utf-8'
         )
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'extra.py',
-            ], cwd=EXAMPLE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'extra.py'],
+            cwd=EXAMPLE_DIR,
         )
         with contextlib.suppress(Exception):
             pathlib.Path('extra.py').unlink()
@@ -251,29 +250,26 @@ class TestReporter:
 
     def test_not_python(self) -> None:
         pathlib.Path('extra.py').write_text(
-            'print("Python rocks!")\n', encoding='utf-8',
+            'print("Python rocks!")\n', encoding='utf-8'
         )
         subprocess.call(
-            [
-                'coverage', 'run', '--omit=**/.tox/*',
-                'extra.py',
-            ], cwd=EXAMPLE_DIR,
+            ['coverage', 'run', '--omit=**/.tox/*', 'extra.py'],
+            cwd=EXAMPLE_DIR,
         )
         pathlib.Path('extra.py').write_text(
-            "<h1>This isn't python!</h1>\n", encoding='utf-8',
+            "<h1>This isn't python!</h1>\n", encoding='utf-8'
         )
 
-        with pytest.raises(
-                RuntimeError,
-                match=r"Couldn't parse .* as Python",
-        ):
+        with pytest.raises(RuntimeError, match=r"Couldn't parse .* as Python"):
             Coveralls(repo_token='xxx').get_coverage()
 
     @responses.activate
     def test_submit_report_422_github(self) -> None:
         responses.add(
-            responses.POST, 'https://coveralls.io/api/v1/jobs',
-            json={'error': 'nope'}, status=422,
+            responses.POST,
+            'https://coveralls.io/api/v1/jobs',
+            json={'error': 'nope'},
+            status=422,
         )
         cov = Coveralls(repo_token='test_token', service_name='github')
 

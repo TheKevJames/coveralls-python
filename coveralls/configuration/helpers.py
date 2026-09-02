@@ -5,7 +5,6 @@ import os
 from collections.abc import Mapping
 from typing import Any
 
-
 log = logging.getLogger('coveralls.configuration.helpers')
 
 # The config file sources coveralls-python reads. See files._from_files for
@@ -30,10 +29,7 @@ DEFAULT_RETRIES = 0
 def default_run_at() -> str:
     """Current local time as an RFC 3339 timestamp, e.g. the /jobs run_at."""
     return (
-        datetime.datetime.now()
-        .astimezone()
-        .replace(microsecond=0)
-        .isoformat()
+        datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
     )
 
 
@@ -111,10 +107,10 @@ class Config:
     def __post_init__(self) -> None:
         self.timeout = self._validate_timeout('timeout', self.timeout)
         self.connect_timeout = self._validate_timeout(
-            'connect_timeout', self.connect_timeout,
+            'connect_timeout', self.connect_timeout
         )
         self.read_timeout = self._validate_timeout(
-            'read_timeout', self.read_timeout,
+            'read_timeout', self.read_timeout
         )
         self.retries = self._validate_retries(self.retries)
 
@@ -126,11 +122,11 @@ class Config:
             value = float(raw)
         except (TypeError, ValueError) as e:
             raise ValueError(
-                f'Invalid {name} value {raw!r}: must be a number.',
+                f'Invalid {name} value {raw!r}: must be a number.'
             ) from e
         if value <= 0:
             raise ValueError(
-                f'Invalid {name} value {raw!r}: must be greater than 0.',
+                f'Invalid {name} value {raw!r}: must be greater than 0.'
             )
         return value
 
@@ -146,11 +142,11 @@ class Config:
             value = int(raw) if is_int else int(str(raw))
         except (TypeError, ValueError) as e:
             raise ValueError(
-                f'Invalid retries value {raw!r}: must be an integer.',
+                f'Invalid retries value {raw!r}: must be an integer.'
             ) from e
         if value < 0:
             raise ValueError(
-                f'Invalid retries value {raw!r}: must not be negative.',
+                f'Invalid retries value {raw!r}: must not be negative.'
             )
         return value
 
@@ -185,13 +181,13 @@ class Config:
             raise RuntimeError(
                 'Running on Github Actions but GITHUB_TOKEN is not set. Add '
                 '"env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}" to your '
-                'step config.',
+                'step config.'
             )
 
         raise RuntimeError(
             'No supported CI found and no repo token configured. You have to '
             f'provide repo_token in {TOML_CONFIG_FILE} ([tool.coveralls]) or '
-            f'{YAML_CONFIG_FILE}, or set the COVERALLS_REPO_TOKEN env var.',
+            f'{YAML_CONFIG_FILE}, or set the COVERALLS_REPO_TOKEN env var.'
         )
 
     def to_payload(self) -> dict[str, Any]:
@@ -213,19 +209,15 @@ _FIELD_NAMES = frozenset(f.name for f in dataclasses.fields(Config))
 # supported and neither warns: ``coveralls_host`` reads more clearly in a
 # config file, while ``host`` matches the ``COVERALLS_HOST`` env var and
 # ``--host`` flag.
-ALIASES = {
-    'coveralls_host': 'host',
-}
+ALIASES = {'coveralls_host': 'host'}
 
 # Renamed keys still accepted for backwards-compatibility but deprecated: they
 # warn and will be removed in a future release.
-DEPRECATED_KEYS = {
-    'config_file': 'rcfile',
-}
+DEPRECATED_KEYS = {'config_file': 'rcfile'}
 
 
 def _canonicalize_keys(
-    data: Mapping[str, Any], *, source: str,
+    data: Mapping[str, Any], *, source: str
 ) -> dict[str, Any]:
     """
     Map alias/deprecated keys to their canonical names.
@@ -242,7 +234,10 @@ def _canonicalize_keys(
         if key in DEPRECATED_KEYS:
             log.warning(
                 '%r is deprecated and will be removed in a future release; '
-                'use %r instead (in %s).', key, canonical, source,
+                'use %r instead (in %s).',
+                key,
+                canonical,
+                source,
             )
         if canonical not in data:
             result[canonical] = value
@@ -256,13 +251,13 @@ def _filter_known(data: Mapping[str, Any], *, source: str) -> dict[str, Any]:
             known[key] = value
         else:
             log.warning(
-                'Ignoring unknown config option %r from %s.', key, source,
+                'Ignoring unknown config option %r from %s.', key, source
             )
     return known
 
 
 def _canonicalize_and_filter(
-    data: Mapping[str, Any], *, source: str,
+    data: Mapping[str, Any], *, source: str
 ) -> dict[str, Any]:
     canonical = _canonicalize_keys(data, source=source)
     return _filter_known(canonical, source=source)

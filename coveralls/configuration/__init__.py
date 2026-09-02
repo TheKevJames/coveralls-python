@@ -1,23 +1,21 @@
 from collections.abc import Mapping
 from typing import Any
 
+from .ci import TOKENLESS_CI_SERVICES
 from .ci import _detect_ci
 from .ci import _from_ci_environment
-from .ci import TOKENLESS_CI_SERVICES
 from .environment import _from_environment
 from .files import _from_files
+from .helpers import Config
 from .helpers import _canonicalize_keys
 from .helpers import _filter_known
-from .helpers import Config
 from .helpers import default_run_at
 
 __all__ = ['Config', 'resolve']
 
 
 def resolve(
-    overrides: Mapping[str, Any],
-    *,
-    token_required: bool = True,
+    overrides: Mapping[str, Any], *, token_required: bool = True
 ) -> Config:
     """
     Resolve configuration from all sources into a single typed Config.
@@ -37,10 +35,7 @@ def resolve(
     """
     overrides = _canonicalize_keys(overrides, source='arguments')
     cleaned = _filter_known(
-        {
-            key: value for key, value in overrides.items()
-            if value is not None
-        },
+        {key: value for key, value in overrides.items() if value is not None},
         source='arguments',
     )
     name, fields = _detect_ci()

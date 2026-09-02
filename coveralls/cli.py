@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 import importlib.metadata
 import inspect
 import logging
@@ -12,7 +13,6 @@ from typer._click.exceptions import ClickException
 from typer._click.exceptions import UsageError
 
 from .api import Coveralls
-
 
 log = logging.getLogger('coveralls')
 # One template for every "X is deprecated, use Y" warning so the deprecated
@@ -59,8 +59,7 @@ def _configure_logging(*, verbose: bool) -> None:
 
 
 def _resolve_deprecated(
-    new: str | None, old: str | None,
-    new_flag: str, old_flag: str,
+    new: str | None, old: str | None, new_flag: str, old_flag: str
 ) -> str | None:
     """Prefer the canonical value, warning when the deprecated flag is used."""
     if old is None:
@@ -75,16 +74,22 @@ def _warn_deprecated_verb(old_flag: str, new_command: str) -> None:
 
 
 def _make_coveralls(
-    *, token_required: bool,
-    service_name: str | None = None, service: str | None = None,
+    *,
+    token_required: bool,
+    service_name: str | None = None,
+    service: str | None = None,
     rcfile: str | None = None,
-    base_dir: str | None = None, basedir: str | None = None,
-    src_dir: str | None = None, srcdir: str | None = None,
-    host: str | None = None, skip_ssl_verify: bool | None = None,
+    base_dir: str | None = None,
+    basedir: str | None = None,
+    src_dir: str | None = None,
+    srcdir: str | None = None,
+    host: str | None = None,
+    skip_ssl_verify: bool | None = None,
     parallel: bool | None = None,
     carryforward: str | None = None,
     timeout: float | None = None,
-    connect_timeout: float | None = None, read_timeout: float | None = None,
+    connect_timeout: float | None = None,
+    read_timeout: float | None = None,
     retries: int | None = None,
 ) -> Coveralls:
     # pylint: disable=too-many-arguments,too-many-locals
@@ -92,10 +97,10 @@ def _make_coveralls(
     # ones so nothing clobbers env/config. An explicit value (incl. a False
     # from --no-parallel) overrides.
     service_name = _resolve_deprecated(
-        service_name, service, '--service-name', '--service',
+        service_name, service, '--service-name', '--service'
     )
     base_dir = _resolve_deprecated(
-        base_dir, basedir, '--base-dir', '--basedir',
+        base_dir, basedir, '--base-dir', '--basedir'
     )
     src_dir = _resolve_deprecated(src_dir, srcdir, '--src-dir', '--srcdir')
 
@@ -139,7 +144,7 @@ def _action_save(coverallz: Coveralls, merge: str | None, path: str) -> None:
 # but the old flat CLI ran it before every action, so the deprecated
 # --submit/--finish paths pass it for identical dispatch.
 def _action_upload(
-    coverallz: Coveralls, path: str, merge: str | None = None,
+    coverallz: Coveralls, path: str, merge: str | None = None
 ) -> None:
     if merge:
         coverallz.merge(merge)
@@ -168,14 +173,13 @@ def _action_debug(coverallz: Coveralls, merge: str | None) -> None:
 _ServiceName = Annotated[
     str | None,
     typer.Option(
-        '--service-name',
-        help='Provide an alternative service name to submit.',
+        '--service-name', help='Provide an alternative service name to submit.'
     ),
 ]
 _Service = Annotated[
     str | None,
     typer.Option(
-        '--service', hidden=True, help='Deprecated alias for --service-name.',
+        '--service', hidden=True, help='Deprecated alias for --service-name.'
     ),
 ]
 _Rcfile = Annotated[
@@ -195,19 +199,19 @@ _BaseDir = Annotated[
 _Basedir = Annotated[
     str | None,
     typer.Option(
-        '--basedir', hidden=True, help='Deprecated alias for --base-dir.',
+        '--basedir', hidden=True, help='Deprecated alias for --base-dir.'
     ),
 ]
 _SrcDir = Annotated[
     str | None,
     typer.Option(
-        '--src-dir', help='Source directory added to reported paths.',
+        '--src-dir', help='Source directory added to reported paths.'
     ),
 ]
 _Srcdir = Annotated[
     str | None,
     typer.Option(
-        '--srcdir', hidden=True, help='Deprecated alias for --src-dir.',
+        '--srcdir', hidden=True, help='Deprecated alias for --src-dir.'
     ),
 ]
 _Merge = Annotated[
@@ -222,15 +226,14 @@ _Parallel = Annotated[
     ),
 ]
 _Host = Annotated[
-    str | None,
-    typer.Option('--host', help='Coveralls API host base URL.'),
+    str | None, typer.Option('--host', help='Coveralls API host base URL.')
 ]
 _Carryforward = Annotated[
     str | None,
     typer.Option(
         '--carryforward',
         help='Comma-separated list of parallel job flags to carry forward '
-             'for missing jobs.',
+        'for missing jobs.',
     ),
 ]
 _SkipSslVerify = Annotated[
@@ -243,7 +246,8 @@ _SkipSslVerify = Annotated[
 _Verbose = Annotated[
     bool,
     typer.Option(
-        '-v', '--verbose',
+        '-v',
+        '--verbose',
         help='Print extra info, always enabled when debugging.',
     ),
 ]
@@ -257,13 +261,13 @@ _Timeout = Annotated[
 _ConnectTimeout = Annotated[
     float | None,
     typer.Option(
-        '--connect-timeout', help='Connect timeout, in seconds (default: 10).',
+        '--connect-timeout', help='Connect timeout, in seconds (default: 10).'
     ),
 ]
 _ReadTimeout = Annotated[
     float | None,
     typer.Option(
-        '--read-timeout', help='Read timeout, in seconds (default: 60).',
+        '--read-timeout', help='Read timeout, in seconds (default: 60).'
     ),
 ]
 _Retries = Annotated[
@@ -271,13 +275,15 @@ _Retries = Annotated[
     typer.Option(
         '--retries',
         help='Retry transient HTTP failures this many times (default: 0). '
-             'Uses exponential backoff with jitter.',
+        'Uses exponential backoff with jitter.',
     ),
 ]
 _Version = Annotated[
     bool | None,
     typer.Option(
-        '--version', callback=_show_version, is_eager=True,
+        '--version',
+        callback=_show_version,
+        is_eager=True,
         help='Display the version and exit.',
     ),
 ]
@@ -287,21 +293,22 @@ _Version = Annotated[
 _Output = Annotated[
     str | None,
     typer.Option(
-        '--output', hidden=True,
-        help='Deprecated alias for the save command.',
+        '--output', hidden=True, help='Deprecated alias for the save command.'
     ),
 ]
 _Submit = Annotated[
     str | None,
     typer.Option(
-        '--submit', hidden=True,
+        '--submit',
+        hidden=True,
         help='Deprecated alias for the upload command.',
     ),
 ]
 _Finish = Annotated[
     bool,
     typer.Option(
-        '--finish', hidden=True,
+        '--finish',
+        hidden=True,
         help='Deprecated alias for the finish command.',
     ),
 ]
@@ -359,15 +366,18 @@ def with_options(
         # otherwise be treated as a positional argument) but keep it on the
         # real function so the injected values have somewhere to land.
         params = [
-            p for p in sig.parameters.values()
+            p
+            for p in sig.parameters.values()
             if p.kind is not inspect.Parameter.VAR_KEYWORD
         ]
         for name, (annotation, default) in injected.items():
             params.append(
                 inspect.Parameter(
-                    name, inspect.Parameter.KEYWORD_ONLY,
-                    default=default, annotation=annotation,
-                ),
+                    name,
+                    inspect.Parameter.KEYWORD_ONLY,
+                    default=default,
+                    annotation=annotation,
+                )
             )
             func.__annotations__[name] = annotation
         new_signature = sig.replace(parameters=params)
@@ -391,11 +401,13 @@ def coveralls(
     """Collect coverage and submit it to coveralls.io."""
     _ = version
     verb_flags = [
-        flag for flag, given in (
+        flag
+        for flag, given in (
             ('--finish', finish_flag),
             ('--output', output is not None),
             ('--submit', submit is not None),
-        ) if given
+        )
+        if given
     ]
 
     # This also runs as the group callback for every subcommand. A deprecated
@@ -406,14 +418,14 @@ def coveralls(
         if verb_flags:
             raise UsageError(
                 f'{verb_flags[0]} cannot be combined with the '
-                f'{ctx.invoked_subcommand!r} command.',
+                f'{ctx.invoked_subcommand!r} command.'
             )
         return
 
     _configure_logging(verbose=verbose)
     if len(verb_flags) > 1:
         raise UsageError(
-            f'{verb_flags[0]} cannot be combined with {verb_flags[1]}.',
+            f'{verb_flags[0]} cannot be combined with {verb_flags[1]}.'
         )
 
     # --merge is consumed by the action, not forwarded to Coveralls.
@@ -439,14 +451,12 @@ def coveralls(
 @app.command()
 @with_options(HTTP_OPTIONS)
 def finish(
-    verbose: _Verbose = False,
-    carryforward: _Carryforward = None,
-    **opts: Any,
+    verbose: _Verbose = False, carryforward: _Carryforward = None, **opts: Any
 ) -> None:
     """Notify coveralls.io that all parallel jobs are done."""
     _configure_logging(verbose=verbose)
     coverallz = _make_coveralls(
-        token_required=True, carryforward=carryforward, **opts,
+        token_required=True, carryforward=carryforward, **opts
     )
     _action_finish(coverallz)
 

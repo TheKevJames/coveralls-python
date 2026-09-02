@@ -7,23 +7,18 @@ import pytest
 from coveralls.configuration import resolve
 from coveralls.configuration.helpers import default_run_at
 
-
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
 # A concrete run_at, in the space-separated form the /jobs endpoint documents.
 FIXED = '2013-02-18 00:52:48 -0800'
 
 
-@unittest.mock.patch.dict(
-    os.environ, {'COVERALLS_RUN_AT': FIXED}, clear=True,
-)
+@unittest.mock.patch.dict(os.environ, {'COVERALLS_RUN_AT': FIXED}, clear=True)
 def test_run_at_read_from_environment() -> None:
     assert resolve({}).run_at == FIXED
 
 
-@unittest.mock.patch.dict(
-    os.environ, {'COVERALLS_RUN_AT': FIXED}, clear=True,
-)
+@unittest.mock.patch.dict(os.environ, {'COVERALLS_RUN_AT': FIXED}, clear=True)
 def test_run_at_override_wins_over_environment() -> None:
     assert resolve({'run_at': '2020-01-01 00:00:00 +0000'}).run_at == (
         '2020-01-01 00:00:00 +0000'

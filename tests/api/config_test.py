@@ -91,8 +91,9 @@ def test_client_settings_never_leak_into_payload() -> None:
         assert name not in payload
 
 
-def test_payload_and_client_fields_are_disjoint_and_cover_the_dataclass(
-) -> None:
+def test_payload_and_client_fields_are_disjoint_and_cover_the_dataclass() -> (
+    None
+):
     field_names = {f.name for f in dataclasses.fields(Config)}
     assert set(PAYLOAD_FIELDS).isdisjoint(CLIENT_ONLY_FIELDS)
     assert set(PAYLOAD_FIELDS) | set(CLIENT_ONLY_FIELDS) == field_names
@@ -125,7 +126,8 @@ def test_timeout_rejects_non_positive(name: str, value: int) -> None:
 
 def test_request_timeout_defaults() -> None:
     assert Config().request_timeout == (
-        DEFAULT_CONNECT_TIMEOUT, DEFAULT_READ_TIMEOUT,
+        DEFAULT_CONNECT_TIMEOUT,
+        DEFAULT_READ_TIMEOUT,
     )
 
 
@@ -141,7 +143,8 @@ def test_request_timeout_phase_specific_wins_over_overall() -> None:
 def test_request_timeout_phase_specific_falls_back_to_default() -> None:
     # only connect overridden -> read falls back to its default
     assert Config(connect_timeout=5).request_timeout == (
-        5.0, DEFAULT_READ_TIMEOUT,
+        5.0,
+        DEFAULT_READ_TIMEOUT,
     )
 
 
@@ -151,7 +154,7 @@ def test_retries_defaults_to_zero() -> None:
 
 @pytest.mark.parametrize(('raw', 'expected'), [(0, 0), (3, 3), ('5', 5)])
 def test_retries_accepts_non_negative_integers(
-    raw: Any, expected: int,
+    raw: Any, expected: int
 ) -> None:
     assert Config(retries=raw).retries == expected
 

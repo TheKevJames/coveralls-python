@@ -2,7 +2,6 @@ import os
 import re
 from typing import Any
 
-
 # Trailing integer, e.g. the number at the end of a pull-request URL or path.
 NUMBER_REGEX = re.compile(r'(\d+)$')
 
@@ -38,7 +37,7 @@ def _from_generic_ci_environment() -> dict[str, Any]:
     }
 
     config['service_pull_request'] = _parse_pr_number(
-        os.environ.get('CI_PULL_REQUEST'),
+        os.environ.get('CI_PULL_REQUEST')
     )
 
     return {key: value for key, value in config.items() if value}
@@ -62,7 +61,7 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
         return 'buildkite', {
             'service_job_id': env.get('BUILDKITE_JOB_ID'),
             'service_pull_request': _parse_pr_number(
-                env.get('BUILDKITE_PULL_REQUEST'),
+                env.get('BUILDKITE_PULL_REQUEST')
             ),
         }
     if env.get('CIRCLECI'):
@@ -72,7 +71,7 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
                 env.get('CIRCLE_WORKFLOW_ID') or env.get('CIRCLE_BUILD_NUM')
             ),
             'service_pull_request': _parse_pr_number(
-                env.get('CI_PULL_REQUEST'),
+                env.get('CI_PULL_REQUEST')
             ),
         }
     if env.get('GITHUB_ACTIONS'):
@@ -93,14 +92,14 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
         return 'jenkins', {
             'service_job_id': env.get('BUILD_NUMBER'),
             'service_pull_request': _parse_pr_number(
-                env.get('CI_PULL_REQUEST'),
+                env.get('CI_PULL_REQUEST')
             ),
         }
     if env.get('TRAVIS'):
         return 'travis-ci', {
             'service_job_id': env.get('TRAVIS_JOB_ID'),
             'service_pull_request': _parse_pr_number(
-                env.get('TRAVIS_PULL_REQUEST'),
+                env.get('TRAVIS_PULL_REQUEST')
             ),
         }
     if env.get('SEMAPHORE'):
@@ -122,7 +121,7 @@ def _detect_ci() -> tuple[str | None, dict[str, Any]]:
 
 
 def _from_ci_environment(
-    name: str | None, fields: dict[str, Any],
+    name: str | None, fields: dict[str, Any]
 ) -> dict[str, Any]:
     # As defined at the bottom of
     # https://docs.coveralls.io/supported-ci-services there are a few env vars

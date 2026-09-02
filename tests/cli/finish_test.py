@@ -16,25 +16,21 @@ from tests.cli.conftest import req_json
 @responses.activate
 def test_finish(mock_log: mock.MagicMock) -> None:
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'done': True}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'done': True},
+        status=200,
     )
     expected_json = {
         'repo_token': 'xxx',
         'repo_name': 'test/repo',
-        'payload': {
-            'status': 'done',
-            'build_num': '123456789',
-        },
+        'payload': {'status': 'done', 'build_num': '123456789'},
     }
 
     coveralls.cli.main(argv=['finish'])
 
     mock_log.assert_has_calls(
-        [
-            mock.call('Finishing parallel jobs...'),
-            mock.call('Done'),
-        ],
+        [mock.call('Finishing parallel jobs...'), mock.call('Done')]
     )
     assert len(responses.calls) == 1
     assert req_json(responses.calls[0].request) == expected_json
@@ -44,8 +40,10 @@ def test_finish(mock_log: mock.MagicMock) -> None:
 @responses.activate
 def test_finish_carryforward_in_webhook_payload() -> None:
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'done': True}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'done': True},
+        status=200,
     )
 
     coveralls.cli.main(argv=['finish', '--carryforward=flag1,flag2'])
@@ -60,15 +58,19 @@ def test_finish_carryforward_in_webhook_payload() -> None:
 @responses.activate
 def test_finish_deprecated_flag_warns(mock_warning: mock.MagicMock) -> None:
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'done': True}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'done': True},
+        status=200,
     )
 
     coveralls.cli.main(argv=['--finish'])
 
     mock_warning.assert_called_once_with(
         '%s is deprecated and will be removed in a future release; use %s '
-        'instead.', '--finish', 'coveralls finish',
+        'instead.',
+        '--finish',
+        'coveralls finish',
     )
     assert len(responses.calls) == 1
 
@@ -77,14 +79,12 @@ def test_finish_deprecated_flag_warns(mock_warning: mock.MagicMock) -> None:
 @responses.activate
 def test_finish_exception(caplog: pytest.LogCaptureFixture) -> None:
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={'error': 'Mocked'}, status=200,
+        responses.POST,
+        'https://coveralls.io/webhook',
+        json={'error': 'Mocked'},
+        status=200,
     )
-    expected_json = {
-        'payload': {
-            'status': 'done',
-        },
-    }
+    expected_json = {'payload': {'status': 'done'}}
     msg = 'Parallel finish failed: Mocked'
 
     with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
@@ -101,14 +101,9 @@ def test_finish_exception_without_error(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     responses.add(
-        responses.POST, 'https://coveralls.io/webhook',
-        json={}, status=200,
+        responses.POST, 'https://coveralls.io/webhook', json={}, status=200
     )
-    expected_json = {
-        'payload': {
-            'status': 'done',
-        },
-    }
+    expected_json = {'payload': {'status': 'done'}}
     msg = 'Parallel finish failed'
 
     with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):

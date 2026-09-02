@@ -3,20 +3,15 @@ import os
 import subprocess
 from typing import Any
 
-
 log = logging.getLogger('coveralls.git')
 
 
 def run_command(*args: str) -> str:
     try:
-        cmd = subprocess.run(
-            list(args),
-            check=True,
-            capture_output=True,
-        )
+        cmd = subprocess.run(list(args), check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(
-            f'{e}\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}',
+            f'{e}\nSTDOUT: {e.stdout}\nSTDERR: {e.stderr}'
         ) from e
 
     return cmd.stdout.decode('utf-8').strip()
@@ -24,7 +19,7 @@ def run_command(*args: str) -> str:
 
 def gitlog(fmt: str) -> str:
     return run_command(
-        'git', '--no-pager', 'log', '-1', f'--pretty=format:{fmt}',
+        'git', '--no-pager', 'log', '-1', f'--pretty=format:{fmt}'
     )
 
 
@@ -32,12 +27,9 @@ def git_branch() -> str | None:
     branch = None
     if os.environ.get('GITHUB_ACTIONS'):
         github_ref = os.environ.get('GITHUB_REF')
-        if (
-            github_ref
-            and (
-                github_ref.startswith('refs/heads/')
-                or github_ref.startswith('refs/tags/')
-            )
+        if github_ref and (
+            github_ref.startswith('refs/heads/')
+            or github_ref.startswith('refs/tags/')
         ):
             # E.g. in push events.
             branch = github_ref.split('/', 2)[-1]
@@ -113,21 +105,18 @@ def git_info() -> dict[str, dict[str, Any]]:
             'committer_email': os.environ.get('GIT_COMMITTER_EMAIL'),
             'message': os.environ.get('GIT_MESSAGE'),
         }
-        remotes = [{
-            'name': os.environ.get('GIT_REMOTE'),
-            'url': os.environ.get('GIT_URL'),
-        }]
+        remotes = [
+            {
+                'name': os.environ.get('GIT_REMOTE'),
+                'url': os.environ.get('GIT_URL'),
+            }
+        ]
         if not all(head.values()) or not all(remotes[0].values()):
             log.warning(
                 'Failed collecting git data. Are you running coveralls inside '
-                'a git repository? Is git installed?', exc_info=ex,
+                'a git repository? Is git installed?',
+                exc_info=ex,
             )
             return {}
 
-    return {
-        'git': {
-            'branch': branch,
-            'head': head,
-            'remotes': remotes,
-        },
-    }
+    return {'git': {'branch': branch, 'head': head, 'remotes': remotes}}

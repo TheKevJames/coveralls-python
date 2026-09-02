@@ -5,6 +5,7 @@ import sys
 import unittest.mock
 
 import pytest
+
 try:
     import yaml
 except ImportError:
@@ -29,9 +30,7 @@ def _write_pyproject(tmp_path: pathlib.Path, body: str) -> None:
 def test_reads_toml_file(tmp_path: pathlib.Path) -> None:
     _write_pyproject(
         tmp_path,
-        '[tool.coveralls]\n'
-        'repo_token = "xxx"\n'
-        'service_name = "jenkins"\n',
+        '[tool.coveralls]\nrepo_token = "xxx"\nservice_name = "jenkins"\n',
     )
     config = resolve({})
     assert config.repo_token == 'xxx'
@@ -40,7 +39,7 @@ def test_reads_toml_file(tmp_path: pathlib.Path) -> None:
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_toml_support_does_not_require_pyyaml(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     # TOML parsing is always available (stdlib tomllib / tomli), so a
     # pyproject-configured project must work even without PyYAML installed and
@@ -55,8 +54,7 @@ def test_toml_support_does_not_require_pyyaml(
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_toml_native_booleans_are_preserved(tmp_path: pathlib.Path) -> None:
     _write_pyproject(
-        tmp_path,
-        '[tool.coveralls]\nrepo_token = "xxx"\nparallel = true\n',
+        tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\nparallel = true\n'
     )
     config = resolve({})
     assert config.parallel is True
@@ -64,11 +62,10 @@ def test_toml_native_booleans_are_preserved(tmp_path: pathlib.Path) -> None:
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_toml_unknown_key_warns(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     _write_pyproject(
-        tmp_path,
-        '[tool.coveralls]\nrepo_token = "xxx"\nbogus_key = "nope"\n',
+        tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\nbogus_key = "nope"\n'
     )
     with caplog.at_level(logging.WARNING):
         config = resolve({})
@@ -79,7 +76,7 @@ def test_toml_unknown_key_warns(
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_toml_aliases_and_deprecated_keys(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     _write_pyproject(
         tmp_path,
@@ -112,9 +109,7 @@ def test_missing_tool_coveralls_table_is_ignored(
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
-def test_empty_tool_coveralls_table_is_ignored(
-    tmp_path: pathlib.Path,
-) -> None:
+def test_empty_tool_coveralls_table_is_ignored(tmp_path: pathlib.Path) -> None:
     _write_pyproject(tmp_path, '[tool.coveralls]\n')
     config = resolve({})
     assert config.service_name == 'coveralls-python'
@@ -138,17 +133,14 @@ def test_non_table_tool_coveralls_raises(tmp_path: pathlib.Path) -> None:
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_yaml_wins_over_toml_and_warns(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     # First file with settings wins, no merging: the legacy .coveralls.yml
     # takes precedence over pyproject.toml and the collision is flagged.
     (tmp_path / '.coveralls.yml').write_text(
-        'repo_token: from_yaml\n', encoding='utf-8',
+        'repo_token: from_yaml\n', encoding='utf-8'
     )
-    _write_pyproject(
-        tmp_path,
-        '[tool.coveralls]\nrepo_token = "from_toml"\n',
-    )
+    _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "from_toml"\n')
     with caplog.at_level(logging.WARNING):
         config = resolve({})
 
@@ -162,15 +154,12 @@ def test_yaml_wins_over_toml_and_warns(
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_empty_yaml_falls_through_to_toml(
-    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture,
+    tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     # An empty .coveralls.yml provides no settings, so pyproject.toml is used
     # and no collision warning is emitted.
     (tmp_path / '.coveralls.yml').write_text('\n', encoding='utf-8')
-    _write_pyproject(
-        tmp_path,
-        '[tool.coveralls]\nrepo_token = "from_toml"\n',
-    )
+    _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "from_toml"\n')
     with caplog.at_level(logging.WARNING):
         config = resolve({})
 

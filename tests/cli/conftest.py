@@ -8,7 +8,6 @@ import pytest
 
 import coveralls.cli
 
-
 EXC = RuntimeError('bad stuff happened')
 
 
@@ -47,10 +46,9 @@ def req_json(request: Any) -> Any:
     return json.loads(request.body.decode('utf-8'))
 
 
-def assert_logged_error(
-    caplog: pytest.LogCaptureFixture, msg: str,
-) -> None:
-    """Assert _run_action logged exactly one error carrying exception `msg`.
+def assert_logged_error(caplog: pytest.LogCaptureFixture, msg: str) -> None:
+    """
+    Assert _run_action logged exactly one error carrying exception `msg`.
 
     _run_action logs via log.exception, so the failing exception is recorded
     in the record's exc_info rather than the message; we inspect that.
@@ -64,13 +62,14 @@ def assert_logged_error(
 
 
 def coveralls_kwargs(**overrides: Any) -> dict[str, Any]:
-    """Expected Coveralls() override kwargs: everything unset (None) initially.
+    """
+    Expected Coveralls() override kwargs: everything unset (None) initially.
 
     The CLI forwards every value as-is and lets resolve() drop the unset ones,
     so the constructor is always called with the full override set. The unset
     baseline is derived from _make_coveralls (see _forwarded_override_keys), so
     a newly added CLI option is asserted automatically without editing here.
     """
-    kwargs: dict[str, Any] = {key: None for key in _FORWARDED_OVERRIDE_KEYS}
+    kwargs: dict[str, Any] = dict.fromkeys(_FORWARDED_OVERRIDE_KEYS)
     kwargs.update(overrides)
     return kwargs
