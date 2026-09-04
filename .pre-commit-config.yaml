@@ -128,7 +128,7 @@ repos:
           - '3.10'
   # TODO: add more rules from https://docs.astral.sh/ruff/rules/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.5
+    rev: v0.16.6
     hooks:
       - id: ruff
         args:
