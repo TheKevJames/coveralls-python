@@ -173,7 +173,7 @@ repos:
         entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
         language: python
         additional_dependencies:
-          - poetry==2.4.2
+          - poetry==2.4.3
         pass_filenames: true
         files: 'pyproject\.toml$'
       - id: pyproject-no-unpinned-git-deps
