@@ -8,7 +8,7 @@ from typing import Annotated
 from typing import Any
 
 import typer
-from typer._click.exceptions import Abort
+from typer import Abort
 from typer._click.exceptions import ClickException
 from typer._click.exceptions import UsageError
 
