@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 import coveralls.cli
-from tests.cli.conftest import coveralls_kwargs
+from tests.cli import conftest
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
@@ -28,7 +28,7 @@ def test_debug_no_token(
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-@mock.patch('coveralls.cli.Coveralls')
+@mock.patch('coveralls.api.Coveralls')
 def test_debug_accepts_options_after_subcommand(
     mock_coveralls: mock.MagicMock,
 ) -> None:
@@ -36,7 +36,7 @@ def test_debug_accepts_options_after_subcommand(
     # (a long-standing, load-bearing invocation for debug).
     coveralls.cli.main(argv=['debug', '--rcfile=coveragerc', '--host=h'])
     mock_coveralls.assert_called_with(
-        False, **coveralls_kwargs(rcfile='coveragerc', host='h')
+        False, **conftest.coveralls_kwargs(rcfile='coveragerc', host='h')
     )
 
 

@@ -2,11 +2,10 @@ import json
 import pathlib
 import subprocess
 import unittest.mock
-from typing import Any
 
 import pytest
 
-from coveralls import Coveralls
+import coveralls
 
 BASE_DIR = pathlib.Path(__file__).parents[2]
 NONUNICODE_DIR = BASE_DIR / 'nonunicode'
@@ -20,7 +19,9 @@ class TestEncoding:
             ['coverage', 'run', 'nonunicode.py'], cwd=NONUNICODE_DIR
         )
 
-        actual_json = json.dumps(Coveralls(repo_token='xxx').get_coverage())
+        actual_json = json.dumps(
+            coveralls.Coveralls(repo_token='xxx').get_coverage()
+        )
         expected_json_part = (
             '"source": "# coding: iso-8859-15\\n\\n'
             'def hello():\\n'
@@ -37,7 +38,7 @@ class TestEncoding:
             ['coverage', 'run', 'malformed.py'], cwd=NONUNICODE_DIR
         )
 
-        result = Coveralls(repo_token='xxx').get_coverage()
+        result = coveralls.Coveralls(repo_token='xxx').get_coverage()
         assert len(result) == 1
 
         assert result[0]['coverage'] == [None, None, 1, 0]
@@ -61,7 +62,7 @@ class TestEncoding:
 
         original_json_dumps = json.dumps
 
-        def mock_json_dumps(value: Any) -> str:
+        def mock_json_dumps(value: object) -> str:
             if value == 'def foo():\n    return "foo"\n':
                 raise UnicodeDecodeError('utf8', b'', 0, 1, 'bad data')
 
@@ -73,6 +74,6 @@ class TestEncoding:
             ),
             unittest.mock.patch('coveralls.api.log') as mock_log,
         ):
-            Coveralls.debug_bad_encoding(data)
+            coveralls.Coveralls.debug_bad_encoding(data)
             mock_log.error.assert_called()
             assert mock_log.error.call_args_list[0][0][1] == 'bad_file.py'

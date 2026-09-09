@@ -14,7 +14,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Software Development :: Testing",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
@@ -41,62 +40,17 @@ yaml = ["pyyaml (>=3.10,<7.0)"]
 
 [dependency-groups]
 dev = [
-    "pytest ==9.1.1",
-    "responses ==0.26.3"
+    "flake8-broken-line==1.0.0",
+    "flake8-complicated-walrus==2.1.0",
+    "flake8-import-restrictions==2.1",
+    "flake8-requirements==2.3.0",
+    "flake8==7.3.0",
+    "pylint==4.0.8",
+    "pytest==9.1.1",
+    "responses==0.26.3",
+    "types-pyyaml==6.0.12.20260906",
 ]
 docs = ["sphinx ==9.1.0; python_version >='3.12'"]
-
-[tool.poetry]
-packages = [
-    { include = "coveralls" },
-]
-
-[tool.pytest.ini_options]
-# addopts = "-Werror"
-filterwarnings = [
-    "error",
-    # co_lnotab deprection on py3.12+ is fixed in coverage v7.1
-    "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
-]
-
-[tool.tox]
-env_list = [
-    { product = [["py310", "py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
-]
-
-[tool.tox.env_run_base]
-pass_env = ["*"]
-use_develop = true
-# TODO: integrate renovate support
-# https://github.com/renovatebot/renovate/pull/43975
-deps = [
-    "responses==0.26.2",
-    "pytest==9.1.1",
-    { replace = "if", condition = "factor.pyyaml", then = ["PyYAML>=3.10,<7.0"], extend = true },
-    { replace = "if", condition = "factor.cov6", then = ["coverage[toml]>=6.0,<7.0"], extend = true },
-    { replace = "if", condition = "factor.cov7", then = ["coverage[toml]>=7.0,<8.0"], extend = true },
-]
-commands = [
-    ["coverage", "run", "--branch", "--source=coveralls", "-m", "pytest", "tests/"],
-    ["coverage", "report", "-m"],
-]
-
-[tool.tox.env.upload]
-deps = ["coverage[toml]>=7.0,<8.0"]
-commands = [["coveralls", "--verbose"]]
-
-[tool.tox.gh-actions]
-python = """
-3.10: py310, upload
-3.11: py311, upload
-3.12: py312, upload
-3.13: py313, upload
-3.14: py314, upload
-"""
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.git-cliff.changelog]
 body = """
@@ -154,3 +108,62 @@ topo_order = false
 topo_order_commits = true
 sort_commits = "oldest"
 recurse_submodules = false
+
+[tool.pytest.ini_options]
+# addopts = "-Werror"
+filterwarnings = [
+    "error",
+    # co_lnotab deprection on py3.12+ is fixed in coverage v7.1
+    "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
+]
+
+[tool.tox]
+env_list = [
+    { product = [["py310", "py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
+]
+
+[tool.tox.env_run_base]
+pass_env = ["*"]
+use_develop = true
+# TODO: integrate renovate support
+# https://github.com/renovatebot/renovate/pull/43975
+deps = [
+    "responses==0.26.2",
+    "pytest==9.1.1",
+    { replace = "if", condition = "factor.pyyaml", then = ["PyYAML>=3.10,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov6", then = ["coverage[toml]>=6.0,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov7", then = ["coverage[toml]>=7.0,<8.0"], extend = true },
+]
+commands = [
+    ["coverage", "run", "--branch", "--source=coveralls", "-m", "pytest", "tests/"],
+    ["coverage", "report", "-m"],
+]
+
+[tool.tox.env.upload]
+deps = ["coverage[toml]>=7.0,<8.0"]
+commands = [["coveralls", "--verbose"]]
+
+[tool.tox.gh-actions]
+python = """
+3.10: py310, upload
+3.11: py311, upload
+3.12: py312, upload
+3.13: py313, upload
+3.14: py314, upload
+"""
+
+[tool.ty.src]
+exclude = ["example/", "nonunicode/", "tests/data/"]
+
+[tool.ty.rules]
+dynamic-function-decorator-return = "error"
+missing-type-argument = "error"
+possibly-unresolved-reference = "warn"
+unsound-return-statement = "error"
+
+[tool.uv.build-backend]
+module-root = ""
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"

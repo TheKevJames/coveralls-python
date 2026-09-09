@@ -1,13 +1,12 @@
-ci:
-    autofix_commit_msg: 'refactor(lint): apply automatic lint fixes'
-    autoupdate_commit_msg: 'chore(deps): bump pre-commit linter versions'
-
 default_install_hook_types:
   - commit-msg
+  - post-checkout
+  - post-merge
+  - post-rewrite
   - pre-commit
 
 default_language_version:
-    python: python3.10
+  python: python3.10
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
@@ -18,6 +17,11 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: remove-crlf
+      - id: remove-tabs
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -44,13 +48,21 @@ repos:
       - id: check-docstring-first
       - id: name-tests-test
         exclude: tests/data/.*
-      - id: requirements-txt-fixer
-  - repo: https://github.com/PyCQA/pylint
-    rev: v4.0.8
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.79
+    hooks:
+      - id: ty
+        exclude: '^(example|nonunicode|tests/data)/'
+  - repo: local
     hooks:
       - id: pylint
+        name: pylint
+        entry: uv run --frozen pylint
+        language: system
+        types: [python]
+        require_serial: true
         args:
-          - --max-line-length=99
+          - --max-line-length=79
           - --max-module-lines=500
           - --max-positional-arguments=10
           - --max-args=10
@@ -58,7 +70,6 @@ repos:
           - -d broad-except
           - -d duplicate-code
           - -d fixme
-          - -d import-error
           - -d invalid-name
           - -d locally-disabled
           - -d missing-docstring
@@ -66,59 +77,30 @@ repos:
           - -d try-except-raise
           - -d ungrouped-imports  # conflicts with ruff isort
           - -d wrong-import-order  # conflicts with ruff isort
-        exclude: nonunicode/.*
-  - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.6
-    hooks:
-      - id: remove-crlf
-      - id: remove-tabs
-        exclude: 'Makefile'
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
-    hooks:
-      - id: mypy
-        require_serial: True
-        language: python
-        # N.B. mypy requires an installed version of whatever third-party
-        # library it is asked to check against. In practice, that means
-        # whenever we see an error telling us to do so, we should add the
-        # relevant library to `additional_dependencies`.
-        # Note that some libraries keep their type hints in packages named
-        # `types-$lib` or `$lib-stubs`.
-        additional_dependencies:
-          - coverage==7.16.0
-          - pytest==9.1.1
-          - responses==0.26.3
-          - types-pyyaml==6.0.12.20260815
-          - types-requests==2.33.0.20260712
-          - typer==0.27.2
-        args:
-          - --show-error-codes
-          - --strict
-          - --strict-equality
-          - --warn-unreachable
-        exclude: '^(example|nonunicode|tests/data)/'
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
-    hooks:
+        exclude: '^(example|nonunicode)/'
       - id: flake8
-        language: python
-        additional_dependencies:
-          - flake8-broken-line==1.0.0
-          - flake8-complicated-walrus==2.1.0
-          - flake8-import-restrictions==2.1
+        name: flake8
+        entry: uv run --frozen flake8
+        language: system
+        types: [python]
+        require_serial: true
         args:
-          # https://www.flake8rules.com/
-          # Restrict flake8 to plugins with no ruff equivalent; core
-          # pyflakes/pycodestyle (E/W/F) are handled by ruff.
-          # FCW: flake8-complicated-walrus
-          # IMR: flake8-import-restrictions
-          # N400: flake8-broken-line
-          # IMR200: Imports should only happen on module level, not locally. Covered by pylint.
-          # IMR241: When using 'from', import submodules not elements.
-          - --select=FCW,IMR,N400
-          - --ignore=IMR200,IMR241
-  # TODO: use ruff once more refurb ruloes are out of preview
+          - --select=FCW,I90,IMR,N400
+          - --ignore=IMR200
+          - --per-file-ignores=tests/*:I900
+          - --imr241_exclude=typing,collections.abc
+        exclude: '^(example|nonunicode)/'
+      - id: disallow-untyped-imports
+        name: disallow-untyped-imports
+        entry: bash -c
+        language: system
+        pass_filenames: false
+        require_serial: true
+        types: [python]
+        # Allowlist packages below which are known to have no third-party typestubs.
+        args:
+          - uvx mypy . --python-executable .venv/bin/python --follow-imports=skip --no-error-summary --no-color-output 2>&1 | grep -E '\[import-untyped\]' | grep -vE '"(some_legacy_pkg)"' | { ! grep .; }
+  # TODO: use ruff once more refurb rules are out of preview
   - repo: https://github.com/dosisod/refurb
     rev: v2.3.1
     hooks:
@@ -126,23 +108,26 @@ repos:
         args:
           - --python-version
           - '3.10'
+          - --
+          - --scripts-are-modules
   # TODO: add more rules from https://docs.astral.sh/ruff/rules/
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.6
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
           - --fix
           - --target-version
           - py310
           - --select
-          - A,C4,C901,D,E,F,G010,I,RUF006,RUF100,S307,T10,TRY,UP,W,YTT
+          - A,ANN,C4,C901,D,E,F,G010,I,PYI,RUF006,RUF100,S307,T10,TRY,UP,W,YTT
+          - --preview
           - --config
           - lint.mccabe.max-complexity = 10
           # Codes owned by flake8 plugins with no ruff equivalent; keeps
           # RUF100 from stripping their noqa directives.
           - --config
-          - lint.external = ['N400', 'FCW', 'IMR']
+          - lint.external = ['FCW', 'I90', 'IMR', 'N400']
           - --config
           - lint.isort.force-single-line = true
           # D1,D203,D205,D212,D400,D401,D404,D407,D412,D413: pydocstyle opinions.
@@ -152,7 +137,7 @@ repos:
           # TRY301: Abstract raise to an inner function.
           - --ignore
           - D1,D203,D205,D212,D400,D401,D404,D407,D412,D413,E501,E741,TRY003,TRY301
-        exclude: nonunicode/.*
+        exclude: '^(example|nonunicode|tests/data)/'
       - id: ruff-format
         args:
           - --config
@@ -164,23 +149,34 @@ repos:
           # Silence the isort/formatter magic-comma incompatibility warning.
           - --config
           - lint.isort.split-on-trailing-comma = false
-        exclude: nonunicode/.*
+        exclude: '^(example|nonunicode|tests/data)/'
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.12.11
+    hooks:
+      - id: uv-audit
+      - id: uv-lock
+      - id: uv-sync
+  - repo: https://github.com/henryiii/validate-pyproject-schema-store
+    rev: 2026.09.08
+    hooks:
+      - id: validate-pyproject
   - repo: local
     hooks:
-      - id: poetry-check
-        name: check pyproject.toml validity
-        description: 'Validate the structure of the pyproject.toml file'
-        entry: bash -c 'set -e; for toml in "$@"; do pushd ./${toml%pyproject.toml}; poetry check; popd; done' --
-        language: python
-        additional_dependencies:
-          - poetry==2.4.3
-        pass_filenames: true
-        files: 'pyproject\.toml$'
       - id: pyproject-no-unpinned-git-deps
         name: disallow git dependencies without rev/tag
-        description: 'Disallow Poetry/PDM git dependencies unless they are pinned with a rev or tag on the same line'
+        description: 'Disallow `[tool.uv.sources]` git dependencies unless they are pinned with a rev or tag on the same line'
         # Flags lines that contain `git = "..."` but do NOT also contain `rev =` or `tag =`.
         entry: '^(?!\s*#)(?=[^#]*\bgit\s*=\s*"[^"]+")(?![^#]*\b(?:rev|tag)\s*=).*$'
+        language: pygrep
+        types: [toml]
+        files: 'pyproject\.toml$'
+      - id: pyproject-no-unpinned-git-url-deps
+        name: disallow unpinned PEP 508 git URLs
+        description: 'Disallow `pkg @ git+<url>` direct references without an @<rev> pin'
+        # A pinned direct reference ends the git+ URL with `@<rev>`. This does
+        # not detect refs embedded in ssh URLs (`git+ssh://git@host/...`);
+        # prefer https direct references so the pin is unambiguous.
+        entry: '^(?!\s*#)(?=[^#]*git\+)(?![^#]*git\+[^\s"'',]+@[^\s"'',@/]+).*$'
         language: pygrep
         types: [toml]
         files: 'pyproject\.toml$'
@@ -190,15 +186,6 @@ repos:
         entry: '@pytest\.fixture( |\n|(\(\)))'
         language: pygrep
         types: [python]
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
-    hooks:
-      - id: python-use-type-annotations
-
-# rst
-      - id: rst-backticks
-      - id: rst-directive-colons
-      - id: rst-inline-touching-normal
 
 # json
   - repo: https://github.com/python-jsonschema/check-jsonschema
@@ -211,6 +198,14 @@ repos:
         additional_dependencies:
           - pyjson5==2.0.1
 
+# rst
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
+
 # docker
   - repo: https://github.com/AleksaC/hadolint-py
     rev: v2.15.1
@@ -218,43 +213,3 @@ repos:
       - id: hadolint
         args:
           - --ignore=DL3025
-
-# java
-  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.16.0
-    hooks:
-      - id: pretty-format-java
-        args: [--autofix]
-
-# kotlin
-      - id: pretty-format-kotlin
-        args: [--autofix]
-
-# terraform
-  - repo: https://github.com/AleksaC/terraform-py
-    rev: v1.16.2
-    hooks:
-      - id: tf-validate
-  - repo: https://github.com/AleksaC/tffumpt
-    rev: v0.1.1
-    hooks:
-      - id: tffumpt
-  - repo: https://github.com/AleksaC/tflint-py
-    rev: v0.64.0
-    hooks:
-      - id: tflint
-
-# shell
-  - repo: https://github.com/openstack/bashate
-    rev: 2.1.1
-    hooks:
-      - id: bashate
-        args: [--max-line-length=80]
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.11.0.1-1
-    hooks:
-      - id: shellcheck
-  - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 3.0.0
-    hooks:
-      - id: script-must-not-have-extension

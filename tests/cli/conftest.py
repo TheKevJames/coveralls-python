@@ -6,6 +6,7 @@ from unittest import mock
 
 import pytest
 
+import coveralls.api
 import coveralls.cli
 
 EXC = RuntimeError('bad stuff happened')
@@ -23,10 +24,10 @@ EXAMPLE_DIR = _REPO_ROOT / 'example'
 # instead the baseline tracks the real call site and cannot drift.
 def _forwarded_override_keys() -> frozenset[str]:
     # pylint: disable=protected-access
-    with mock.patch.object(coveralls.cli, 'Coveralls') as fake:
+    with mock.patch.object(coveralls.api, 'Coveralls') as fake:
         coveralls.cli._make_coveralls(token_required=True)
     _, kwargs = fake.call_args
-    return frozenset(kwargs)
+    return frozenset(str(key) for key in kwargs)
 
 
 _FORWARDED_OVERRIDE_KEYS = _forwarded_override_keys()
@@ -42,7 +43,7 @@ def github_finish_env() -> dict[str, str]:
     }
 
 
-def req_json(request: Any) -> Any:
+def req_json(request: Any) -> Any:  # noqa: ANN401
     return json.loads(request.body.decode('utf-8'))
 
 
@@ -61,7 +62,7 @@ def assert_logged_error(caplog: pytest.LogCaptureFixture, msg: str) -> None:
     assert str(record.exc_info[1]) == msg
 
 
-def coveralls_kwargs(**overrides: Any) -> dict[str, Any]:
+def coveralls_kwargs(**overrides: object) -> dict[str, Any]:
     """
     Expected Coveralls() override kwargs: everything unset (None) initially.
 

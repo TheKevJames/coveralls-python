@@ -7,14 +7,13 @@ from typing import Any
 
 import coverage
 import requests
+import requests.adapters
 import urllib3.exceptions
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
+import urllib3.util.retry
 
-from .configuration import Config
-from .configuration import resolve
-from .git import git_info
-from .reporter import CoverallReporter
+from . import configuration
+from . import git
+from . import reporter
 
 log = logging.getLogger('coveralls.api')
 
@@ -46,7 +45,7 @@ def _build_session(retries: int) -> requests.Session:
     # a requests Timeout. Mirror requests' own default (Retry(0, read=False))
     # so the no-retry path still surfaces read timeouts as TimeoutError.
     read = retries or False
-    retry = Retry(
+    retry = urllib3.util.retry.Retry(
         total=retries,
         connect=retries,
         read=read,
@@ -65,7 +64,7 @@ def _build_session(retries: int) -> requests.Session:
         respect_retry_after_header=False,
         raise_on_status=False,
     )
-    adapter = HTTPAdapter(max_retries=retry)
+    adapter = requests.adapters.HTTPAdapter(max_retries=retry)
     session = requests.Session()
     session.mount('http://', adapter)
     session.mount('https://', adapter)
@@ -88,7 +87,7 @@ def _caused_by_timeout(exc: requests.exceptions.RequestException) -> bool:
 
 
 class Coveralls:
-    def __init__(self, token_required: bool = True, **kwargs: Any) -> None:
+    def __init__(self, token_required: bool = True, **kwargs: object) -> None:
         """
         Initialize the main Coveralls collection entrypoint.
 
@@ -110,7 +109,9 @@ class Coveralls:
         """
         self._data: dict[str, Any] | None = None
 
-        self.config: Config = resolve(kwargs, token_required=token_required)
+        self.config: configuration.Config = configuration.resolve(
+            kwargs, token_required=token_required
+        )
 
         self.config.ensure_token()
 
@@ -124,7 +125,11 @@ class Coveralls:
             return {}
         return self.submit_report(json_string)
 
-    def _post(self, endpoint: str, **kwargs: Any) -> requests.Response:
+    def _post(
+        self,
+        endpoint: str,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> requests.Response:
         """
         POST to a coveralls endpoint, retrying transient failures.
 
@@ -272,17 +277,18 @@ class Coveralls:
         if self._data:
             return self._data
 
-        self._data = {'source_files': self.get_coverage()} | git_info()
-        self._data.update(self.config.to_payload())
-        if extra:
+        source_files = self.get_coverage()
+        if extra is not None:
             if 'source_files' in extra:
-                self._data['source_files'].extend(extra['source_files'])
+                source_files.extend(extra['source_files'])
             else:
                 log.warning(
                     'No data to be merged; does the json file contain '
                     '"source_files" data?'
                 )
 
+        self._data = {'source_files': source_files} | git.git_info()
+        self._data.update(self.config.to_payload())
         return self._data
 
     def get_coverage(self) -> list[dict[str, Any]]:
@@ -290,7 +296,7 @@ class Coveralls:
         work.load()
         work.get_data()
 
-        return CoverallReporter(
+        return reporter.CoverallReporter(
             work, self.config.base_dir, self.config.src_dir
         ).coverage
 

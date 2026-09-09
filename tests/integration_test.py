@@ -6,7 +6,7 @@ import unittest.mock
 
 import pytest
 
-from coveralls import Coveralls
+import coveralls
 
 COVERAGE_CODE_STANZA = """
 import sys
@@ -48,7 +48,7 @@ class TestIntegration:
             [sys.executable, '-m', 'coverage', 'run', str(test_file)]
         )
 
-        coverallz = Coveralls(repo_token='xxx')
+        coverallz = coveralls.Coveralls(repo_token='xxx')
         report = coverallz.create_data()
         coverallz.create_report()  # This is purely for coverage
 

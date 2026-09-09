@@ -19,7 +19,7 @@ def _parse_pr_number(value: str | None) -> str | None:
     All CI loaders that read a PR value share this single semantic.
     """
     matches = NUMBER_REGEX.findall(value or '')
-    return matches[-1] if matches else None
+    return str(matches[-1]) if matches else None
 
 
 def _from_generic_ci_environment() -> dict[str, Any]:

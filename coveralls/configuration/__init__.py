@@ -1,15 +1,12 @@
 from collections.abc import Mapping
 from typing import Any
 
-from .ci import TOKENLESS_CI_SERVICES
-from .ci import _detect_ci
-from .ci import _from_ci_environment
-from .environment import _from_environment
-from .files import _from_files
-from .helpers import Config
-from .helpers import _canonicalize_keys
-from .helpers import _filter_known
-from .helpers import default_run_at
+from . import ci
+from . import environment
+from . import files
+from . import helpers
+
+Config = helpers.Config
 
 __all__ = ['Config', 'resolve']
 
@@ -33,17 +30,18 @@ def resolve(
     that authenticates uploads itself. A ``token_required`` key in the config
     file or environment is therefore ignored.
     """
-    overrides = _canonicalize_keys(overrides, source='arguments')
-    cleaned = _filter_known(
+    # pylint: disable=protected-access
+    overrides = helpers._canonicalize_keys(overrides, source='arguments')
+    cleaned = helpers._filter_known(
         {key: value for key, value in overrides.items() if value is not None},
         source='arguments',
     )
-    name, fields = _detect_ci()
+    name, fields = ci._detect_ci()
 
     partials = [
-        _from_ci_environment(name, fields),
-        _from_environment(),
-        _from_files(),
+        ci._from_ci_environment(name, fields),
+        environment._from_environment(),
+        files._from_files(),
         cleaned,
     ]
 
@@ -51,12 +49,12 @@ def resolve(
     for part in partials:
         merged.update(part)
     merged['token_required'] = (
-        token_required and name not in TOKENLESS_CI_SERVICES
+        token_required and name not in ci.TOKENLESS_CI_SERVICES
     )
     # run_at is optional to the API (it timestamps on receipt when absent), but
     # the official reporter always sends one: default to now when no source set
     # it, matching coverallsapp/coverage-reporter's COVERALLS_RUN_AT-or-now.
-    merged.setdefault('run_at', default_run_at())
+    merged.setdefault('run_at', helpers.default_run_at())
     # Coerce the boolean flags: a config file may carry a non-bool (e.g. a
     # quoted ``parallel: "yes"``), which must not reach the API or a client
     # toggle as a stray string.
@@ -64,4 +62,4 @@ def resolve(
         if flag in merged:
             merged[flag] = bool(merged[flag])
 
-    return Config(**merged)
+    return helpers.Config(**merged)

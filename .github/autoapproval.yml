@@ -3,7 +3,8 @@ from_owner:
   - renovate[bot]
 
 required_labels: []
-apply_labels: []
+apply_labels:
+  - automerge
 blacklisted_labels:
   - blocked
   - in-progress

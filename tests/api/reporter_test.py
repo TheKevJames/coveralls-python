@@ -8,7 +8,7 @@ from typing import Any
 import pytest
 import responses
 
-from coveralls import Coveralls
+import coveralls
 
 BASE_DIR = pathlib.Path(__file__).parents[2]
 EXAMPLE_DIR = BASE_DIR / 'example'
@@ -103,7 +103,7 @@ class TestReporter:
             ['coverage', 'run', '--omit=**/.tox/*', 'runtests.py'],
             cwd=EXAMPLE_DIR,
         )
-        results = Coveralls(repo_token='xxx').get_coverage()
+        results = coveralls.Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results()
@@ -120,7 +120,7 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(repo_token='xxx').get_coverage()
+        results = coveralls.Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results(name_prefix='example/')
@@ -137,7 +137,7 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(
+        results = coveralls.Coveralls(
             repo_token='xxx', base_dir='example'
         ).get_coverage()
         assert len(results) == 2
@@ -156,7 +156,7 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(
+        results = coveralls.Coveralls(
             repo_token='xxx', base_dir='example/'
         ).get_coverage()
         assert len(results) == 2
@@ -175,7 +175,9 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(repo_token='xxx', src_dir='src').get_coverage()
+        results = coveralls.Coveralls(
+            repo_token='xxx', src_dir='src'
+        ).get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results(name_prefix='src/example/')
@@ -192,7 +194,9 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(repo_token='xxx', src_dir='src/').get_coverage()
+        results = coveralls.Coveralls(
+            repo_token='xxx', src_dir='src/'
+        ).get_coverage()
         assert len(results) == 2
 
         expected_results = self.make_test_results(name_prefix='src/example/')
@@ -209,7 +213,7 @@ class TestReporter:
 
         # without base_dir arg, file name is prefixed with 'example/'
         monkeypatch.chdir(BASE_DIR)
-        results = Coveralls(
+        results = coveralls.Coveralls(
             repo_token='xxx', base_dir='example', src_dir='src'
         ).get_coverage()
         assert len(results) == 2
@@ -223,7 +227,7 @@ class TestReporter:
             ['coverage', 'run', '--branch', '--omit=**/.tox/*', 'runtests.py'],
             cwd=EXAMPLE_DIR,
         )
-        results = Coveralls(repo_token='xxx').get_coverage()
+        results = coveralls.Coveralls(repo_token='xxx').get_coverage()
         assert len(results) == 2
 
         # Branches are expressed as four values each in a flat list
@@ -246,7 +250,7 @@ class TestReporter:
             pathlib.Path('extra.py').unlink()
 
         with pytest.raises(RuntimeError, match='No source for code'):
-            Coveralls(repo_token='xxx').get_coverage()
+            coveralls.Coveralls(repo_token='xxx').get_coverage()
 
     def test_not_python(self) -> None:
         pathlib.Path('extra.py').write_text(
@@ -261,7 +265,7 @@ class TestReporter:
         )
 
         with pytest.raises(RuntimeError, match=r"Couldn't parse .* as Python"):
-            Coveralls(repo_token='xxx').get_coverage()
+            coveralls.Coveralls(repo_token='xxx').get_coverage()
 
     @responses.activate
     def test_submit_report_422_github(self) -> None:
@@ -271,7 +275,9 @@ class TestReporter:
             json={'error': 'nope'},
             status=422,
         )
-        cov = Coveralls(repo_token='test_token', service_name='github')
+        cov = coveralls.Coveralls(
+            repo_token='test_token', service_name='github'
+        )
 
         with unittest.mock.patch('coveralls.api.log.warning') as mock_warn:
             with pytest.raises(RuntimeError):

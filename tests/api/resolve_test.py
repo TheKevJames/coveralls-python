@@ -2,7 +2,6 @@ import logging
 import os
 import pathlib
 import unittest.mock
-from typing import Any
 
 import pytest
 
@@ -11,14 +10,15 @@ try:
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
-from coveralls.configuration import Config
-from coveralls.configuration import resolve
+from coveralls import configuration
 
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
 
-def resolve_config(*, token_required: bool = True, **overrides: Any) -> Config:
-    return resolve(overrides, token_required=token_required)
+def resolve_config(
+    *, token_required: bool = True, **overrides: object
+) -> configuration.Config:
+    return configuration.resolve(overrides, token_required=token_required)
 
 
 @unittest.mock.patch.dict(
@@ -99,7 +99,7 @@ def test_config_file_cannot_waive_token_required(
     (tmp_path / '.coveralls.yml').write_text(
         'token_required: false\n', encoding='utf-8'
     )
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.token_required
 
 
@@ -126,7 +126,7 @@ def test_file_source_and_unknown_key_warning(
         encoding='utf-8',
     )
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
 
     assert config.repo_token == 'xxx'
     assert config.service_name == 'jenkins'
@@ -148,7 +148,7 @@ def test_bool_flags_are_coerced_from_config_file(
         'repo_token: xxx\nparallel: "yes"\nskip_ssl_verify: "1"\n',
         encoding='utf-8',
     )
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.parallel is True
     assert config.skip_ssl_verify
 
@@ -180,13 +180,13 @@ def test_file_source_without_yaml_warns(
         'repo_token: xxx\n', encoding='utf-8'
     )
     with caplog.at_level(logging.WARNING):
-        resolve({})
+        configuration.resolve({})
     assert 'PyYAML is not installed' in caplog.text
     assert '.coveralls.yml' in caplog.text
 
 
 def test_resolve_returns_config_instance() -> None:
-    assert isinstance(resolve_config(), Config)
+    assert isinstance(resolve_config(), configuration.Config)
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
@@ -235,7 +235,7 @@ def test_empty_config_file_is_ignored(
     # treat that as no config rather than crashing on a None update.
     (tmp_path / '.coveralls.yml').write_text(content, encoding='utf-8')
 
-    config = resolve({})
+    config = configuration.resolve({})
 
     assert config.service_name == 'coveralls-python'
     assert config.repo_token is None
@@ -249,7 +249,7 @@ def test_none_rcfile_override_keeps_file_value(tmp_path: pathlib.Path) -> None:
     (tmp_path / '.coveralls.yml').write_text(
         'repo_token: xxx\nconfig_file: from_yaml.rc\n', encoding='utf-8'
     )
-    config = resolve({'rcfile': None})
+    config = configuration.resolve({'rcfile': None})
     assert config.rcfile == 'from_yaml.rc'
 
 
@@ -265,7 +265,7 @@ def test_alias_and_deprecated_file_keys_still_work(
         encoding='utf-8',
     )
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
 
     assert config.host == 'https://old.example.com'
     assert config.rcfile == 'custom.rc'

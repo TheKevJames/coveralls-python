@@ -7,7 +7,6 @@ import unittest.mock
 import pytest
 
 import coveralls.git
-from coveralls.git import run_command
 
 GIT_COMMIT_MSG = 'first commit'
 GIT_EMAIL = 'me@here.com'
@@ -18,7 +17,7 @@ GIT_URL = 'https://github.com/username/Hello-World.git'
 
 def in_git_dir() -> bool:
     try:
-        run_command('git', 'rev-parse')
+        coveralls.git.run_command('git', 'rev-parse')
     except Exception:
         return False
 

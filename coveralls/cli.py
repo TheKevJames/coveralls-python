@@ -8,11 +8,9 @@ from typing import Annotated
 from typing import Any
 
 import typer
-from typer import Abort
-from typer._click.exceptions import ClickException
-from typer._click.exceptions import UsageError
+from typer._click import exceptions
 
-from .api import Coveralls
+from . import api
 
 log = logging.getLogger('coveralls')
 # One template for every "X is deprecated, use Y" warning so the deprecated
@@ -91,7 +89,7 @@ def _make_coveralls(
     connect_timeout: float | None = None,
     read_timeout: float | None = None,
     retries: int | None = None,
-) -> Coveralls:
+) -> api.Coveralls:
     # pylint: disable=too-many-arguments,too-many-locals
     # Modifiers not exposed by a command default to None; resolve() drops unset
     # ones so nothing clobbers env/config. An explicit value (incl. a False
@@ -118,10 +116,10 @@ def _make_coveralls(
         'read_timeout': read_timeout,
         'retries': retries,
     }
-    return Coveralls(token_required, **overrides)
+    return api.Coveralls(token_required, **overrides)
 
 
-def _action_submit(coverallz: Coveralls, merge: str | None) -> None:
+def _action_submit(coverallz: api.Coveralls, merge: str | None) -> None:
     if merge:
         coverallz.merge(merge)
     log.info('Submitting coverage to coveralls.io...')
@@ -133,7 +131,9 @@ def _action_submit(coverallz: Coveralls, merge: str | None) -> None:
         log.info(result.get('url'))
 
 
-def _action_save(coverallz: Coveralls, merge: str | None, path: str) -> None:
+def _action_save(
+    coverallz: api.Coveralls, merge: str | None, path: str
+) -> None:
     if merge:
         coverallz.merge(merge)
     log.info('Write coverage report to file...')
@@ -144,7 +144,7 @@ def _action_save(coverallz: Coveralls, merge: str | None, path: str) -> None:
 # but the old flat CLI ran it before every action, so the deprecated
 # --submit/--finish paths pass it for identical dispatch.
 def _action_upload(
-    coverallz: Coveralls, path: str, merge: str | None = None
+    coverallz: api.Coveralls, path: str, merge: str | None = None
 ) -> None:
     if merge:
         coverallz.merge(merge)
@@ -152,7 +152,7 @@ def _action_upload(
     coverallz.submit_report(report)
 
 
-def _action_finish(coverallz: Coveralls, merge: str | None = None) -> None:
+def _action_finish(coverallz: api.Coveralls, merge: str | None = None) -> None:
     if merge:
         coverallz.merge(merge)
     log.info('Finishing parallel jobs...')
@@ -160,7 +160,7 @@ def _action_finish(coverallz: Coveralls, merge: str | None = None) -> None:
     log.info('Done')
 
 
-def _action_debug(coverallz: Coveralls, merge: str | None) -> None:
+def _action_debug(coverallz: api.Coveralls, merge: str | None) -> None:
     if merge:
         coverallz.merge(merge)
     log.info('Testing coveralls-python...')
@@ -381,7 +381,7 @@ def with_options(
             )
             func.__annotations__[name] = annotation
         new_signature = sig.replace(parameters=params)
-        func.__signature__ = new_signature  # type: ignore[attr-defined]
+        func.__signature__ = new_signature  # ty: ignore[unresolved-attribute]
         return func
 
     return decorate
@@ -396,7 +396,7 @@ def coveralls(
     submit: _Submit = None,
     finish_flag: _Finish = False,
     version: _Version = None,
-    **opts: Any,
+    **opts: Any,  # noqa: ANN401
 ) -> None:
     """Collect coverage and submit it to coveralls.io."""
     _ = version
@@ -416,7 +416,7 @@ def coveralls(
     # configures its own logging, so there is nothing else to do here.
     if ctx.invoked_subcommand is not None:
         if verb_flags:
-            raise UsageError(
+            raise exceptions.UsageError(
                 f'{verb_flags[0]} cannot be combined with the '
                 f'{ctx.invoked_subcommand!r} command.'
             )
@@ -424,7 +424,7 @@ def coveralls(
 
     _configure_logging(verbose=verbose)
     if len(verb_flags) > 1:
-        raise UsageError(
+        raise exceptions.UsageError(
             f'{verb_flags[0]} cannot be combined with {verb_flags[1]}.'
         )
 
@@ -451,7 +451,9 @@ def coveralls(
 @app.command()
 @with_options(HTTP_OPTIONS)
 def finish(
-    verbose: _Verbose = False, carryforward: _Carryforward = None, **opts: Any
+    verbose: _Verbose = False,
+    carryforward: _Carryforward = None,
+    **opts: Any,  # noqa: ANN401
 ) -> None:
     """Notify coveralls.io that all parallel jobs are done."""
     _configure_logging(verbose=verbose)
@@ -463,7 +465,11 @@ def finish(
 
 @app.command()
 @with_options(HTTP_OPTIONS)
-def upload(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
+def upload(
+    file: _File,
+    verbose: _Verbose = False,
+    **opts: Any,  # noqa: ANN401
+) -> None:
     """Upload a previously generated coverage report FILE."""
     _configure_logging(verbose=verbose)
     coverallz = _make_coveralls(token_required=True, **opts)
@@ -472,7 +478,11 @@ def upload(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
 
 @app.command()
 @with_options(COLLECTION_OPTIONS, HTTP_OPTIONS)
-def save(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
+def save(
+    file: _File,
+    verbose: _Verbose = False,
+    **opts: Any,  # noqa: ANN401
+) -> None:
     """Build the coverage report and write it to FILE without sending it."""
     _configure_logging(verbose=verbose)
     # --parallel is accepted although nothing is sent: it is baked into the
@@ -484,7 +494,7 @@ def save(file: _File, verbose: _Verbose = False, **opts: Any) -> None:
 
 @app.command(help=DEBUG_HELP)
 @with_options(COLLECTION_OPTIONS, HTTP_OPTIONS)
-def debug(**opts: Any) -> None:
+def debug(**opts: Any) -> None:  # noqa: ANN401
     # debug always forces verbose and sends nothing, so it omits its own
     # (always-on, thus meaningless) --verbose flag.
     _configure_logging(verbose=True)
@@ -497,10 +507,10 @@ def main(argv: list[str] | None = None) -> None:
     try:
         command = typer.main.get_command(app)
         command.main(args=argv, prog_name='coveralls', standalone_mode=False)
-    except ClickException as e:
+    except exceptions.ClickException as e:
         e.show()
         raise SystemExit(e.exit_code) from e
-    except Abort:
+    except typer.Abort:
         log.info('Aborted')
     except Exception as e:
         log.exception('Error running coveralls')

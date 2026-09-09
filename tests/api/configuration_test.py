@@ -9,7 +9,7 @@ try:
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
-from coveralls import Coveralls
+import coveralls
 
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
@@ -25,7 +25,7 @@ class TestConfigIntegration:
             'repo_token: xxx\nservice_name: jenkins\n', encoding='utf-8'
         )
 
-        cover = Coveralls()
+        cover = coveralls.Coveralls()
 
         assert cover.config.service_name == 'jenkins'
         assert cover.config.repo_token == 'xxx'
@@ -42,7 +42,7 @@ class TestConfigIntegration:
         clear=True,
     )
     def test_reads_environment(self) -> None:
-        cover = Coveralls()
+        cover = coveralls.Coveralls()
 
         assert cover.config.host == 'https://enterprise.example.com'
         assert cover.config.parallel is True
@@ -51,7 +51,7 @@ class TestConfigIntegration:
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_overrides_win(self) -> None:
-        cover = Coveralls(
+        cover = coveralls.Coveralls(
             repo_token='yyy',
             service_name='coveralls-aaa',
             host='https://coveralls.aaa.com',
@@ -68,7 +68,7 @@ class TestConfigIntegration:
     )
     def test_invalid_timeout_raises_on_construction(self) -> None:
         with pytest.raises(ValueError, match='must be a number'):
-            Coveralls()
+            coveralls.Coveralls()
 
 
 class TestEnsureToken:
@@ -82,21 +82,21 @@ class TestEnsureToken:
         clear=True,
     )
     def test_repo_token_from_env(self) -> None:
-        cover = Coveralls()
+        cover = coveralls.Coveralls()
         assert cover.config.service_name == 'travis-ci'
         assert cover.config.service_job_id == '777'
         assert cover.config.repo_token == 'yyy'
 
     @unittest.mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
     def test_travis_needs_no_token(self) -> None:
-        cover = Coveralls()
+        cover = coveralls.Coveralls()
         assert not cover.config.token_required
         assert cover.config.repo_token is None
 
     @unittest.mock.patch.dict(os.environ, {}, clear=True)
     def test_misconfigured(self) -> None:
         with pytest.raises(RuntimeError) as excinfo:
-            Coveralls()
+            coveralls.Coveralls()
 
         assert str(excinfo.value) == (
             'No supported CI found and no repo token configured. You have to '
@@ -109,7 +109,7 @@ class TestEnsureToken:
     )
     def test_misconfigured_github(self) -> None:
         with pytest.raises(RuntimeError) as excinfo:
-            Coveralls()
+            coveralls.Coveralls()
 
         assert str(excinfo.value).startswith(
             'Running on Github Actions but GITHUB_TOKEN is not set.'

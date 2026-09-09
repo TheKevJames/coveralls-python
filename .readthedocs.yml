@@ -6,11 +6,12 @@ build:
     python: "3.12"
   jobs:
     post_create_environment:
-      - pip install poetry
+      - pip install uv
     post_install:
-      # VIRTUAL_ENV needs to be set manually for now.
-      # See https://github.com/readthedocs/readthedocs.org/pull/11152/
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with docs
+      # Point uv at RTD's virtualenv; otherwise `uv sync` provisions its own
+      # `.venv`, which the Sphinx build (run in $READTHEDOCS_VIRTUALENV_PATH)
+      # never sees.
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --group docs
 
 sphinx:
   configuration: docs/conf.py

@@ -26,16 +26,16 @@ stamp the new ``CHANGELOG.md`` section with it and prepend it in place:
 
 .. code-block:: bash
 
-    poetry version (major|minor|patch)
-    git cliff --unreleased --tag "$(poetry version | cut -f2 -d' ')" --prepend CHANGELOG.md
+    uv version --bump (major|minor|patch)
+    git cliff --unreleased --tag "$(uv version --short)" --prepend CHANGELOG.md
     # touch up changelog here, if need be
-    poetry lock --regenerate
-    poetry sync
-    poetry run pytest
+    uv lock
+    uv sync
+    uv run pytest
     git commit -am 'chore(release): bump version'
     git push
-    git tag $(poetry version | cut -f2 -d' ')
-    git push origin $(poetry version | cut -f2 -d' ')
+    git tag $(uv version --short)
+    git push origin $(uv version --short)
 
 Then:
 

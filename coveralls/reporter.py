@@ -3,14 +3,14 @@ import pathlib
 from typing import Any
 
 import coverage
-from coverage.plugin import FileReporter
-from coverage.results import Analysis
+from coverage import plugin
+from coverage import results
 
 try:
     # coverage v7.5+ moved get_analysis_to_report into report_core
-    from coverage.report_core import get_analysis_to_report
+    from coverage import report_core
 except ImportError:
-    from coverage.report import get_analysis_to_report  # type: ignore[attr-defined]
+    from coverage import report as report_core
 
 
 log = logging.getLogger('coveralls.reporter')
@@ -38,7 +38,7 @@ class CoverallReporter:
 
     def report(self, cov: coverage.Coverage) -> None:
         try:
-            for fr, analysis in get_analysis_to_report(cov, None):
+            for fr, analysis in report_core.get_analysis_to_report(cov, None):
                 self.parse_file(fr, analysis)
         except coverage.exceptions.NoDataError:
             return
@@ -46,7 +46,7 @@ class CoverallReporter:
             raise RuntimeError(f'Got coverage library error: {e}') from e
 
     @staticmethod
-    def get_hits(line_num: int, analysis: Analysis) -> int | None:
+    def get_hits(line_num: int, analysis: results.Analysis) -> int | None:
         """
         Source file stats for each line.
 
@@ -65,7 +65,7 @@ class CoverallReporter:
         return 1
 
     @staticmethod
-    def get_arcs(analysis: Analysis) -> list[int]:
+    def get_arcs(analysis: results.Analysis) -> list[int]:
         """
         Hit stats for each branch.
 
@@ -77,7 +77,7 @@ class CoverallReporter:
         """
         has_arcs: bool
         try:
-            has_arcs = analysis.has_arcs()  # type: ignore[operator]
+            has_arcs = analysis.has_arcs()  # ty: ignore[call-non-callable]
         except TypeError:
             # coverage v7.5+
             has_arcs = analysis.has_arcs
@@ -98,7 +98,9 @@ class CoverallReporter:
 
         return branches
 
-    def parse_file(self, cu: FileReporter, analysis: Analysis) -> None:
+    def parse_file(
+        self, cu: plugin.FileReporter, analysis: results.Analysis
+    ) -> None:
         """Generate data for single file."""
         # ensure results are properly merged between platforms
         posix_filename = pathlib.PurePath(cu.relative_filename()).as_posix()
@@ -111,7 +113,7 @@ class CoverallReporter:
             self.get_hits(i, analysis) for i, _ in enumerate(token_lines, 1)
         ]
 
-        results = {
+        file_data = {
             'name': posix_filename,
             'source': cu.source(),
             'coverage': coverage_lines,
@@ -119,6 +121,6 @@ class CoverallReporter:
 
         branches = self.get_arcs(analysis)
         if branches:
-            results['branches'] = branches
+            file_data['branches'] = branches
 
-        self.coverage.append(results)
+        self.coverage.append(file_data)

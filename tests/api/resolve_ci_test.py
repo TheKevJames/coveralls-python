@@ -1,17 +1,17 @@
 import os
 import unittest.mock
-from typing import Any
 
 import pytest
 
-from coveralls.configuration import Config
-from coveralls.configuration import resolve
+from coveralls import configuration
 
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
 
-def resolve_config(*, token_required: bool = True, **overrides: Any) -> Config:
-    return resolve(overrides, token_required=token_required)
+def resolve_config(
+    *, token_required: bool = True, **overrides: object
+) -> configuration.Config:
+    return configuration.resolve(overrides, token_required=token_required)
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)

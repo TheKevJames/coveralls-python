@@ -115,7 +115,7 @@ class Config:
         self.retries = self._validate_retries(self.retries)
 
     @staticmethod
-    def _validate_timeout(name: str, raw: Any) -> float | None:
+    def _validate_timeout(name: str, raw: Any) -> float | None:  # noqa: ANN401
         if raw is None:
             return None
         try:
@@ -131,7 +131,7 @@ class Config:
         return value
 
     @staticmethod
-    def _validate_retries(raw: Any) -> int:
+    def _validate_retries(raw: Any) -> int:  # noqa: ANN401
         # Only genuine ints and integer-valued strings (e.g. "3", from env vars
         # or YAML) are accepted. Bools are excluded despite being ints, so
         # retries=True is not silently read as 1; everything else is routed

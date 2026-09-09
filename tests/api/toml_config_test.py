@@ -11,7 +11,7 @@ try:
 except ImportError:
     yaml = None  # type: ignore[assignment]
 
-from coveralls.configuration import resolve
+from coveralls import configuration
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -32,7 +32,7 @@ def test_reads_toml_file(tmp_path: pathlib.Path) -> None:
         tmp_path,
         '[tool.coveralls]\nrepo_token = "xxx"\nservice_name = "jenkins"\n',
     )
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.repo_token == 'xxx'
     assert config.service_name == 'jenkins'
 
@@ -46,7 +46,7 @@ def test_toml_support_does_not_require_pyyaml(
     # must not emit the PyYAML warning when no .coveralls.yml exists.
     _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\n')
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
     assert config.repo_token == 'xxx'
     assert not caplog.records
 
@@ -56,7 +56,7 @@ def test_toml_native_booleans_are_preserved(tmp_path: pathlib.Path) -> None:
     _write_pyproject(
         tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\nparallel = true\n'
     )
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.parallel is True
 
 
@@ -68,7 +68,7 @@ def test_toml_unknown_key_warns(
         tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\nbogus_key = "nope"\n'
     )
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
     assert config.repo_token == 'xxx'
     assert 'bogus_key' in caplog.text
     assert 'pyproject.toml' in caplog.text
@@ -86,7 +86,7 @@ def test_toml_aliases_and_deprecated_keys(
         'config_file = "custom.rc"\n',
     )
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
     assert config.host == 'https://old.example.com'
     assert config.rcfile == 'custom.rc'
     # config_file warns and names pyproject.toml; coveralls_host stays silent.
@@ -103,7 +103,7 @@ def test_missing_tool_coveralls_table_is_ignored(
     # A pyproject.toml without a [tool.coveralls] table (the common case for
     # any Python project) provides no settings and must not error.
     _write_pyproject(tmp_path, '[tool.other]\nkey = "value"\n')
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.service_name == 'coveralls-python'
     assert config.repo_token is None
 
@@ -111,7 +111,7 @@ def test_missing_tool_coveralls_table_is_ignored(
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_empty_tool_coveralls_table_is_ignored(tmp_path: pathlib.Path) -> None:
     _write_pyproject(tmp_path, '[tool.coveralls]\n')
-    config = resolve({})
+    config = configuration.resolve({})
     assert config.service_name == 'coveralls-python'
     assert config.repo_token is None
 
@@ -120,14 +120,14 @@ def test_empty_tool_coveralls_table_is_ignored(tmp_path: pathlib.Path) -> None:
 def test_malformed_toml_raises(tmp_path: pathlib.Path) -> None:
     _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = \n')
     with pytest.raises(tomllib.TOMLDecodeError):
-        resolve({})
+        configuration.resolve({})
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)
 def test_non_table_tool_coveralls_raises(tmp_path: pathlib.Path) -> None:
     _write_pyproject(tmp_path, '[tool]\ncoveralls = "nope"\n')
     with pytest.raises(TypeError, match='expected a table'):
-        resolve({})
+        configuration.resolve({})
 
 
 @pytest.mark.skipif(yaml is None, reason='requires PyYAML')
@@ -142,7 +142,7 @@ def test_yaml_wins_over_toml_and_warns(
     )
     _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "from_toml"\n')
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
 
     assert config.repo_token == 'from_yaml'
     # The collision warning names both files and flags the YAML as legacy.
@@ -161,7 +161,7 @@ def test_empty_yaml_falls_through_to_toml(
     (tmp_path / '.coveralls.yml').write_text('\n', encoding='utf-8')
     _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "from_toml"\n')
     with caplog.at_level(logging.WARNING):
-        config = resolve({})
+        config = configuration.resolve({})
 
     assert config.repo_token == 'from_toml'
     assert not caplog.records

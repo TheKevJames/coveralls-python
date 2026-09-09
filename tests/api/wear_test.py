@@ -12,13 +12,11 @@ from typing import Any
 import coverage
 import pytest
 import requests
+import requests.adapters
 import responses
-from requests.adapters import HTTPAdapter
 
 import coveralls
-from coveralls.api import RETRY_BACKOFF_MAX
-from coveralls.api import _build_session
-from coveralls.api import log
+import coveralls.api
 
 EXPECTED = {
     'message': 'Job #7.1 - 44.58% Covered',
@@ -28,13 +26,13 @@ JOBS_URL = 'https://coveralls.io/api/v1/jobs'
 WEBHOOK_URL = 'https://coveralls.io/webhook'
 
 
-def req_kwargs(call: Any) -> Any:
+def req_kwargs(call: Any) -> Any:  # noqa: ANN401
     # responses attaches the send() kwargs (timeout, verify, ...) to the
     # captured request; they are not part of the typed PreparedRequest API.
     return call.request.req_kwargs
 
 
-def req_json(call: Any) -> Any:
+def req_json(call: Any) -> Any:  # noqa: ANN401
     return json.loads(call.request.body)
 
 
@@ -146,7 +144,9 @@ def test_merge_invalid_data() -> None:
         coverage_file.write(b'{"random": "stuff"}')
         coverage_file.seek(0)
 
-        with unittest.mock.patch.object(log, 'warning') as logger:
+        with unittest.mock.patch.object(
+            coveralls.api.log, 'warning'
+        ) as logger:
             api = coveralls.Coveralls(repo_token='xxx')
             api.merge(coverage_file.name)
             result = api.create_report()
@@ -169,7 +169,7 @@ def test_dry_run() -> None:
 
 @responses.activate
 def test_repo_token_in_not_compromised_verbose() -> None:
-    with unittest.mock.patch.object(log, 'debug') as logger:
+    with unittest.mock.patch.object(coveralls.api.log, 'debug') as logger:
         coveralls.Coveralls(repo_token='xxx').wear(dry_run=True)
 
     assert 'xxx' not in logger.call_args[0][0]
@@ -438,11 +438,14 @@ def test_retries_do_not_honour_retry_after_header() -> None:
     # hang CI for hours on our supported range. Guard that we ignore the header
     # and rely on our own bounded backoff instead. This cannot be exercised via
     # responses, which does not drive urllib3's retry sleep machinery.
-    adapter = _build_session(3).get_adapter('https://coveralls.io')
-    assert isinstance(adapter, HTTPAdapter)
+    # pylint: disable=protected-access
+    adapter = coveralls.api._build_session(3).get_adapter(
+        'https://coveralls.io'
+    )
+    assert isinstance(adapter, requests.adapters.HTTPAdapter)
     retry = adapter.max_retries
     assert retry.respect_retry_after_header is False
-    assert retry.backoff_max == RETRY_BACKOFF_MAX
+    assert retry.backoff_max == coveralls.api.RETRY_BACKOFF_MAX
 
 
 @unittest.mock.patch.dict(os.environ, {}, clear=True)

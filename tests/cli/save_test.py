@@ -2,7 +2,7 @@ import os
 from unittest import mock
 
 import coveralls.cli
-from tests.cli.conftest import coveralls_kwargs
+from tests.cli import conftest
 
 
 @mock.patch.object(coveralls.Coveralls, 'save_report')
@@ -38,12 +38,14 @@ def test_save_report_deprecated_output_warns(
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-@mock.patch('coveralls.cli.Coveralls')
+@mock.patch('coveralls.api.Coveralls')
 def test_submit_family_accepts_merge_and_parallel(
     mock_coveralls: mock.MagicMock,
 ) -> None:
     # save/debug build a report, so they honour the submit-only modifiers.
     coveralls.cli.main(argv=['save', 'o', '--parallel', '--merge=extra.json'])
-    mock_coveralls.assert_called_with(False, **coveralls_kwargs(parallel=True))
+    mock_coveralls.assert_called_with(
+        False, **conftest.coveralls_kwargs(parallel=True)
+    )
     mock_coveralls.return_value.merge.assert_called_once_with('extra.json')
     mock_coveralls.return_value.save_report.assert_called_once_with('o')

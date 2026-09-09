@@ -1,4 +1,4 @@
-from coveralls import __version__
+import coveralls
 
 master_doc = 'index'
 source_suffix = '.rst'
@@ -21,5 +21,5 @@ globals()['copyright'] = '2013, TheKevJames'
 author = 'TheKevJames'
 language = 'en'
 
-version = __version__
-release = __version__
+version = coveralls.__version__
+release = coveralls.__version__

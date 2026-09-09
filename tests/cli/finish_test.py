@@ -6,12 +6,10 @@ import pytest
 import responses
 
 import coveralls.cli
-from tests.cli.conftest import assert_logged_error
-from tests.cli.conftest import github_finish_env
-from tests.cli.conftest import req_json
+from tests.cli import conftest
 
 
-@mock.patch.dict(os.environ, github_finish_env(), clear=True)
+@mock.patch.dict(os.environ, conftest.github_finish_env(), clear=True)
 @mock.patch.object(coveralls.cli.log, 'info')
 @responses.activate
 def test_finish(mock_log: mock.MagicMock) -> None:
@@ -33,10 +31,10 @@ def test_finish(mock_log: mock.MagicMock) -> None:
         [mock.call('Finishing parallel jobs...'), mock.call('Done')]
     )
     assert len(responses.calls) == 1
-    assert req_json(responses.calls[0].request) == expected_json
+    assert conftest.req_json(responses.calls[0].request) == expected_json
 
 
-@mock.patch.dict(os.environ, github_finish_env(), clear=True)
+@mock.patch.dict(os.environ, conftest.github_finish_env(), clear=True)
 @responses.activate
 def test_finish_carryforward_in_webhook_payload() -> None:
     responses.add(
@@ -49,11 +47,11 @@ def test_finish_carryforward_in_webhook_payload() -> None:
     coveralls.cli.main(argv=['finish', '--carryforward=flag1,flag2'])
 
     assert len(responses.calls) == 1
-    body = req_json(responses.calls[0].request)
+    body = conftest.req_json(responses.calls[0].request)
     assert body['carryforward'] == 'flag1,flag2'
 
 
-@mock.patch.dict(os.environ, github_finish_env(), clear=True)
+@mock.patch.dict(os.environ, conftest.github_finish_env(), clear=True)
 @mock.patch.object(coveralls.cli.log, 'warning')
 @responses.activate
 def test_finish_deprecated_flag_warns(mock_warning: mock.MagicMock) -> None:
@@ -90,9 +88,9 @@ def test_finish_exception(caplog: pytest.LogCaptureFixture) -> None:
     with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
         coveralls.cli.main(argv=['finish'])
 
-    assert_logged_error(caplog, msg)
+    conftest.assert_logged_error(caplog, msg)
     assert len(responses.calls) == 1
-    assert req_json(responses.calls[0].request) == expected_json
+    assert conftest.req_json(responses.calls[0].request) == expected_json
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
@@ -109,13 +107,13 @@ def test_finish_exception_without_error(
     with pytest.raises(SystemExit), caplog.at_level(logging.ERROR):
         coveralls.cli.main(argv=['finish'])
 
-    assert_logged_error(caplog, msg)
+    conftest.assert_logged_error(caplog, msg)
     assert len(responses.calls) == 1
-    assert req_json(responses.calls[0].request) == expected_json
+    assert conftest.req_json(responses.calls[0].request) == expected_json
 
 
 @mock.patch.dict(os.environ, {'TRAVIS': 'True'}, clear=True)
-@mock.patch('coveralls.cli.Coveralls')
+@mock.patch('coveralls.api.Coveralls')
 def test_deprecated_finish_applies_merge(
     mock_coveralls: mock.MagicMock,
 ) -> None:

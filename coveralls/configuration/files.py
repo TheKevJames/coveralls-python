@@ -4,9 +4,7 @@ import sys
 from collections.abc import Mapping
 from typing import Any
 
-from .helpers import TOML_CONFIG_FILE
-from .helpers import YAML_CONFIG_FILE
-from .helpers import _canonicalize_and_filter
+from . import helpers
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -25,14 +23,16 @@ def _read_yaml() -> dict[str, Any] | None:
     unreadable because PyYAML is missing, so :func:`_from_files` can tell "this
     source provided settings" from "this source is silent" and pick a winner.
     """
-    path = pathlib.Path.cwd() / YAML_CONFIG_FILE
+    path = pathlib.Path.cwd() / helpers.YAML_CONFIG_FILE
     if not path.exists():
         return None
 
     try:
         import yaml  # pylint: disable=import-outside-toplevel
     except ImportError:
-        log.warning('PyYAML is not installed, skipping %s.', YAML_CONFIG_FILE)
+        log.warning(
+            'PyYAML is not installed, skipping %s.', helpers.YAML_CONFIG_FILE
+        )
         return None
 
     data = yaml.safe_load(path.read_text(encoding='utf-8'))
@@ -47,7 +47,7 @@ def _read_toml() -> dict[str, Any] | None:
     surfaces as :class:`tomllib.TOMLDecodeError`; a ``tool.coveralls`` that is
     present but not a table is a configuration error and raises ``TypeError``.
     """
-    path = pathlib.Path.cwd() / TOML_CONFIG_FILE
+    path = pathlib.Path.cwd() / helpers.TOML_CONFIG_FILE
     if not path.exists():
         return None
 
@@ -59,8 +59,8 @@ def _read_toml() -> dict[str, Any] | None:
         return None
     if not isinstance(section, Mapping):
         raise TypeError(
-            f'Invalid [tool.coveralls] in {TOML_CONFIG_FILE}: expected a '
-            f'table, got {type(section).__name__}.'
+            f'Invalid [tool.coveralls] in {helpers.TOML_CONFIG_FILE}: '
+            f'expected a table, got {type(section).__name__}.'
         )
     return dict(section) or None
 
@@ -75,6 +75,7 @@ def _from_files() -> dict[str, Any]:
     Only the winner is canonicalized/filtered, so unknown-key warnings are not
     emitted for a file whose values are discarded.
     """
+    # pylint: disable=protected-access
     yaml_config = _read_yaml()
     toml_config = _read_toml()
 
@@ -83,16 +84,18 @@ def _from_files() -> dict[str, Any]:
             'Both %s and [tool.coveralls] in %s were found; using %s and '
             'ignoring %s. The YAML config is legacy -- consider consolidating '
             'into %s.',
-            YAML_CONFIG_FILE,
-            TOML_CONFIG_FILE,
-            YAML_CONFIG_FILE,
-            TOML_CONFIG_FILE,
-            TOML_CONFIG_FILE,
+            helpers.YAML_CONFIG_FILE,
+            helpers.TOML_CONFIG_FILE,
+            helpers.YAML_CONFIG_FILE,
+            helpers.TOML_CONFIG_FILE,
+            helpers.TOML_CONFIG_FILE,
         )
 
     if yaml_config is not None:
-        return _canonicalize_and_filter(yaml_config, source=YAML_CONFIG_FILE)
+        return helpers._canonicalize_and_filter(
+            yaml_config, source=helpers.YAML_CONFIG_FILE
+        )
     if toml_config is not None:
-        source = f'{TOML_CONFIG_FILE} [tool.coveralls]'
-        return _canonicalize_and_filter(toml_config, source=source)
+        source = f'{helpers.TOML_CONFIG_FILE} [tool.coveralls]'
+        return helpers._canonicalize_and_filter(toml_config, source=source)
     return {}
