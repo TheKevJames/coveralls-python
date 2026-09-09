@@ -2,13 +2,13 @@
 name = "coveralls"
 version = "4.1.0"
 description = "Show coverage stats online via coveralls.io"
-readme = "README.rst"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+readme = "README.rst"
 
 authors = [
     { name="Kevin James", email="coveralls-python@thekev.in" },
 ]
-license = "MIT"
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -42,7 +42,7 @@ yaml = ["pyyaml (>=3.10,<7.0)"]
 [dependency-groups]
 dev = [
     "pytest ==9.1.1",
-    "responses ==0.26.2"
+    "responses ==0.26.3"
 ]
 docs = ["sphinx ==9.1.0; python_version >='3.12'"]
 
