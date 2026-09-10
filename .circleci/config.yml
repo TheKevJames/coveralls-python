@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   docker: https://raw.githubusercontent.com/TheKevJames/tools/refs/heads/master/circleci-orbs/docker.yml
-  pre-commit: https://raw.githubusercontent.com/TheKevJames/tools/refs/heads/master/circleci-orbs/pre-commit.yml
+  prek: https://raw.githubusercontent.com/TheKevJames/tools/refs/heads/master/circleci-orbs/prek.yml
 
 executors:
   docker-git:
@@ -153,10 +153,7 @@ workflows:
 
   test:
     jobs:
-      - pre-commit/pre-commit:
-          executor: py310
-          pre-steps:
-            - run: apk add --no-cache bash git
+      - prek/prek
       - toxpy:
           name: test-<<matrix.executor>>
           matrix:
