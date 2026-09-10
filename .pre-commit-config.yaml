@@ -232,7 +232,7 @@ repos:
 
 # terraform
   - repo: https://github.com/AleksaC/terraform-py
-    rev: v1.16.1
+    rev: v1.16.2
     hooks:
       - id: tf-validate
   - repo: https://github.com/AleksaC/tffumpt
