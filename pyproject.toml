@@ -109,6 +109,9 @@ topo_order_commits = true
 sort_commits = "oldest"
 recurse_submodules = false
 
+[tool.hatch.build.targets.wheel]
+packages = ["coveralls"]
+
 [tool.pytest.ini_options]
 # addopts = "-Werror"
 filterwarnings = [
@@ -161,9 +164,6 @@ missing-type-argument = "error"
 possibly-unresolved-reference = "warn"
 unsound-return-statement = "error"
 
-[tool.uv.build-backend]
-module-root = ""
-
 [build-system]
-requires = ["uv_build>=0.12.9,<0.13.0"]
-build-backend = "uv_build"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
