@@ -17,7 +17,7 @@ jobs:
         with:
           # renovate: datasource=docker depName=python
           python-version: '3.14'
-      - uses: astral-sh/setup-uv@v7.2.0
+      - uses: astral-sh/setup-uv@v7.6.0
         with:
           # renovate: datasource=pypi depName=uv
           version: 0.12.9
