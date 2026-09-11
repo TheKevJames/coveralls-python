@@ -151,7 +151,7 @@ repos:
           - lint.isort.split-on-trailing-comma = false
         exclude: '^(example|nonunicode|tests/data)/'
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.12.11
+    rev: 0.12.13
     hooks:
       - id: uv-audit
       - id: uv-lock
