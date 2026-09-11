@@ -20,7 +20,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.1.0
         with:
           # renovate: datasource=pypi depName=uv
-          version: 0.12.9
+          version: 0.12.13
       - run: uv build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
