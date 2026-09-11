@@ -112,7 +112,7 @@ repos:
           - --scripts-are-modules
   # TODO: add more rules from https://docs.astral.sh/ruff/rules/
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.6
+    rev: v0.16.7
     hooks:
       - id: ruff-check
         args:
