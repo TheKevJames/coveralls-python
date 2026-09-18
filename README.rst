@@ -5,7 +5,7 @@ Coveralls for Python
 
     .. image:: https://img.shields.io/circleci/project/github/TheKevJames/coveralls-python/master.svg?style=flat-square&label=CircleCI
         :target: https://circleci.com/gh/TheKevJames/coveralls-python
-    .. image:: https://img.shields.io/github/actions/workflow/status/TheKevJames/coveralls-python/test.yml?branch=master&style=flat-square&label=Github%20Actions
+    .. image:: https://img.shields.io/github/actions/workflow/status/TheKevJames/coveralls-python/ci.yml?branch=master&style=flat-square&label=Github%20Actions
         :target: https://github.com/TheKevJames/coveralls-python/actions
     .. image:: https://img.shields.io/coveralls/TheKevJames/coveralls-python/master.svg?style=flat-square&label=Coverage
         :target: https://coveralls.io/r/TheKevJames/coveralls-python
