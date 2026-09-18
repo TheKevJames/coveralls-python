@@ -19,3 +19,64 @@ jobs:
           # renovate: datasource=pypi depName=prek
           prek-version: v0.5.3
           extra-args: --all-files
+
+  test:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip tox tox-uv tox-gh-actions
+      - run: tox
+      - run: tox -e upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          # renovate: datasource=github-releases depName=astral-sh/uv
+          version: 0.12.16
+          # renovate: datasource=docker depName=python
+          python-version: 3.14.7
+      - name: validate tag matches pyproject.toml
+        run: |
+          version="$(uv version --short)"
+          if [ "${GITHUB_REF_NAME}" != "${version}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match pyproject version ${version}"
+            exit 1
+          fi
+      - run: uv build
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [lint, test, build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/coveralls
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
