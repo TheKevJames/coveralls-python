@@ -48,6 +48,7 @@ dev = [
     "pylint==4.0.8",
     "pytest==9.1.1",
     "responses==0.26.3",
+    "tomli==2.4.1",
     "types-pyyaml==6.0.12.20260906",
 ]
 docs = ["sphinx ==9.1.0; python_version >='3.12'"]

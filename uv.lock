@@ -396,6 +396,7 @@ dev = [
     { name = "pylint" },
     { name = "pytest" },
     { name = "responses" },
+    { name = "tomli" },
     { name = "types-pyyaml" },
 ]
 docs = [
@@ -423,6 +424,7 @@ dev = [
     { name = "pylint", specifier = "==4.0.8" },
     { name = "pytest", specifier = "==9.1.1" },
     { name = "responses", specifier = "==0.26.3" },
+    { name = "tomli", specifier = "==2.4.1" },
     { name = "types-pyyaml", specifier = "==6.0.12.20260906" },
 ]
 docs = [{ name = "sphinx", marker = "python_full_version >= '3.12'", specifier = "==9.1.0" }]
