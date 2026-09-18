@@ -1,4 +1,10 @@
+name: dependency-review
+
 on: [pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -8,10 +14,8 @@ jobs:
   dependency-review:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout Repository'
-        uses: actions/checkout@v7.0.1
-      - name: 'Dependency Review'
-        uses: actions/dependency-review-action@v5.0.0
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/dependency-review-action@v5.0.0
         with:
           fail-on-severity: low
           fail-on-scopes: runtime,development,unknown

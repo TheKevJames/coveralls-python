@@ -1,3 +1,5 @@
+name: autoapproval
+
 on:
   pull_request:
     types: [opened, reopened, labeled]
@@ -11,8 +13,8 @@ permissions:
 jobs:
   autoapproval:
     runs-on: ubuntu-latest
-    name: Auto-Approval Bot
     steps:
+      # TODO: very out-of-date (still uses nodejs 20), look into updating
       - uses: dkhmelenko/autoapproval@v1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

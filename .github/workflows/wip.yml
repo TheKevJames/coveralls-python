@@ -1,0 +1,24 @@
+name: wip
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  wip:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if grep -qP '\bWIP\b' <<< "$PR_TITLE"; then
+            echo "::error::PR title contains WIP marker: $PR_TITLE"
+            exit 1
+          fi
+          echo "PR title is clear of the WIP marker."

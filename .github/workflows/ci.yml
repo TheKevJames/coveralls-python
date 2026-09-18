@@ -1,0 +1,21 @@
+name: ci
+
+on: [pull_request, push]
+
+jobs:
+  lint:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.1.0
+        with:
+          # renovate: datasource=github-releases depName=astral-sh/uv
+          version: 0.12.16
+          # renovate: datasource=docker depName=python
+          python-version: 3.14.7
+      - uses: j178/prek-action@v3.0.0
+        with:
+          # renovate: datasource=pypi depName=prek
+          prek-version: v0.5.3
+          extra-args: --all-files
