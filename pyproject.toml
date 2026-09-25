@@ -45,7 +45,7 @@ dev = [
     "flake8-import-restrictions==2.1",
     "flake8-requirements==2.3.0",
     "flake8==7.3.0",
-    "pylint==4.0.8",
+    "pylint==4.0.9",
     "pytest==9.1.1",
     "responses==0.26.3",
     "tomli==2.4.1",
