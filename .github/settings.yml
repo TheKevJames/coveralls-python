@@ -1,7 +1,7 @@
 repository:
   name: coveralls-python
   description: Show coverage stats online via coveralls.io
-  homepage: coveralls-python.readthedocs.io
+  homepage: https://coveralls-python.readthedocs.io
   topics: coveralls, coverage, nosetests, pytest, python
   private: false
 
@@ -20,35 +20,62 @@ repository:
   enable_automated_security_fixes: true
   enable_vulnerability_alerts: true
 
+# TODO: https://github.com/marketplace/actions/label-sync
 labels:
   - name: bug
     color: '#fc2929'
+    description: Fix existing functionality
   - name: feature
     color: '#84b6eb'
-    oldname: enhancement
+    description: Add new functionality
   - name: task
     color: '#d93f0b'
+    description: Meta change to repo, CI, tooling, etc
 
   - name: help wanted
     color: '#159818'
+    description: Looking for outside help
   - name: low-priority
     color: '#fbca04'
-  - name: question
-    color: '#cc317c'
 
-  - name: triage
+  - name: needs-triage
     color: '#ededed'
-  - name: backlog
+    description: Needs a maintainer to triage
+  - name: needs-info
+    color: '#cc317c'
+    description: Needs more information from the reporter
+  - name: ready-for-human
     color: '#ededed'
+    description: Ticket ready for a human to tackle
+  - name: ready-for-agent
+    color: '#ededed'
+    description: Ticket ready for an agent to tackle
+  - name: wontfix
+    color: '#dbe19f'
+    description: Ticket closed as not planned
+
+  - name: blocked
+    color: '#dbe19f'
   - name: in-progress
     color: '#0052cc'
   - name: in-review
     color: '#5319e7'
-  - name: blocked
-    color: '#dbe19f'
 
   - name: automerge
     color: '#d913a6'
 
 branches:
   - name: master
+    protection:
+      required_pull_request_reviews:
+        required_approving_review_count: 1
+        dismiss_stale_reviews: false
+        require_code_owner_reviews: true
+      required_status_checks:
+        strict: true
+        contexts:
+          - dependency-review
+          - lint
+          - wip
+      enforce_admins: true
+      required_linear_history: true
