@@ -6,6 +6,7 @@ import socket
 import tempfile
 import threading
 import unittest.mock
+from collections.abc import Generator
 from collections.abc import Iterator
 from typing import Any
 
@@ -264,7 +265,7 @@ def test_submit_report_raises_on_timeout() -> None:
 
 
 @contextlib.contextmanager
-def _hanging_server() -> Iterator[str]:
+def _hanging_server() -> Generator[str, None, None]:
     # A server that accepts connections in the background but never responds,
     # so connects succeed and every request hits a read timeout. responses
     # cannot exercise this: it short-circuits urllib3's transport, and an
