@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   wip:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - env:
           PR_TITLE: ${{ github.event.pull_request.title }}
