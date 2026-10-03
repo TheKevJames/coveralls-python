@@ -157,7 +157,7 @@ repos:
       - id: uv-lock
       - id: uv-sync
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.09.30
+    rev: 2026.10.02
     hooks:
       - id: validate-pyproject
   - repo: local
