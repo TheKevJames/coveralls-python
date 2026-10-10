@@ -1,20 +1,22 @@
 name: autoapproval
 
 on:
-  pull_request:
-    types: [opened, reopened, labeled]
-  pull_request_review:
-    types: [dismissed]
+  pull_request_target:
+    types: [opened]
 
-permissions:
-  contents: read
-  pull-requests: write
+permissions: {}
 
 jobs:
   autoapproval:
+    # Only PRs Renovate will automerge; everything else needs a human review.
+    if: >-
+      github.event.pull_request.user.login == 'renovate[bot]'
+      && contains(github.event.pull_request.body, '**Automerge**: Enabled')
     runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: write
     steps:
-      # TODO: very out-of-date (still uses nodejs 20), look into updating
-      - uses: dkhmelenko/autoapproval@v1.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: gh pr review "$PR_URL" --approve

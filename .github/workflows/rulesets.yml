@@ -1,0 +1,30 @@
+name: rulesets
+
+# Reconciles branch rulesets with .github/rulesets/*.json, which are
+# authoritative: unlisted rulesets and classic branch protection get deleted.
+# See TheKevJames/tools/.github/workflows/_rulesets.yml for the event -> mode
+# mapping. Workflow changes are included since required checks are validated
+# against workflow job names.
+
+on:
+  pull_request:
+    paths:
+      - .github/rulesets/**
+      - .github/workflows/**
+  push:
+    paths:
+      - .github/rulesets/**
+      - .github/workflows/**
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rulesets:
+    uses: TheKevJames/tools/.github/workflows/_rulesets.yml@master
+    secrets:
+      # Set via `repo-template set-secret`.
+      RULESETS_TOKEN: ${{ secrets.RULESETS_TOKEN }}
