@@ -115,7 +115,7 @@ packages = ["coveralls"]
 # addopts = "-Werror"
 filterwarnings = [
     "error",
-    # co_lnotab deprection on py3.12+ is fixed in coverage v7.1
+    # co_lnotab deprecation on py3.12+ is fixed in coverage v7.0.2
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
 

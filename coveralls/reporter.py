@@ -7,7 +7,7 @@ from coverage import plugin
 from coverage import results
 
 try:
-    # coverage v7.5+ moved get_analysis_to_report into report_core
+    # coverage v7.2.6+ moved get_analysis_to_report into report_core
     from coverage import report_core
 except ImportError:
     from coverage import report as report_core
