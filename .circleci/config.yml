@@ -25,9 +25,17 @@ executors:
     docker:
       - image: python:3.14-alpine
     resource_class: small
+  py315:
+    docker:
+      - image: python:3.15-alpine
+    resource_class: small
   pypy311:
     docker:
-      - image: pypy:3.11-7.3-slim
+      - image: pypy:3.11-slim
+    resource_class: small
+  pypy312:
+    docker:
+      - image: pypy:3.12-slim
     resource_class: small
 
 commands:
@@ -125,7 +133,7 @@ jobs:
       - run: apt-get install -qy --no-install-recommends git
       - checkout
       - run: pip install --upgrade tox tox-uv
-      - run: tox run -f pypy3
+      - run: tox run -f "${CIRCLE_JOB//test-}"
       - run: tox run -e upload
 
 workflows:
@@ -154,7 +162,9 @@ workflows:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
-              executor: [py311, py312, py313, py314]
+              executor: [py311, py312, py313, py314, py315]
       - toxpypy:
-          name: test-pypy311
-          executor: pypy311
+          name: test-<<matrix.executor>>
+          matrix:
+            parameters:
+              executor: [pypy311, pypy312]
