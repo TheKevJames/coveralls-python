@@ -1,16 +1,10 @@
 import logging
 import pathlib
-import sys
+import tomllib
 from collections.abc import Mapping
 from typing import Any
 
 from . import helpers
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
 
 log = logging.getLogger('coveralls.configuration.files')
 

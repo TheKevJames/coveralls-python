@@ -6,7 +6,7 @@ default_install_hook_types:
   - pre-commit
 
 default_language_version:
-  python: python3.10
+  python: python3.11
 
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
@@ -107,7 +107,7 @@ repos:
       - id: refurb
         args:
           - --python-version
-          - '3.10'
+          - '3.11'
           - --
           - --scripts-are-modules
   # TODO: add more rules from https://docs.astral.sh/ruff/rules/
@@ -117,8 +117,6 @@ repos:
       - id: ruff-check
         args:
           - --fix
-          - --target-version
-          - py310
           - --select
           - A,ANN,C4,C901,D,E,F,G010,I,PYI,RUF006,RUF100,S307,T10,TRY,UP,W,YTT
           - --preview
