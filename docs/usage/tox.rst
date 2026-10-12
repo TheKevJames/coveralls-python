@@ -6,7 +6,7 @@ Running coveralls-python from within a `tox`_ environment (v2.0 and above) requi
 For example, on TravisCI::
 
     [tox]
-    envlist = py310,py311,py312
+    envlist = py311,py312,py313
 
     [testenv]
     passenv = TRAVIS , TRAVIS_*

@@ -1,7 +1,7 @@
 import logging
 import os
 import pathlib
-import sys
+import tomllib
 import unittest.mock
 
 import pytest
@@ -12,12 +12,6 @@ except ImportError:
     yaml = None  # type: ignore[assignment]
 
 from coveralls import configuration
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
 
 pytestmark = pytest.mark.usefixtures('isolate_cwd')
 
@@ -41,7 +35,7 @@ def test_reads_toml_file(tmp_path: pathlib.Path) -> None:
 def test_toml_support_does_not_require_pyyaml(
     tmp_path: pathlib.Path, caplog: pytest.LogCaptureFixture
 ) -> None:
-    # TOML parsing is always available (stdlib tomllib / tomli), so a
+    # TOML parsing is always available (stdlib tomllib), so a
     # pyproject-configured project must work even without PyYAML installed and
     # must not emit the PyYAML warning when no .coveralls.yml exists.
     _write_pyproject(tmp_path, '[tool.coveralls]\nrepo_token = "xxx"\n')

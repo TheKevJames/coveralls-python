@@ -2,7 +2,7 @@
 name = "coveralls"
 version = "4.1.0"
 description = "Show coverage stats online via coveralls.io"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 readme = "README.rst"
 
@@ -19,10 +19,9 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "coverage[toml] (>=6.3,<8.0)",
+    "coverage (>=6.5,<8.0)",
     "requests (>=2.30.0,<3.0.0)",
-    "tomli (>=1.1.0) ; python_version < '3.11'",
-    "typer (>=0.12.0,<1.0.0)",
+    "typer (>=0.26.0,<1.0.0)",
     "urllib3 (>=2.0.0,<3.0.0)"
 ]
 
@@ -36,7 +35,7 @@ coveralls = "coveralls.cli:main"
 python-coveralls = "coveralls.cli:main"
 
 [project.optional-dependencies]
-yaml = ["pyyaml (>=3.10,<7.0)"]
+yaml = ["pyyaml (>=6.0.1,<7.0)"]
 
 [dependency-groups]
 dev = [
@@ -48,7 +47,6 @@ dev = [
     "pylint==4.1.3",
     "pytest==9.1.1",
     "responses==0.26.3",
-    "tomli==2.5.0",
     "types-pyyaml==6.0.12.20260906",
 ]
 docs = ["sphinx ==9.1.0; python_version >='3.12'"]
@@ -117,13 +115,13 @@ packages = ["coveralls"]
 # addopts = "-Werror"
 filterwarnings = [
     "error",
-    # co_lnotab deprection on py3.12+ is fixed in coverage v7.1
+    # co_lnotab deprecation on py3.12+ is fixed in coverage v7.0.2
     "ignore:co_lnotab is deprecated, use co_lines instead:DeprecationWarning",
 ]
 
 [tool.tox]
 env_list = [
-    { product = [["py310", "py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
+    { product = [["py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
 ]
 
 [tool.tox.env_run_base]
@@ -134,9 +132,9 @@ use_develop = true
 deps = [
     "responses==0.26.2",
     "pytest==9.1.1",
-    { replace = "if", condition = "factor.pyyaml", then = ["PyYAML>=3.10,<7.0"], extend = true },
-    { replace = "if", condition = "factor.cov6", then = ["coverage[toml]>=6.0,<7.0"], extend = true },
-    { replace = "if", condition = "factor.cov7", then = ["coverage[toml]>=7.0,<8.0"], extend = true },
+    { replace = "if", condition = "factor.pyyaml", then = ["PyYAML>=6.0.1,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov6", then = ["coverage>=6.5,<7.0"], extend = true },
+    { replace = "if", condition = "factor.cov7", then = ["coverage>=7.0,<8.0"], extend = true },
 ]
 commands = [
     ["coverage", "run", "--branch", "--source=coveralls", "-m", "pytest", "tests/"],
@@ -144,12 +142,11 @@ commands = [
 ]
 
 [tool.tox.env.upload]
-deps = ["coverage[toml]>=7.0,<8.0"]
+deps = ["coverage>=7.0,<8.0"]
 commands = [["coveralls", "--verbose"]]
 
 [tool.tox.gh-actions]
 python = """
-3.10: py310, upload
 3.11: py311, upload
 3.12: py312, upload
 3.13: py313, upload

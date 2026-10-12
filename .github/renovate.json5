@@ -12,7 +12,7 @@
                 "python",
                 "python/cpython",
             ],
-            "allowedVersions": "3.10",
+            "allowedVersions": "3.11",
         },
     ],
 }

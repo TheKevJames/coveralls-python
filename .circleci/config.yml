@@ -9,10 +9,6 @@ executors:
     docker:
       - image: docker:25.0.5-git
     resource_class: medium
-  py310:
-    docker:
-      - image: python:3.10-alpine
-    resource_class: small
   py311:
     docker:
       - image: python:3.11-alpine
@@ -29,9 +25,9 @@ executors:
     docker:
       - image: python:3.14-alpine
     resource_class: small
-  pypy73:  # py310
+  pypy311:
     docker:
-      - image: pypy:3-7.3-slim
+      - image: pypy:3.11-7.3-slim
     resource_class: small
 
 commands:
@@ -158,7 +154,7 @@ workflows:
           name: test-<<matrix.executor>>
           matrix:
             parameters:
-              executor: [py310, py311, py312, py313, py314]
+              executor: [py311, py312, py313, py314]
       - toxpypy:
-          name: test-pypy73
-          executor: pypy73
+          name: test-pypy311
+          executor: pypy311
