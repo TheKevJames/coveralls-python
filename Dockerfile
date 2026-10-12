@@ -3,10 +3,10 @@
 # renovate: datasource=pypi depName=coveralls
 ARG COVERALLS_VERSION=4.1.0
 # renovate: datasource=repology depName=alpine_3_24/git versioning=loose
-ARG GIT_VERSION=2.49.1-r0
+ARG GIT_VERSION=2.54.0-r0
 
 
-FROM python:3.14-alpine3.22
+FROM python:3.15-alpine3.24
 
 ARG GIT_VERSION
 RUN --mount=type=cache,target=/var/cache/apk \

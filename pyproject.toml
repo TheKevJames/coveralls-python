@@ -19,7 +19,8 @@ classifiers = [
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
 dependencies = [
-    "coverage (>=6.5,<8.0)",
+    "coverage (>=6.5,<8.0) ; python_version < '3.15'",
+    "coverage (>=7.0.2,<8.0) ; python_version >= '3.15'",
     "requests (>=2.30.0,<3.0.0)",
     "typer (>=0.26.0,<1.0.0)",
     "urllib3 (>=2.0.0,<3.0.0)"
@@ -121,7 +122,8 @@ filterwarnings = [
 
 [tool.tox]
 env_list = [
-    { product = [["py311", "py312", "py313", "py314", "pypy3"], ["cov6", "cov7"], ["default", "pyyaml"]] },
+    { product = [["py311", "py312", "py313", "py314", "pypy311", "pypy312"], ["cov6", "cov7"], ["default", "pyyaml"]] },
+    { product = [["py315"], ["cov7"], ["default", "pyyaml"]] },
 ]
 
 [tool.tox.env_run_base]
@@ -151,6 +153,9 @@ python = """
 3.12: py312, upload
 3.13: py313, upload
 3.14: py314, upload
+3.15: py315, upload
+pypy-3.11: pypy311, upload
+pypy-3.12: pypy312, upload
 """
 
 [tool.ty.src]
