@@ -2,15 +2,18 @@ name: autoapproval
 
 on:
   pull_request_target:
-    types: [opened]
+    types: [opened, reopened, synchronize]
 
 permissions: {}
 
 jobs:
   autoapproval:
-    # Only PRs Renovate will automerge; everything else needs a human review.
+    # Only PRs which have been created (pull_request.user) and pushed
+    # (sender.login) by Renovate should be autoapproved, which will let
+    # Renovate automerge them. Everything else needs a human review.
     if: >-
       github.event.pull_request.user.login == 'renovate[bot]'
+      && github.event.sender.login == 'renovate[bot]'
       && contains(github.event.pull_request.body, '**Automerge**: Enabled')
     runs-on: ubuntu-26.04
     permissions:
