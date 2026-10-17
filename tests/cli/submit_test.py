@@ -148,7 +148,7 @@ def test_exception(
     errors = [r for r in caplog.records if r.levelno == logging.ERROR]
     assert len(errors) == 1
     assert errors[0].message == 'Error running coveralls'
-    assert errors[0].exc_info is not None
+    assert errors[0].exc_info
     assert errors[0].exc_info[1] is conftest.EXC
 
 

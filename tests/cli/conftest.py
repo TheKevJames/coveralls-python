@@ -58,7 +58,7 @@ def assert_logged_error(caplog: pytest.LogCaptureFixture, msg: str) -> None:
     assert len(errors) == 1
     record = errors[0]
     assert record.message == 'Error running coveralls'
-    assert record.exc_info is not None
+    assert record.exc_info
     assert str(record.exc_info[1]) == msg
 
 
