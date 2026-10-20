@@ -27,13 +27,18 @@
           {"context": "ci/circleci: test-py312"},
           {"context": "ci/circleci: test-py313"},
           {"context": "ci/circleci: test-py314"},
+          {"context": "ci/circleci: test-py315"},
           {"context": "ci/circleci: test-pypy311"},
+          {"context": "ci/circleci: test-pypy312"},
           {"context": "dependency-review"},
           {"context": "lint"},
           {"context": "test (3.11)"},
           {"context": "test (3.12)"},
           {"context": "test (3.13)"},
           {"context": "test (3.14)"},
+          {"context": "test (3.15)"},
+          {"context": "test (pypy3.11)"},
+          {"context": "test (pypy3.12)"},
           {"context": "wip"}
         ]
       }
