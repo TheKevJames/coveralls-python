@@ -18,7 +18,7 @@ jobs:
           version: 0.13.1
           # renovate: datasource=docker depName=python
           python-version: 3.14.8
-      - uses: j178/prek-action@v3.0.1
+      - uses: j178/prek-action@v3.0.2
         with:
           # renovate: datasource=pypi depName=prek
           prek-version: v0.5.6
