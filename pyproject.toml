@@ -50,7 +50,7 @@ dev = [
     "responses==0.26.3",
     "types-pyyaml==6.0.12.20260906",
 ]
-docs = ["sphinx ==9.1.0; python_version >='3.12'"]
+docs = ["sphinx ==9.1.1; python_version >='3.12'"]
 
 [tool.git-cliff.changelog]
 body = """
