@@ -17,7 +17,7 @@ jobs:
           # renovate: datasource=github-releases depName=astral-sh/uv
           version: 0.13.1
           # renovate: datasource=docker depName=python
-          python-version: 3.14.8
+          python-version: 3.15.0
       - uses: j178/prek-action@v3.1.0
         with:
           # renovate: datasource=pypi depName=prek
@@ -55,7 +55,7 @@ jobs:
           # renovate: datasource=github-releases depName=astral-sh/uv
           version: 0.13.1
           # renovate: datasource=docker depName=python
-          python-version: 3.14.8
+          python-version: 3.15.0
       - name: validate tag matches pyproject.toml
         run: |
           version="$(uv version --short)"
