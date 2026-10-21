@@ -1,0 +1,36 @@
+# git-cliff configuration — generates GitHub Release notes from Conventional
+# Commits. Dependency bumps and other non-user-facing changes are filtered out.
+[changelog]
+header = ""
+body = """
+{%- for group, commits in commits | group_by(attribute="group") %}
+### {{ group | striptags | trim | upper_first }}
+{% for commit in commits %}
+- {% if commit.scope %}**{{ commit.scope }}**: {% endif %}{{ commit.message | upper_first }}
+{%- endfor %}
+{% endfor -%}
+"""
+trim = true
+footer = ""
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+filter_commits = true
+protect_breaking_commits = true
+tag_pattern = "[0-9]*.[0-9]*.[0-9]*"
+
+# Infra/tooling scopes (deps, ci, renovate, gha, pre-commit) are dropped
+# regardless of type; then only user-facing change types are surfaced, in a
+# deliberate order (the <!-- N --> prefix controls sorting and is stripped
+# from the rendered heading). Everything else (chore, style, test, build) is
+# skipped so releases read cleanly.
+commit_parsers = [
+    { message = "^[a-z]+\\((deps|deps-dev|renovate|ci|gha|pre-commit)\\)", skip = true },
+    { message = "^feat", group = "<!-- 0 -->Features" },
+    { message = "^fix", group = "<!-- 1 -->Bug Fixes" },
+    { message = "^perf", group = "<!-- 2 -->Performance" },
+    { message = "^refactor", group = "<!-- 3 -->Refactor" },
+    { message = "^docs?", group = "<!-- 4 -->Documentation" },
+    { message = ".*", skip = true },
+]
