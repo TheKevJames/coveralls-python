@@ -1,5 +1,9 @@
 name: autoapproval
 
+# The only reason .github/actions-permissions.json lets Actions approve pull
+# requests. That is safe only because this job runs none of the PR's code: it
+# must never check it out or run it.
+
 on:
   pull_request_target:
     types: [opened, reopened, synchronize]
