@@ -98,7 +98,7 @@ jobs:
   # TODO: this should be doable with curl or python...
   docker-readme-push:
     docker:
-      - image: node:26.12.0-alpine
+      - image: node:26.12.1-alpine
     parameters:
       ident:
         type: string
