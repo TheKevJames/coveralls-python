@@ -1,0 +1,33 @@
+name: repo-settings
+
+# Reconciles repository settings with their definitions in .github/:
+# rulesets/*.json (authoritative: unlisted rulesets and classic branch
+# protection get deleted) and actions-permissions.json. See
+# TheKevJames/tools/.github/workflows/_repo-settings.yml for the event -> mode
+# mapping. Workflow changes are included since required checks are validated
+# against workflow job names.
+
+on:
+  pull_request:
+    paths:
+      - .github/actions-permissions.json
+      - .github/rulesets/**
+      - .github/workflows/**
+  push:
+    paths:
+      - .github/actions-permissions.json
+      - .github/rulesets/**
+      - .github/workflows/**
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repo-settings:
+    uses: TheKevJames/tools/.github/workflows/_repo-settings.yml@master
+    secrets:
+      # Set via `repo-template set-secret`.
+      REPO_SETTINGS_TOKEN: ${{ secrets.REPO_SETTINGS_TOKEN }}
