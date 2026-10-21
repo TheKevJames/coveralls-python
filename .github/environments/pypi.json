@@ -1,0 +1,5 @@
+{
+  "deployment_policies": [
+    {"type": "tag", "name": "*.*.*"}
+  ]
+}
