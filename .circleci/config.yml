@@ -31,7 +31,7 @@ executors:
     resource_class: small
   pypy311:
     docker:
-      - image: pypy:3.11-slim
+      - image: pypy:3.12-slim
     resource_class: small
   pypy312:
     docker:
