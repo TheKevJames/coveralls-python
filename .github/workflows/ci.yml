@@ -15,7 +15,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.2
         with:
           # renovate: datasource=github-releases depName=astral-sh/uv
-          version: 0.13.5
+          version: 0.13.6
           # renovate: datasource=docker depName=python
           python-version: 3.15.1
       - uses: j178/prek-action@v3.1.0
@@ -68,7 +68,7 @@ jobs:
       - uses: astral-sh/setup-uv@v10.3.2
         with:
           # renovate: datasource=github-releases depName=astral-sh/uv
-          version: 0.13.5
+          version: 0.13.6
           # renovate: datasource=docker depName=python
           python-version: 3.15.1
       - name: validate tag matches pyproject.toml
