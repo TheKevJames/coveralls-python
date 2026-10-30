@@ -112,7 +112,7 @@ recurse_submodules = false
 [tool.hatch.build.targets.wheel]
 packages = ["coveralls"]
 
-[tool.pytest.ini_options]
+[tool.pytest]
 # addopts = "-Werror"
 filterwarnings = [
     "error",
