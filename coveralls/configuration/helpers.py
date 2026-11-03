@@ -1,6 +1,7 @@
 import dataclasses
 import datetime
 import logging
+import math
 import os
 from collections.abc import Mapping
 from typing import Any
@@ -124,6 +125,8 @@ class Config:
             raise ValueError(
                 f'Invalid {name} value {raw!r}: must be a number.'
             ) from e
+        if not math.isfinite(value):
+            raise ValueError(f'Invalid {name} value {raw!r}: must be finite.')
         if value <= 0:
             raise ValueError(
                 f'Invalid {name} value {raw!r}: must be greater than 0.'

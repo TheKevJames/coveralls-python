@@ -125,6 +125,16 @@ def test_timeout_rejects_non_positive(name: str, value: int) -> None:
         configuration.Config(**kwargs)
 
 
+@pytest.mark.parametrize('name', TIMEOUT_FIELDS)
+@pytest.mark.parametrize(
+    'value', [float('nan'), float('inf'), 'nan', 'inf', '1e1000']
+)
+def test_timeout_rejects_non_finite(name: str, value: float | str) -> None:
+    kwargs: dict[str, Any] = {name: value}
+    with pytest.raises(ValueError, match='must be finite'):
+        configuration.Config(**kwargs)
+
+
 def test_request_timeout_defaults() -> None:
     assert configuration.Config().request_timeout == (
         helpers.DEFAULT_CONNECT_TIMEOUT,
