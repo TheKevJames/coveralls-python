@@ -83,7 +83,7 @@ jobs:
   # See thekevjames/tools
   docker-readme-build:
     docker:
-      - image: pandoc/core:3.11.0
+      - image: pandoc/core:3.14.0
     steps:
       - run: apk add --no-cache --no-progress ca-certificates openssl
       - run: mkdir /meta
